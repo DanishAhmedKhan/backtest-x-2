@@ -15,6 +15,8 @@ function App() {
                 width: '100vw',
                 height: '100vh',
                 display: 'grid',
+                gridTemplateColumns: '1fr',
+                gridTemplateRows: '50px 1fr',
             }}
         >
             <TopBar symbol={symbol} />

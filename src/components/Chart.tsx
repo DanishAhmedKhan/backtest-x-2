@@ -16,6 +16,7 @@ export default function Chart() {
         if (!chartContainerRef.current) return
 
         const chart: IChartApi = createChart(chartContainerRef.current, {
+            autoSize: true,
             layout: {
                 background: { color: '#0f0f0f' },
                 textColor: '#d1d4dc',
