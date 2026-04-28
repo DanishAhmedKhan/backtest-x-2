@@ -29,8 +29,6 @@ export class CsvCandleLoader {
         const files: string[] = await fetch(manifestUrl).then((res) => res.json())
         const latestFiles = files.slice(-fileCount)
 
-        console.log({ latestFiles })
-
         const candles: Candle[] = []
 
         for (const file of latestFiles) {

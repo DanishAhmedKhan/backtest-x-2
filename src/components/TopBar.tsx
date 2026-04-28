@@ -9,8 +9,8 @@ type Props = {
 }
 
 export default function TopBar({ ticker, timeframe }: Props) {
-    const onTickerChange = (value) => {}
-    const onTimeframeChange = () => {}
+    const onTickerChange = (value: string) => {}
+    const onTimeframeChange = (value: string) => {}
 
     return (
         <div

@@ -1,15 +1,7 @@
 import { useEffect, useRef } from 'react'
-import {
-    createChart,
-    CandlestickSeries,
-    CrosshairMode,
-    type IChartApi,
-    type CandlestickData,
-    type ISeriesApi,
-} from 'lightweight-charts'
-import { candleData } from '../data/sampleData'
+import { createChart, CandlestickSeries, CrosshairMode, type IChartApi } from 'lightweight-charts'
 import { Ticker } from '../core/Ticker'
-import type { Timeframe } from '../core/Timeframe'
+import { Timeframe } from '../core/Timeframe'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
 
 type Props = {
@@ -19,15 +11,6 @@ type Props = {
 
 export default function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
-
-    const fetchCandleData = async () => {
-        try {
-            const candleData2 = await CsvCandleLoader.loadData(ticker, timeframe)
-            console.log('candleData', candleData2)
-        } catch (e) {
-            console.log(e)
-        }
-    }
 
     useEffect(() => {
         if (!chartContainerRef.current) return
@@ -88,7 +71,7 @@ export default function Chart({ ticker, timeframe }: Props) {
 
                 candleSeries.setData(formatted)
             } catch (e) {
-                console.error(e)
+                console.error('Error loading candle data.')
             }
         }
 
