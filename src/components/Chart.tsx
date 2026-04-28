@@ -8,8 +8,16 @@ import {
     type ISeriesApi,
 } from 'lightweight-charts'
 import { candleData } from '../data/sampleData'
+import { Ticker } from '../core/Ticker'
+import type { Timeframe } from '../core/Timeframe'
+import { CsvCandleLoader } from '../data/CsvCandleLoader'
 
-export default function Chart() {
+type Props = {
+    ticker: Ticker
+    timeframe: Timeframe
+}
+
+export default function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -66,6 +74,9 @@ export default function Chart() {
                 minMove: 0.00001,
             },
         })
+
+        const candleData2 = CsvCandleLoader.loadData(ticker, timeframe)
+        console.log(candleData2)
 
         candleSeries.setData(candleData as CandlestickData[])
 

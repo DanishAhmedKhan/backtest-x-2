@@ -1,13 +1,9 @@
 import Chart from './components/Chart'
 import TopBar from './components/TopBar'
-import { TickerRegistry } from './core/TickerRegstry'
-import { TimeframeRegistry } from './core/TimeframeRegistry'
+import { ConfigService } from './config/ConfigService'
 
 function App() {
-    const symbol = {
-        ticker: TickerRegistry.getDefault(),
-        timeframe: TimeframeRegistry.getDefault(),
-    }
+    const config = ConfigService.getConfig()
 
     return (
         <div
@@ -19,9 +15,9 @@ function App() {
                 gridTemplateRows: '50px 1fr',
             }}
         >
-            <TopBar symbol={symbol} />
+            <TopBar ticker={config.ticker} timeframe={config.timeframe} />
 
-            <Chart />
+            <Chart ticker={config.ticker} timeframe={config.timeframe} />
         </div>
     )
 }

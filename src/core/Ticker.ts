@@ -1,27 +1,27 @@
 import { AssetType } from './AsetType'
 
 export class Ticker {
-    public readonly symbol: string
+    public readonly value: string
     public readonly assetType: AssetType
     public readonly description?: string
 
     public static DEFAULT = new Ticker('EURUSD', AssetType.FOREX)
 
-    constructor(symbol: string, assetType: AssetType = AssetType.UNKNOWN, description?: string) {
-        if (!symbol.trim()) {
-            throw new Error('Ticker symbol cannot be empty')
+    constructor(value: string, assetType: AssetType = AssetType.UNKNOWN, description?: string) {
+        if (!value.trim()) {
+            throw new Error('Ticker value cannot be empty')
         }
 
-        this.symbol = symbol.toUpperCase()
+        this.value = value.toUpperCase()
         this.assetType = assetType
         this.description = description
     }
 
     public equals(ticker: Ticker): boolean {
-        return this.symbol === ticker.symbol
+        return this.value === ticker.value
     }
 
     public toString(): string {
-        return this.symbol
+        return this.value
     }
 }
