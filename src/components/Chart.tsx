@@ -20,6 +20,15 @@ type Props = {
 export default function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
 
+    const fetchCandleData = async () => {
+        try {
+            const candleData2 = await CsvCandleLoader.loadData(ticker, timeframe)
+            console.log('candleData', candleData2)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     useEffect(() => {
         if (!chartContainerRef.current) return
 
@@ -35,16 +44,6 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
             crosshair: {
                 mode: CrosshairMode.Normal,
-                // vertLine: {
-                //     visible: true,
-                //     labelVisible: true,
-                //     width: 1,
-                // },
-                // horzLine: {
-                //     visible: true,
-                //     labelVisible: true,
-                //     width: 1,
-                // },
                 vertLine: {
                     width: 1,
                     color: '#9B7DFF',
@@ -62,7 +61,7 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
         })
 
-        const candleSeries: ISeriesApi<'Candlestick'> = chart.addSeries(CandlestickSeries, {
+        const candleSeries = chart.addSeries(CandlestickSeries, {
             upColor: '#26a69a',
             downColor: '#ef5350',
             wickUpColor: '#26a69a',
@@ -75,24 +74,30 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
         })
 
-        const candleData2 = CsvCandleLoader.loadData(ticker, timeframe)
-        console.log(candleData2)
+        const loadData = async () => {
+            try {
+                const raw = await CsvCandleLoader.loadData(ticker, timeframe)
 
-        candleSeries.setData(candleData as CandlestickData[])
+                const formatted = raw.map((c) => ({
+                    time: c.time as any,
+                    open: c.open,
+                    high: c.high,
+                    low: c.low,
+                    close: c.close,
+                }))
 
-        const handleResize = () => {
-            chart.applyOptions({
-                width: chartContainerRef.current!.clientWidth,
-            })
+                candleSeries.setData(formatted)
+            } catch (e) {
+                console.error(e)
+            }
         }
 
-        window.addEventListener('resize', handleResize)
+        loadData()
 
         return () => {
-            window.removeEventListener('resize', handleResize)
             chart.remove()
         }
-    }, [])
+    }, [ticker, timeframe])
 
     return (
         <div

@@ -6,10 +6,10 @@ import { TimeframeUnit } from '../core/TimeframeUnit'
 type FolderName = 'M' | 'H' | 'D'
 
 const ROOT_DATA_FOLDER_NAME = 'ticker-data'
-const DEFAULT_FOLDER_COUNT = 10
+const DEFAULT_FOLDER_COUNT = 2
 
 export class CsvCandleLoader {
-    public static loadData(ticker: Ticker, timeframe: Timeframe) {
+    public static async loadData(ticker: Ticker, timeframe: Timeframe) {
         let intervalFolder: FolderName
 
         const unit = timeframe.unit
@@ -17,7 +17,7 @@ export class CsvCandleLoader {
         else if (unit === TimeframeUnit.Hour) intervalFolder = 'H'
         else if (unit === TimeframeUnit.Day) intervalFolder = 'D'
 
-        return this.load(ticker.value, intervalFolder)
+        return await this.load(ticker.value, intervalFolder)
     }
 
     public static async load(
@@ -29,6 +29,8 @@ export class CsvCandleLoader {
         const files: string[] = await fetch(manifestUrl).then((res) => res.json())
         const latestFiles = files.slice(-fileCount)
 
+        console.log({ latestFiles })
+
         const candles: Candle[] = []
 
         for (const file of latestFiles) {
@@ -37,7 +39,7 @@ export class CsvCandleLoader {
             candles.push(...this.parseCsv(text))
         }
 
-        return candles.sort((a, b) => a.time - b.time)
+        return candles
     }
 
     private static parseCsv(csv: string): Candle[] {
