@@ -3,6 +3,7 @@ import { createChart, CandlestickSeries, CrosshairMode, type IChartApi } from 'l
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
+import { CandleService } from '../core/CandleService'
 
 type Props = {
     ticker: Ticker
@@ -59,7 +60,8 @@ export default function Chart({ ticker, timeframe }: Props) {
 
         const loadData = async () => {
             try {
-                const raw = await CsvCandleLoader.loadData(ticker, timeframe)
+                // const raw = await CsvCandleLoader.loadData(ticker, timeframe)
+                const raw = await CandleService.getCandles(ticker, timeframe)
 
                 const formatted = raw.map((c) => ({
                     time: c.time as any,

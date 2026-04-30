@@ -1,7 +1,7 @@
 import { Candle } from '../core/Candle'
 
 export class CandleAggregator {
-    public static aggregateCandles(candles: Candle[], intervalMinutes: number): Candle[] {
+    public static aggregate(candles: Candle[], intervalMinutes: number): Candle[] {
         if (!candles.length) return []
 
         const result: Candle[] = []
