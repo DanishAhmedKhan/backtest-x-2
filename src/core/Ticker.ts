@@ -17,11 +17,15 @@ export class Ticker {
         this.description = description
     }
 
-    public equals(ticker: Ticker): boolean {
-        return this.value === ticker.value
+    public toKey(): string {
+        return `${this.value}`
     }
 
     public toString(): string {
         return this.value
+    }
+
+    public equals(ticker?: Ticker): boolean {
+        return this.value === ticker?.value
     }
 }

@@ -24,7 +24,7 @@ export class Timeframe {
     }
 
     get label() {
-        return this.value + this.unit
+        return `${this.value}${this.unit}`
     }
 
     public static parse(tf: string): Timeframe {
@@ -72,7 +72,7 @@ export class Timeframe {
         }
     }
 
-    public toString(): string {
+    public toKey(): string {
         return `${this.value}${this.unit}`
     }
 

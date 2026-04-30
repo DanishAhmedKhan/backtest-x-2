@@ -1,9 +1,17 @@
+import { useEffect, useState } from 'react'
 import Chart from './components/Chart'
 import TopBar from './components/TopBar'
 import { ConfigService } from './config/ConfigService'
+import type { Ticker } from './core/Ticker'
+import type { Timeframe } from './core/Timeframe'
 
 function App() {
-    const config = ConfigService.getConfig()
+    const [ticker, setTicker] = useState<Ticker>(ConfigService.getConfig().ticker)
+    const [timeframe, setTimeframe] = useState<Timeframe>(ConfigService.getConfig().timeframe)
+
+    useEffect(() => {
+        ConfigService.updateConfig({ ticker, timeframe })
+    }, [ticker, timeframe])
 
     return (
         <div
@@ -15,9 +23,9 @@ function App() {
                 gridTemplateRows: '50px 1fr',
             }}
         >
-            <TopBar ticker={config.ticker} timeframe={config.timeframe} />
+            <TopBar ticker={ticker} timeframe={timeframe} onTickerChange={setTicker} onTimeframeChange={setTimeframe} />
 
-            <Chart ticker={config.ticker} timeframe={config.timeframe} />
+            <Chart ticker={ticker} timeframe={timeframe} />
         </div>
     )
 }

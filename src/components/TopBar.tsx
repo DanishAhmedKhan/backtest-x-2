@@ -6,32 +6,49 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 type Props = {
     ticker: Ticker
     timeframe: Timeframe
+    onTickerChange: (ticker: Ticker) => void
+    onTimeframeChange: (timeframe: Timeframe) => void
 }
 
-export default function TopBar({ ticker, timeframe }: Props) {
-    const onTickerChange = (value: string) => {}
-    const onTimeframeChange = (value: string) => {}
+export default function TopBar({ ticker, timeframe, onTickerChange, onTimeframeChange }: Props) {
+    const handleTickerChange = (value: string) => {
+        const selected = TickerRegistry.getByValue(value)
+        if (selected && !selected.equals(ticker)) {
+            onTickerChange(selected)
+        }
+    }
+
+    const handleTimeframeChange = (value: string) => {
+        const selected = TimeframeRegistry.getByValue(value)
+        if (selected && !selected.equals(timeframe)) {
+            onTimeframeChange(selected)
+        }
+    }
 
     return (
         <div
             style={{
                 display: 'flex',
+                alignItems: 'center',
                 gap: '10px',
                 padding: '10px',
-                borderBottom: '1px solid #ccc',
+                borderBottom: '1px solid #222',
+                background: '#0f0f0f',
             }}
         >
-            <select value={ticker.value} onChange={(e) => onTickerChange(e.target.value)}>
+            {/* Ticker */}
+            <select value={ticker.value} onChange={(e) => handleTickerChange(e.target.value)}>
                 {TickerRegistry.getAll().map((tkr) => (
-                    <option key={tkr.value} value={tkr.value}>
+                    <option key={tkr.toKey()} value={tkr.value}>
                         {tkr.value}
                     </option>
                 ))}
             </select>
 
-            <select value={timeframe.value} onChange={(e) => onTimeframeChange(e.target.value)}>
+            {/* Timeframe */}
+            <select value={timeframe.toString()} onChange={(e) => handleTimeframeChange(e.target.value)}>
                 {TimeframeRegistry.getAll().map((tf) => (
-                    <option key={tf.value} value={tf.value}>
+                    <option key={tf.toKey()} value={tf.toString()}>
                         {tf.label}
                     </option>
                 ))}
