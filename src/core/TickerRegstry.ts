@@ -19,4 +19,8 @@ export class TickerRegistry {
     static register(ticker: Ticker) {
         this.tickers.push(ticker)
     }
+
+    static getByValue(value: string): Ticker | undefined {
+        return this.tickers.find((t) => t.value === value)
+    }
 }

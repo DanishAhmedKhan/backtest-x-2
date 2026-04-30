@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { createChart, CandlestickSeries, CrosshairMode, type IChartApi } from 'lightweight-charts'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
-import { CsvCandleLoader } from '../data/CsvCandleLoader'
 import { CandleService } from '../core/CandleService'
 
 type Props = {
@@ -60,7 +59,6 @@ export default function Chart({ ticker, timeframe }: Props) {
 
         const loadData = async () => {
             try {
-                // const raw = await CsvCandleLoader.loadData(ticker, timeframe)
                 const raw = await CandleService.getCandles(ticker, timeframe)
 
                 const formatted = raw.map((c) => ({
@@ -89,6 +87,8 @@ export default function Chart({ ticker, timeframe }: Props) {
             style={{
                 width: '100%',
                 height: '100%',
+                minHeight: 0,
+                minWidth: 0,
             }}
             ref={chartContainerRef}
         />

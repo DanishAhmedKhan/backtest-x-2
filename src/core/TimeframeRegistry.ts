@@ -18,4 +18,8 @@ export class TimeframeRegistry {
     static getDefault(): Timeframe {
         return this.timeframes[0]
     }
+
+    static getByValue(value: string): Timeframe | undefined {
+        return this.timeframes.find((tf) => tf.toString() === value)
+    }
 }
