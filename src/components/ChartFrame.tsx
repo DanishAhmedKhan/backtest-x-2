@@ -1,5 +1,5 @@
-import type { ChartState } from '../core/ChartState'
 import Chart from './Chart'
+import type { ChartState } from '../types/ChartState'
 
 type Props = {
     chart: ChartState
@@ -12,12 +12,11 @@ export default function ChartFrame({ chart, isActive, onSelect }: Props) {
         <div
             onClick={onSelect}
             style={{
-                border: isActive ? '2px solid #9B7DFF' : '1px solid #333',
-                height: '100%',
+                border: '1px solid #333',
+                boxShadow: isActive ? 'inset 0 0 0 2px #9B7DFF' : 'none',
                 minHeight: 0,
                 minWidth: 0,
                 overflow: 'hidden',
-                boxSizing: 'border-box',
             }}
         >
             <Chart ticker={chart.ticker} timeframe={chart.timeframe} />

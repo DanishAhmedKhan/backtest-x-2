@@ -1,57 +1,54 @@
-import type { Ticker } from '../core/Ticker'
-import type { Timeframe } from '../core/Timeframe'
+import { Ticker } from '../core/Ticker'
+import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
+import type { LayoutType } from '../types/Layout'
 
 type Props = {
     ticker: Ticker
     timeframe: Timeframe
-    onTickerChange: (ticker: Ticker) => void
-    onTimeframeChange: (timeframe: Timeframe) => void
+    layout: LayoutType
+    onTickerChange: (t: Ticker) => void
+    onTimeframeChange: (t: Timeframe) => void
+    onLayoutChange: (l: LayoutType) => void
 }
 
-export default function TopBar({ ticker, timeframe, onTickerChange, onTimeframeChange }: Props) {
-    const handleTickerChange = (value: string) => {
-        const selected = TickerRegistry.getByValue(value)
-        if (selected && !selected.equals(ticker)) {
-            onTickerChange(selected)
-        }
-    }
-
-    const handleTimeframeChange = (value: string) => {
-        const selected = TimeframeRegistry.getByValue(value)
-        if (selected && !selected.equals(timeframe)) {
-            onTimeframeChange(selected)
-        }
-    }
-
+export default function TopBar({
+    ticker,
+    timeframe,
+    layout,
+    onTickerChange,
+    onTimeframeChange,
+    onLayoutChange,
+}: Props) {
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px',
-                borderBottom: '1px solid #222',
-                background: '#0f0f0f',
-            }}
-        >
+        <div style={{ display: 'flex', gap: 10, padding: 10 }}>
             {/* Ticker */}
-            <select value={ticker.value} onChange={(e) => handleTickerChange(e.target.value)}>
-                {TickerRegistry.getAll().map((tkr) => (
-                    <option key={tkr.toKey()} value={tkr.value}>
-                        {tkr.value}
+            <select value={ticker.value} onChange={(e) => onTickerChange(TickerRegistry.getByValue(e.target.value)!)}>
+                {TickerRegistry.getAll().map((t) => (
+                    <option key={t.value} value={t.value}>
+                        {t.value}
                     </option>
                 ))}
             </select>
 
             {/* Timeframe */}
-            <select value={timeframe.toString()} onChange={(e) => handleTimeframeChange(e.target.value)}>
+            <select
+                value={timeframe.toString()}
+                onChange={(e) => onTimeframeChange(TimeframeRegistry.getByValue(e.target.value)!)}
+            >
                 {TimeframeRegistry.getAll().map((tf) => (
-                    <option key={tf.toKey()} value={tf.toString()}>
+                    <option key={tf.toString()} value={tf.toString()}>
                         {tf.label}
                     </option>
                 ))}
+            </select>
+
+            {/* Layout */}
+            <select value={layout} onChange={(e) => onLayoutChange(e.target.value as LayoutType)}>
+                <option value="1x1">1 Chart</option>
+                <option value="2x1">2 Charts</option>
+                <option value="2x2">4 Charts</option>
             </select>
         </div>
     )

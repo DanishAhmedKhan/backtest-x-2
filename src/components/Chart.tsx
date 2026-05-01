@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createChart, CandlestickSeries, CrosshairMode, type IChartApi } from 'lightweight-charts'
+import { createChart, CandlestickSeries, CrosshairMode, type IChartApi, type ISeriesApi } from 'lightweight-charts'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CandleService } from '../core/CandleService'
@@ -11,11 +11,13 @@ type Props = {
 
 export default function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
+    const chartRef = useRef<IChartApi | null>(null)
+    const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
 
     useEffect(() => {
         if (!chartContainerRef.current) return
 
-        const chart: IChartApi = createChart(chartContainerRef.current, {
+        const chart = createChart(chartContainerRef.current, {
             autoSize: true,
             layout: {
                 background: { color: '#0f0f0f' },
@@ -44,7 +46,7 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
         })
 
-        const candleSeries = chart.addSeries(CandlestickSeries, {
+        const series = chart.addSeries(CandlestickSeries, {
             upColor: '#26a69a',
             downColor: '#ef5350',
             wickUpColor: '#26a69a',
@@ -57,7 +59,33 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
         })
 
+        chartRef.current = chart
+        seriesRef.current = series
+
+        const observer = new ResizeObserver(() => {
+            if (!chartContainerRef.current || !chartRef.current) return
+
+            const width = Math.floor(chartContainerRef.current.clientWidth)
+            const height = Math.floor(chartContainerRef.current.clientHeight)
+
+            chartRef.current.applyOptions({
+                width,
+                height,
+            })
+        })
+
+        observer.observe(chartContainerRef.current)
+
+        return () => {
+            observer.disconnect()
+            chart.remove()
+        }
+    }, [])
+
+    useEffect(() => {
         const loadData = async () => {
+            if (!seriesRef.current) return
+
             try {
                 const raw = await CandleService.getCandles(ticker, timeframe)
 
@@ -69,28 +97,27 @@ export default function Chart({ ticker, timeframe }: Props) {
                     close: c.close,
                 }))
 
-                candleSeries.setData(formatted)
+                seriesRef.current.setData(formatted)
+
+                chartRef.current?.timeScale().fitContent()
             } catch (e) {
-                console.error('Error loading candle data.')
+                console.error('Error loading candle data.', e)
             }
         }
 
         loadData()
-
-        return () => {
-            chart.remove()
-        }
     }, [ticker, timeframe])
 
     return (
         <div
+            ref={chartContainerRef}
             style={{
+                display: 'block',
                 width: '100%',
                 height: '100%',
                 minHeight: 0,
                 minWidth: 0,
             }}
-            ref={chartContainerRef}
         />
     )
 }

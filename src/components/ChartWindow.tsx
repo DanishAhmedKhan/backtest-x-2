@@ -1,58 +1,41 @@
-import { useState } from 'react'
 import ChartFrame from './ChartFrame'
-import TopBar from './TopBar'
-import { TickerRegistry } from '../core/TickerRegstry'
-import { TimeframeRegistry } from '../core/TimeframeRegistry'
-import type { ChartState } from '../core/ChartState'
+import type { ChartState } from '../types/ChartState'
+import type { LayoutType } from '../types/Layout'
 
-export default function ChartWindow() {
-    const [charts, setCharts] = useState<ChartState[]>([
-        {
-            id: 'chart-1',
-            ticker: TickerRegistry.getDefault(),
-            timeframe: TimeframeRegistry.getDefault(),
-        },
-        {
-            id: 'chart-2',
-            ticker: TickerRegistry.getDefault(),
-            timeframe: TimeframeRegistry.getDefault(),
-        },
-    ])
+type Props = {
+    charts: ChartState[]
+    activeChartId: string
+    onSelectChart: (id: string) => void
+    layout: LayoutType
+}
 
-    const [activeChartId, setActiveChartId] = useState('chart-1')
-
-    const activeChart = charts.find((c) => c.id === activeChartId)!
-
-    const updateActiveChart = (partial: Partial<ChartState>) => {
-        setCharts((prev) => prev.map((c) => (c.id === activeChartId ? { ...c, ...partial } : c)))
+export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
+    const layoutMap = {
+        '1x1': '1fr / 1fr',
+        '2x1': '1fr / 1fr 1fr',
+        '2x2': '1fr 1fr / 1fr 1fr',
     }
+
+    const [rows, cols] = layoutMap[layout].split(' / ')
 
     return (
         <div
             style={{
-                height: '100%',
                 display: 'grid',
-                gridTemplateRows: '50px 1fr',
+                gridTemplateRows: rows,
+                gridTemplateColumns: cols,
+                height: '100%',
                 overflow: 'hidden',
             }}
         >
-            <TopBar
-                ticker={activeChart.ticker}
-                timeframe={activeChart.timeframe}
-                onTickerChange={(t) => updateActiveChart({ ticker: t })}
-                onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
-            />
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                {charts.map((chart) => (
-                    <ChartFrame
-                        key={chart.id}
-                        chart={chart}
-                        isActive={chart.id === activeChartId}
-                        onSelect={() => setActiveChartId(chart.id)}
-                    />
-                ))}
-            </div>
+            {charts.map((chart) => (
+                <ChartFrame
+                    key={chart.id}
+                    chart={chart}
+                    isActive={chart.id === activeChartId}
+                    onSelect={() => onSelectChart(chart.id)}
+                />
+            ))}
         </div>
     )
 }
