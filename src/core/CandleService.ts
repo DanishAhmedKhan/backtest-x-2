@@ -3,32 +3,34 @@ import type { Timeframe } from './Timeframe'
 import { CandleAggregator } from '../data/CandleAggregator'
 import { candleCache } from '../data/CandleCache'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
+import type { Candle } from './Candle'
 
 export class CandleService {
     static async getCandles(ticker: Ticker, timeframe: Timeframe) {
-        const key = `${ticker.value}_${timeframe.label}`
+        const key = `${ticker.value}_${timeframe.toKey()}`
+        console.log(key)
 
         if (candleCache.has(key)) {
             return candleCache.get(key)!
         }
 
-        let baseData
+        const tfSeconds = timeframe.toSeconds()
 
-        const tf = Number(timeframe.value)
+        let baseData: Candle[]
 
-        if (tf < 60) {
+        if (tfSeconds < 3600) {
             baseData = await CsvCandleLoader.load(ticker.value, 'M')
         } else {
             baseData = await CsvCandleLoader.load(ticker.value, 'H')
         }
 
-        let result
+        let result: Candle[]
 
-        if (tf === 1 || tf === 60) {
+        if (tfSeconds === 60 || tfSeconds === 3600) {
             result = baseData
         } else {
-            const interval = tf < 60 ? tf : (tf / 60) * 60
-            result = CandleAggregator.aggregate(baseData, interval)
+            const intervalMinutes = tfSeconds / 60
+            result = CandleAggregator.aggregate(baseData, intervalMinutes)
         }
 
         candleCache.set(key, result)

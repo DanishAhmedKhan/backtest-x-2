@@ -4,46 +4,40 @@ export class CandleAggregator {
     public static aggregate(candles: Candle[], intervalMinutes: number): Candle[] {
         if (!candles.length) return []
 
-        const result: Candle[] = []
+        const intervalSec = intervalMinutes * 60
 
-        let bucket: Candle[] = []
-        let currentBucketStart = this.alignTime(candles[0].time, intervalMinutes)
+        const sorted = candles.slice().sort((a, b) => a.time - b.time)
 
-        for (const candle of candles) {
-            const bucketStart = this.alignTime(candle.time, intervalMinutes)
+        const buckets = new Map<number, Candle[]>()
 
-            if (bucketStart !== currentBucketStart) {
-                result.push(this.buildCandle(bucket))
-                bucket = []
-                currentBucketStart = bucketStart
+        for (const candle of sorted) {
+            const bucketTime = Math.floor(candle.time / intervalSec) * intervalSec
+
+            if (!buckets.has(bucketTime)) {
+                buckets.set(bucketTime, [])
             }
 
-            bucket.push(candle)
+            buckets.get(bucketTime)!.push(candle)
         }
 
-        if (bucket.length) {
-            result.push(this.buildCandle(bucket))
+        const result: Candle[] = []
+
+        for (const [bucketTime, group] of buckets) {
+            const first = group[0]
+            const last = group[group.length - 1]
+
+            result.push(
+                new Candle({
+                    time: bucketTime,
+                    open: first.open,
+                    high: Math.max(...group.map((c) => c.high)),
+                    low: Math.min(...group.map((c) => c.low)),
+                    close: last.close,
+                    volume: group.reduce((sum, c) => sum + c.volume, 0),
+                }),
+            )
         }
 
-        return result
-    }
-
-    private static alignTime(timestamp: number, intervalMinutes: number) {
-        const intervalSec = intervalMinutes * 60
-        return Math.floor(timestamp / intervalSec) * intervalSec
-    }
-
-    private static buildCandle(candles: Candle[]): Candle {
-        const first = candles[0]
-        const last = candles[candles.length - 1]
-
-        return new Candle({
-            time: first.time,
-            open: first.open,
-            high: Math.max(...candles.map((c) => c.high)),
-            low: Math.min(...candles.map((c) => c.low)),
-            close: last.close,
-            volume: candles.reduce((sum, c) => sum + c.volume, 0),
-        })
+        return result.sort((a, b) => a.time - b.time)
     }
 }

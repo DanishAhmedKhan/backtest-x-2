@@ -83,6 +83,8 @@ export default function Chart({ ticker, timeframe }: Props) {
     }, [])
 
     useEffect(() => {
+        console.log(ticker.toKey(), timeframe.toKey())
+
         const loadData = async () => {
             if (!seriesRef.current) return
 
@@ -96,6 +98,7 @@ export default function Chart({ ticker, timeframe }: Props) {
                     low: c.low,
                     close: c.close,
                 }))
+                console.log('Candles count:', formatted.length)
 
                 seriesRef.current.setData(formatted)
 

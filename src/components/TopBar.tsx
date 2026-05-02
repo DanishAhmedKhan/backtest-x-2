@@ -23,8 +23,12 @@ export default function TopBar({
 }: Props) {
     return (
         <div style={{ display: 'flex', gap: 10, padding: 10 }}>
-            {/* Ticker */}
-            <select value={ticker.value} onChange={(e) => onTickerChange(TickerRegistry.getByValue(e.target.value)!)}>
+            <select
+                value={ticker.value}
+                onChange={(e) => {
+                    onTickerChange(TickerRegistry.getByValue(e.target.value)!)
+                }}
+            >
                 {TickerRegistry.getAll().map((t) => (
                     <option key={t.value} value={t.value}>
                         {t.value}
@@ -32,19 +36,19 @@ export default function TopBar({
                 ))}
             </select>
 
-            {/* Timeframe */}
             <select
-                value={timeframe.toString()}
-                onChange={(e) => onTimeframeChange(TimeframeRegistry.getByValue(e.target.value)!)}
+                value={timeframe.toKey()}
+                onChange={(e) => {
+                    onTimeframeChange(Timeframe.parse(e.target.value))
+                }}
             >
                 {TimeframeRegistry.getAll().map((tf) => (
-                    <option key={tf.toString()} value={tf.toString()}>
+                    <option key={tf.toKey()} value={tf.toKey()}>
                         {tf.label}
                     </option>
                 ))}
             </select>
 
-            {/* Layout */}
             <select value={layout} onChange={(e) => onLayoutChange(e.target.value as LayoutType)}>
                 <option value="1x1">1 Chart</option>
                 <option value="2x1">2 Charts</option>
