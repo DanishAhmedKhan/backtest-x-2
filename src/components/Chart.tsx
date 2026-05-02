@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { createChart, CandlestickSeries, CrosshairMode, type IChartApi, type ISeriesApi } from 'lightweight-charts'
+
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CandleService } from '../core/CandleService'
@@ -13,6 +14,10 @@ export default function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
     const chartRef = useRef<IChartApi | null>(null)
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
+
+    const allCandlesRef = useRef<any[]>([])
+    const fileIndexRef = useRef<number>(0)
+    const loadingRef = useRef(false)
 
     useEffect(() => {
         if (!chartContainerRef.current) return
@@ -62,64 +67,99 @@ export default function Chart({ ticker, timeframe }: Props) {
         chartRef.current = chart
         seriesRef.current = series
 
-        const observer = new ResizeObserver(() => {
-            if (!chartContainerRef.current || !chartRef.current) return
-
-            const width = Math.floor(chartContainerRef.current.clientWidth)
-            const height = Math.floor(chartContainerRef.current.clientHeight)
-
-            chartRef.current.applyOptions({
-                width,
-                height,
-            })
-        })
-
-        observer.observe(chartContainerRef.current)
-
         return () => {
-            observer.disconnect()
             chart.remove()
         }
     }, [])
 
     useEffect(() => {
-        console.log(ticker.toKey(), timeframe.toKey())
-
-        const loadData = async () => {
+        const loadInitial = async () => {
             if (!seriesRef.current) return
 
-            try {
-                const raw = await CandleService.getCandles(ticker, timeframe)
+            const raw = await CandleService.getCandles(ticker, timeframe)
 
-                const formatted = raw.map((c) => ({
-                    time: c.time as any,
-                    open: c.open,
-                    high: c.high,
-                    low: c.low,
-                    close: c.close,
-                }))
-                console.log('Candles count:', formatted.length)
+            const formatted = raw.map((c) => ({
+                time: c.time as any,
+                open: c.open,
+                high: c.high,
+                low: c.low,
+                close: c.close,
+            }))
 
-                seriesRef.current.setData(formatted)
+            allCandlesRef.current = formatted
 
-                chartRef.current?.timeScale().fitContent()
-            } catch (e) {
-                console.error('Error loading candle data.', e)
+            fileIndexRef.current = 100 - 2
+
+            seriesRef.current.setData(formatted)
+            chartRef.current?.timeScale().fitContent()
+        }
+
+        loadInitial()
+    }, [ticker, timeframe])
+
+    const loadMore = async () => {
+        if (loadingRef.current) return
+        loadingRef.current = true
+
+        const chart = chartRef.current
+        if (!chart) return
+
+        const more = await CandleService.getOlderCandles(ticker, timeframe, fileIndexRef.current - 2, 2)
+
+        fileIndexRef.current -= 2
+
+        const formatted = more.map((c) => ({
+            time: c.time as any,
+            open: c.open,
+            high: c.high,
+            low: c.low,
+            close: c.close,
+        }))
+
+        const logicalRange = chart.timeScale().getVisibleLogicalRange()
+
+        allCandlesRef.current = [...formatted, ...allCandlesRef.current]
+
+        seriesRef.current?.setData(allCandlesRef.current)
+
+        if (logicalRange) {
+            chart.timeScale().setVisibleLogicalRange({
+                from: logicalRange.from + formatted.length,
+                to: logicalRange.to + formatted.length,
+            })
+        }
+
+        loadingRef.current = false
+    }
+
+    useEffect(() => {
+        if (!chartRef.current) return
+
+        const timeScale = chartRef.current.timeScale()
+
+        const handler = async () => {
+            const range = timeScale.getVisibleLogicalRange()
+            if (!range) return
+
+            if (range.from < 10) {
+                console.log('Loading more...')
+                await loadMore()
             }
         }
 
-        loadData()
+        timeScale.subscribeVisibleLogicalRangeChange(handler)
+
+        return () => {
+            timeScale.unsubscribeVisibleLogicalRangeChange(handler)
+        }
     }, [ticker, timeframe])
 
     return (
         <div
             ref={chartContainerRef}
             style={{
-                display: 'block',
                 width: '100%',
                 height: '100%',
-                minHeight: 0,
-                minWidth: 0,
             }}
         />
     )
