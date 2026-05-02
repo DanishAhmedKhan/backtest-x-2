@@ -1,6 +1,13 @@
-import { useEffect, useRef } from 'react'
-import { createChart, CandlestickSeries, CrosshairMode, type IChartApi, type ISeriesApi } from 'lightweight-charts'
-
+import { useEffect, useRef, useCallback } from 'react'
+import {
+    createChart,
+    CandlestickSeries,
+    CrosshairMode,
+    type CandlestickData,
+    type Time,
+    type IChartApi,
+    type ISeriesApi,
+} from 'lightweight-charts'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CandleService } from '../core/CandleService'
@@ -15,7 +22,7 @@ export default function Chart({ ticker, timeframe }: Props) {
     const chartRef = useRef<IChartApi | null>(null)
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
 
-    const allCandlesRef = useRef<any[]>([])
+    const allCandlesRef = useRef<CandlestickData<Time>[]>([])
     const fileIndexRef = useRef<number>(0)
     const loadingRef = useRef(false)
 
@@ -79,7 +86,7 @@ export default function Chart({ ticker, timeframe }: Props) {
             const raw = await CandleService.getCandles(ticker, timeframe)
 
             const formatted = raw.map((c) => ({
-                time: c.time as any,
+                time: c.time as Time,
                 open: c.open,
                 high: c.high,
                 low: c.low,
@@ -97,7 +104,7 @@ export default function Chart({ ticker, timeframe }: Props) {
         loadInitial()
     }, [ticker, timeframe])
 
-    const loadMore = async () => {
+    const loadMore = useCallback(async () => {
         if (loadingRef.current) return
         loadingRef.current = true
 
@@ -109,7 +116,7 @@ export default function Chart({ ticker, timeframe }: Props) {
         fileIndexRef.current -= 2
 
         const formatted = more.map((c) => ({
-            time: c.time as any,
+            time: c.time as Time,
             open: c.open,
             high: c.high,
             low: c.low,
@@ -130,7 +137,7 @@ export default function Chart({ ticker, timeframe }: Props) {
         }
 
         loadingRef.current = false
-    }
+    }, [ticker, timeframe])
 
     useEffect(() => {
         if (!chartRef.current) return
@@ -152,7 +159,7 @@ export default function Chart({ ticker, timeframe }: Props) {
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [ticker, timeframe])
+    }, [loadMore])
 
     return (
         <div
