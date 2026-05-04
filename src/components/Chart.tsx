@@ -8,6 +8,7 @@ import {
     type IChartApi,
     type ISeriesApi,
 } from 'lightweight-charts'
+
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CandleService } from '../core/CandleService'
@@ -24,7 +25,11 @@ export default function Chart({ ticker, timeframe }: Props) {
 
     const allCandlesRef = useRef<CandlestickData<Time>[]>([])
     const fileIndexRef = useRef<number>(0)
+
     const loadingRef = useRef(false)
+    const lastLoadRef = useRef(0)
+
+    const LOAD_COOLDOWN = 500
 
     useEffect(() => {
         if (!chartContainerRef.current) return
@@ -41,20 +46,9 @@ export default function Chart({ ticker, timeframe }: Props) {
             },
             crosshair: {
                 mode: CrosshairMode.Normal,
-                vertLine: {
-                    width: 1,
-                    color: '#9B7DFF',
-                    labelBackgroundColor: '#000',
-                },
-                horzLine: {
-                    width: 1,
-                    color: '#9B7DFF',
-                    labelBackgroundColor: '#000',
-                },
             },
             timeScale: {
                 timeVisible: true,
-                secondsVisible: false,
             },
         })
 
@@ -64,28 +58,24 @@ export default function Chart({ ticker, timeframe }: Props) {
             wickUpColor: '#26a69a',
             wickDownColor: '#ef5350',
             borderVisible: false,
-            priceFormat: {
-                type: 'price',
-                precision: 5,
-                minMove: 0.00001,
-            },
+            priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
         })
 
         chartRef.current = chart
         seriesRef.current = series
 
-        return () => {
-            chart.remove()
-        }
+        return () => chart.remove()
     }, [])
 
     useEffect(() => {
         const loadInitial = async () => {
             if (!seriesRef.current) return
 
+            console.log('Loading initial data...')
+
             const raw = await CandleService.getCandles(ticker, timeframe)
 
-            const formatted = raw.map((c) => ({
+            const formatted: CandlestickData<Time>[] = raw.map((c) => ({
                 time: c.time as Time,
                 open: c.open,
                 high: c.high,
@@ -95,27 +85,58 @@ export default function Chart({ ticker, timeframe }: Props) {
 
             allCandlesRef.current = formatted
 
-            fileIndexRef.current = 100 - 2
+            const totalFiles = await CandleService.getTotalFiles(ticker)
+            fileIndexRef.current = totalFiles - 2
+
+            console.log('Total files:', totalFiles)
 
             seriesRef.current.setData(formatted)
-            chartRef.current?.timeScale().fitContent()
+
+            const chart = chartRef.current
+            if (!chart) return
+
+            chart.timeScale().scrollToRealTime()
         }
 
         loadInitial()
     }, [ticker, timeframe])
 
     const loadMore = useCallback(async () => {
+        const now = Date.now()
+
         if (loadingRef.current) return
+        if (now - lastLoadRef.current < LOAD_COOLDOWN) return
+        if (fileIndexRef.current <= 0) {
+            console.log('No more history')
+            return
+        }
+
         loadingRef.current = true
+        lastLoadRef.current = now
 
         const chart = chartRef.current
         if (!chart) return
 
-        const more = await CandleService.getOlderCandles(ticker, timeframe, fileIndexRef.current - 2, 2)
+        const start = fileIndexRef.current - 2
 
-        fileIndexRef.current -= 2
+        if (start < 0) {
+            loadingRef.current = false
+            return
+        }
 
-        const formatted = more.map((c) => ({
+        console.log('Loading files from index:', start)
+
+        const more = await CandleService.getOlderCandles(ticker, timeframe, start, 2)
+
+        if (!more.length) {
+            console.warn('No candles returned')
+            loadingRef.current = false
+            return
+        }
+
+        fileIndexRef.current = start
+
+        const formatted: CandlestickData<Time>[] = more.map((c) => ({
             time: c.time as Time,
             open: c.open,
             high: c.high,
@@ -123,11 +144,22 @@ export default function Chart({ ticker, timeframe }: Props) {
             close: c.close,
         }))
 
+        formatted.sort((a, b) => Number(a.time) - Number(b.time))
+
+        console.log('Loaded range:', formatted[0].time, '→', formatted[formatted.length - 1].time)
+
         const logicalRange = chart.timeScale().getVisibleLogicalRange()
 
-        allCandlesRef.current = [...formatted, ...allCandlesRef.current]
+        const merged = [...formatted, ...allCandlesRef.current]
 
-        seriesRef.current?.setData(allCandlesRef.current)
+        const map = new Map<number, CandlestickData<Time>>()
+        for (const c of merged) {
+            map.set(Number(c.time), c)
+        }
+
+        allCandlesRef.current = Array.from(map.values()).sort((a, b) => Number(a.time) - Number(b.time))
+
+        seriesRef.current.setData(allCandlesRef.current)
 
         if (logicalRange) {
             chart.timeScale().setVisibleLogicalRange({
@@ -140,16 +172,19 @@ export default function Chart({ ticker, timeframe }: Props) {
     }, [ticker, timeframe])
 
     useEffect(() => {
-        if (!chartRef.current) return
+        const chart = chartRef.current
+        if (!chart) return
 
-        const timeScale = chartRef.current.timeScale()
+        const timeScale = chart.timeScale()
 
         const handler = async () => {
             const range = timeScale.getVisibleLogicalRange()
             if (!range) return
 
-            if (range.from < 10) {
-                console.log('Loading more...')
+            const barsBefore = range.from
+
+            if (barsBefore < 30 && !loadingRef.current) {
+                console.log('Preloading more...')
                 await loadMore()
             }
         }
@@ -161,13 +196,5 @@ export default function Chart({ ticker, timeframe }: Props) {
         }
     }, [loadMore])
 
-    return (
-        <div
-            ref={chartContainerRef}
-            style={{
-                width: '100%',
-                height: '100%',
-            }}
-        />
-    )
+    return <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
 }
