@@ -22,7 +22,15 @@ export default function TopBar({
     onLayoutChange,
 }: Props) {
     return (
-        <div style={{ display: 'flex', gap: 10, padding: 10 }}>
+        <div
+            style={{
+                display: 'flex',
+                gap: 10,
+                padding: 10,
+                backgroundColor: '#fff',
+                height: '100%',
+            }}
+        >
             <select
                 value={ticker.value}
                 onChange={(e) => {

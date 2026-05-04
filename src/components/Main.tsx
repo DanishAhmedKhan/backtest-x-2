@@ -46,7 +46,10 @@ export default function Main() {
                 display: 'grid',
                 gridTemplateRows: '50px 1fr',
                 gridTemplateColumns: '60px 1fr',
-                height: '100%',
+                gap: '10px',
+                height: '100vh',
+                overflow: 'hidden',
+                backgroundColor: '#aaa',
             }}
         >
             <div style={{ gridColumn: '1 / span 2' }}>
