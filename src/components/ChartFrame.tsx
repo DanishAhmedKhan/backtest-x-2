@@ -19,7 +19,7 @@ export default function ChartFrame({ chart, isActive, onSelect }: Props) {
                 minWidth: 0,
                 minHeight: 0,
 
-                border: isActive ? '3px solid red' : '3px solid black',
+                border: isActive ? '3px solid #0051ff' : '3px solid black',
 
                 // borderRadius: '4px',
                 // boxShadow: isActive ? 'inset 0 0 0 1px red' : 'none',
@@ -27,7 +27,7 @@ export default function ChartFrame({ chart, isActive, onSelect }: Props) {
             }}
         >
             {/* top highlight bar (TradingView style) */}
-            {isActive && (
+            {/* {isActive && (
                 <div
                     style={{
                         position: 'absolute',
@@ -39,7 +39,7 @@ export default function ChartFrame({ chart, isActive, onSelect }: Props) {
                         zIndex: 10,
                     }}
                 />
-            )}
+            )} */}
 
             <Chart ticker={chart.ticker} timeframe={chart.timeframe} />
         </div>

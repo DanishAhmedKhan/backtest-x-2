@@ -21,8 +21,6 @@ export class CsvCandleLoader {
 
         const selectedFiles = files.slice(-fileCount)
 
-        console.log('Initial load files:', selectedFiles)
-
         const candles: Candle[] = []
 
         for (const file of selectedFiles) {
@@ -47,8 +45,6 @@ export class CsvCandleLoader {
         const safeStart = Math.max(0, startIndex)
 
         const selectedFiles = files.slice(safeStart, safeStart + count)
-
-        console.log('Chunk load files:', selectedFiles)
 
         if (selectedFiles.length === 0) {
             console.warn('No files selected (index out of range)')

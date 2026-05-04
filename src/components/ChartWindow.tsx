@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import ChartFrame from './ChartFrame'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
@@ -13,13 +13,22 @@ type Props = {
 export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
     const [split, setSplit] = useState(50)
 
+    const containerRef = useRef<HTMLDivElement | null>(null)
+
     const startDrag = (e: React.MouseEvent) => {
-        const startX = e.clientX
+        e.preventDefault()
+
+        const container = containerRef.current
+        if (!container) return
+
+        const rect = container.getBoundingClientRect()
 
         const onMove = (moveEvent: MouseEvent) => {
-            const dx = moveEvent.clientX - startX
-            const newSplit = Math.min(80, Math.max(20, split + dx * 0.1))
-            setSplit(newSplit)
+            const x = moveEvent.clientX - rect.left
+            const percentage = (x / rect.width) * 100
+
+            const clamped = Math.min(80, Math.max(20, percentage))
+            setSplit(clamped)
         }
 
         const onUp = () => {
@@ -33,18 +42,28 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
 
     if (layout === '1x1') {
         return (
-            <ChartFrame
-                chart={charts[0]}
-                isActive={charts[0].id === activeChartId}
-                onSelect={() => onSelectChart(charts[0].id)}
-            />
+            <div ref={containerRef} style={{ height: '100%', width: '100%' }}>
+                <ChartFrame
+                    chart={charts[0]}
+                    isActive={charts[0].id === activeChartId}
+                    onSelect={() => onSelectChart(charts[0].id)}
+                />
+            </div>
         )
     }
 
     if (layout === '2x1') {
         return (
-            <div style={{ display: 'flex', height: '100%' }}>
-                <div style={{ width: `${split}%`, height: '100%' }}>
+            <div
+                ref={containerRef}
+                style={{
+                    display: 'flex',
+                    height: '100%',
+                    width: '100%',
+                    overflow: 'hidden',
+                }}
+            >
+                <div style={{ width: `${split}%`, height: '100%', minWidth: 0 }}>
                     <ChartFrame
                         chart={charts[0]}
                         isActive={charts[0].id === activeChartId}
@@ -57,11 +76,24 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     style={{
                         width: '6px',
                         cursor: 'col-resize',
-                        background: '#2a2a2a',
+                        position: 'relative',
+                        background: 'transparent',
                     }}
-                />
+                >
+                    {/* <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '50%',
+                            width: '2px',
+                            transform: 'translateX(-50%)',
+                            background: '#444',
+                        }}
+                    /> */}
+                </div>
 
-                <div style={{ flex: 1, height: '100%' }}>
+                <div style={{ flex: 1, height: '100%', minWidth: 0 }}>
                     <ChartFrame
                         chart={charts[1]}
                         isActive={charts[1].id === activeChartId}
@@ -75,11 +107,14 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
     if (layout === '2x2') {
         return (
             <div
+                ref={containerRef}
                 style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gridTemplateRows: '1fr 1fr',
                     height: '100%',
+                    width: '100%',
+                    overflow: 'hidden',
                 }}
             >
                 {charts.map((chart) => (

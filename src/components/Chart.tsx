@@ -71,8 +71,6 @@ export default function Chart({ ticker, timeframe }: Props) {
         const loadInitial = async () => {
             if (!seriesRef.current) return
 
-            console.log('Loading initial data...')
-
             const raw = await CandleService.getCandles(ticker, timeframe)
 
             const formatted: CandlestickData<Time>[] = raw.map((c) => ({
@@ -87,8 +85,6 @@ export default function Chart({ ticker, timeframe }: Props) {
 
             const totalFiles = await CandleService.getTotalFiles(ticker)
             fileIndexRef.current = totalFiles - 2
-
-            console.log('Total files:', totalFiles)
 
             seriesRef.current.setData(formatted)
 
@@ -107,7 +103,6 @@ export default function Chart({ ticker, timeframe }: Props) {
         if (loadingRef.current) return
         if (now - lastLoadRef.current < LOAD_COOLDOWN) return
         if (fileIndexRef.current <= 0) {
-            console.log('No more history')
             return
         }
 
@@ -124,12 +119,9 @@ export default function Chart({ ticker, timeframe }: Props) {
             return
         }
 
-        console.log('Loading files from index:', start)
-
         const more = await CandleService.getOlderCandles(ticker, timeframe, start, 2)
 
         if (!more.length) {
-            console.warn('No candles returned')
             loadingRef.current = false
             return
         }
@@ -145,8 +137,6 @@ export default function Chart({ ticker, timeframe }: Props) {
         }))
 
         formatted.sort((a, b) => Number(a.time) - Number(b.time))
-
-        console.log('Loaded range:', formatted[0].time, '→', formatted[formatted.length - 1].time)
 
         const logicalRange = chart.timeScale().getVisibleLogicalRange()
 
@@ -184,7 +174,6 @@ export default function Chart({ ticker, timeframe }: Props) {
             const barsBefore = range.from
 
             if (barsBefore < 30 && !loadingRef.current) {
-                console.log('Preloading more...')
                 await loadMore()
             }
         }
