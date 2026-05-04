@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import ChartFrame from './ChartFrame'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
+import { useResize } from '../hooks/useResize'
 
 type Props = {
     charts: ChartState[]
@@ -10,35 +11,24 @@ type Props = {
     layout: LayoutType
 }
 
-export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
-    const [split, setSplit] = useState(50)
+const vHandle = {
+    width: '6px',
+    background: '#3a3a3a',
+    cursor: 'col-resize',
+}
 
+const hHandle = {
+    height: '6px',
+    background: '#3a3a3a',
+    cursor: 'row-resize',
+}
+
+export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
-    const startDrag = (e: React.MouseEvent) => {
-        e.preventDefault()
-
-        const container = containerRef.current
-        if (!container) return
-
-        const rect = container.getBoundingClientRect()
-
-        const onMove = (moveEvent: MouseEvent) => {
-            const x = moveEvent.clientX - rect.left
-            const percentage = (x / rect.width) * 100
-
-            const clamped = Math.min(80, Math.max(20, percentage))
-            setSplit(clamped)
-        }
-
-        const onUp = () => {
-            window.removeEventListener('mousemove', onMove)
-            window.removeEventListener('mouseup', onUp)
-        }
-
-        window.addEventListener('mousemove', onMove)
-        window.addEventListener('mouseup', onUp)
-    }
+    const resize = useResize(containerRef, 50)
+    const vertical = useResize(containerRef, 50)
+    const horizontal = useResize(containerRef, 50)
 
     if (layout === '1x1') {
         return (
@@ -54,16 +44,8 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
 
     if (layout === '2x1') {
         return (
-            <div
-                ref={containerRef}
-                style={{
-                    display: 'flex',
-                    height: '100%',
-                    width: '100%',
-                    overflow: 'hidden',
-                }}
-            >
-                <div style={{ width: `${split}%`, height: '100%', minWidth: 0 }}>
+            <div ref={containerRef} style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+                <div style={{ width: `${resize.split}%`, minWidth: 0 }}>
                     <ChartFrame
                         chart={charts[0]}
                         isActive={charts[0].id === activeChartId}
@@ -71,29 +53,9 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     />
                 </div>
 
-                <div
-                    onMouseDown={startDrag}
-                    style={{
-                        width: '6px',
-                        cursor: 'col-resize',
-                        position: 'relative',
-                        background: 'transparent',
-                    }}
-                >
-                    {/* <div
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            bottom: 0,
-                            left: '50%',
-                            width: '2px',
-                            transform: 'translateX(-50%)',
-                            background: '#444',
-                        }}
-                    /> */}
-                </div>
+                <div onMouseDown={resize.startDrag('vertical')} style={vHandle} />
 
-                <div style={{ flex: 1, height: '100%', minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                     <ChartFrame
                         chart={charts[1]}
                         isActive={charts[1].id === activeChartId}
@@ -109,22 +71,63 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
             <div
                 ref={containerRef}
                 style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gridTemplateRows: '1fr 1fr',
+                    position: 'relative',
                     height: '100%',
                     width: '100%',
                     overflow: 'hidden',
                 }}
             >
-                {charts.map((chart) => (
-                    <ChartFrame
-                        key={chart.id}
-                        chart={chart}
-                        isActive={chart.id === activeChartId}
-                        onSelect={() => onSelectChart(chart.id)}
-                    />
-                ))}
+                <div style={{ height: `${horizontal.split}%`, display: 'flex' }}>
+                    <div style={{ width: `${vertical.split}%`, minWidth: 0 }}>
+                        <ChartFrame
+                            chart={charts[0]}
+                            isActive={charts[0].id === activeChartId}
+                            onSelect={() => onSelectChart(charts[0].id)}
+                        />
+                    </div>
+
+                    <div onMouseDown={vertical.startDrag('vertical')} style={vHandle} />
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <ChartFrame
+                            chart={charts[1]}
+                            isActive={charts[1].id === activeChartId}
+                            onSelect={() => onSelectChart(charts[1].id)}
+                        />
+                    </div>
+                </div>
+
+                <div
+                    onMouseDown={horizontal.startDrag('horizontal')}
+                    style={{
+                        ...hHandle,
+                        position: 'absolute',
+                        top: `${horizontal.split}%`,
+                        left: 0,
+                        right: 0,
+                        zIndex: 10,
+                    }}
+                />
+
+                <div style={{ height: `${100 - horizontal.split}%`, display: 'flex' }}>
+                    <div style={{ width: `${vertical.split}%`, minWidth: 0 }}>
+                        <ChartFrame
+                            chart={charts[2]}
+                            isActive={charts[2].id === activeChartId}
+                            onSelect={() => onSelectChart(charts[2].id)}
+                        />
+                    </div>
+
+                    <div onMouseDown={vertical.startDrag('vertical')} style={vHandle} />
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <ChartFrame
+                            chart={charts[3]}
+                            isActive={charts[3].id === activeChartId}
+                            onSelect={() => onSelectChart(charts[3].id)}
+                        />
+                    </div>
+                </div>
             </div>
         )
     }
