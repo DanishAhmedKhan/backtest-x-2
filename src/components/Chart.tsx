@@ -35,7 +35,7 @@ export default function Chart({ ticker, timeframe }: Props) {
         if (!chartContainerRef.current) return
 
         const chart = createChart(chartContainerRef.current, {
-            autoSize: true,
+            // autoSize: true,
             layout: {
                 background: { color: '#0f0f0f' },
                 textColor: '#d1d4dc',
@@ -65,6 +65,45 @@ export default function Chart({ ticker, timeframe }: Props) {
         seriesRef.current = series
 
         return () => chart.remove()
+    }, [])
+
+    useEffect(() => {
+        const container = chartContainerRef.current
+        const chart = chartRef.current
+
+        if (!container || !chart) return
+
+        const resize = () => {
+            const width = container.clientWidth
+            const height = container.clientHeight
+
+            chart.applyOptions({
+                width,
+                height,
+            })
+        }
+
+        // 🔥 ResizeObserver (normal resize)
+        const observer = new ResizeObserver(() => {
+            resize()
+        })
+
+        observer.observe(container)
+
+        // 🔥 FORCE sync during drag (fixes jitter)
+        let rafId: number
+
+        const loop = () => {
+            resize()
+            rafId = requestAnimationFrame(loop)
+        }
+
+        loop()
+
+        return () => {
+            observer.disconnect()
+            cancelAnimationFrame(rafId)
+        }
     }, [])
 
     useEffect(() => {
