@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 type Direction = 'horizontal' | 'vertical'
 
-export function useResize(containerRef: React.RefObject<HTMLDivElement>, initial = 50) {
-    const [split, setSplit] = useState(initial)
+export function useResize(containerRef: React.RefObject<HTMLDivElement>) {
+    const [size, setSize] = useState<number | null>(null)
 
     const startDrag = (direction: Direction) => (e: React.MouseEvent) => {
         e.preventDefault()
@@ -14,18 +14,22 @@ export function useResize(containerRef: React.RefObject<HTMLDivElement>, initial
         const rect = container.getBoundingClientRect()
 
         const onMove = (ev: MouseEvent) => {
-            let percent = 50
+            let newSize = 0
 
             if (direction === 'vertical') {
-                const x = ev.clientX - rect.left
-                percent = (x / rect.width) * 100
+                newSize = ev.clientX - rect.left
             } else {
-                const y = ev.clientY - rect.top
-                percent = (y / rect.height) * 100
+                newSize = ev.clientY - rect.top
             }
 
-            const clamped = Math.min(80, Math.max(20, percent))
-            setSplit(clamped)
+            const max = direction === 'vertical' ? rect.width : rect.height
+
+            const minPx = max * 0.2
+            const maxPx = max * 0.8
+
+            const clamped = Math.min(maxPx, Math.max(minPx, newSize))
+
+            setSize(clamped)
         }
 
         const onUp = () => {
@@ -37,5 +41,5 @@ export function useResize(containerRef: React.RefObject<HTMLDivElement>, initial
         window.addEventListener('mouseup', onUp)
     }
 
-    return { split, startDrag }
+    return { size, startDrag }
 }

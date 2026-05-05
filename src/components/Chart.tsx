@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, memo } from 'react'
 import {
     createChart,
     CandlestickSeries,
@@ -18,7 +18,7 @@ type Props = {
     timeframe: Timeframe
 }
 
-export default function Chart({ ticker, timeframe }: Props) {
+function Chart({ ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
     const chartRef = useRef<IChartApi | null>(null)
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
@@ -74,36 +74,18 @@ export default function Chart({ ticker, timeframe }: Props) {
         if (!container || !chart) return
 
         const resize = () => {
-            const width = container.clientWidth
-            const height = container.clientHeight
-
             chart.applyOptions({
-                width,
-                height,
+                width: container.clientWidth,
+                height: container.clientHeight,
             })
         }
 
-        // 🔥 ResizeObserver (normal resize)
-        const observer = new ResizeObserver(() => {
-            resize()
-        })
-
+        const observer = new ResizeObserver(resize)
         observer.observe(container)
 
-        // 🔥 FORCE sync during drag (fixes jitter)
-        let rafId: number
+        resize()
 
-        const loop = () => {
-            resize()
-            rafId = requestAnimationFrame(loop)
-        }
-
-        loop()
-
-        return () => {
-            observer.disconnect()
-            cancelAnimationFrame(rafId)
-        }
+        return () => observer.disconnect()
     }, [])
 
     useEffect(() => {
@@ -224,5 +206,16 @@ export default function Chart({ ticker, timeframe }: Props) {
         }
     }, [loadMore])
 
-    return <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+    return (
+        <div
+            ref={chartContainerRef}
+            style={{
+                width: '100%',
+                height: '100%',
+                contain: 'layout size style',
+            }}
+        />
+    )
 }
+
+export default memo(Chart)
