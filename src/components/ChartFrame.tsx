@@ -2,6 +2,7 @@ import Chart from './Chart'
 import type { ChartState } from '../types/ChartState'
 
 type Props = {
+    id: string
     chart: ChartState
     isActive: boolean
     onSelect: () => void
@@ -41,7 +42,7 @@ export default function ChartFrame({ chart, isActive, onSelect }: Props) {
                 />
             )} */}
 
-            <Chart ticker={chart.ticker} timeframe={chart.timeframe} />
+            <Chart id={chart.id} ticker={chart.ticker} timeframe={chart.timeframe} />
         </div>
     )
 }
