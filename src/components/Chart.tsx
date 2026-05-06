@@ -12,9 +12,9 @@ import {
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { CandleService } from '../core/CandleService'
-import { useViewportSync } from '../hooks/useViewportSync'
-import { useCrosshairSync } from '../hooks/useCrosshairSync'
-import { findNearestTime } from '../hooks/useNearestTime'
+
+import { useViewportSync } from '../hooks/charts/useViewportSync'
+import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 
 type Props = {
     id: string
@@ -31,9 +31,12 @@ function Chart({ id, ticker, timeframe }: Props) {
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
+    const rightOffsetRef = useRef<number>(10)
+    const visibleBarsRef = useRef<number>(100)
+
     const [isHovered, setIsHovered] = useState(false)
 
-    const lastRightTimeRef = useViewportSync(chartRef, candlesRef)
+    useViewportSync(chartRef, candlesRef, rightOffsetRef, visibleBarsRef)
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -131,30 +134,21 @@ function Chart({ id, ticker, timeframe }: Props) {
 
             const timeScale = chart.timeScale()
 
-            const targetTime = lastRightTimeRef.current
+            const totalBars = formatted.length
+            const visibleBars = visibleBarsRef.current || 100
+            const rightOffset = rightOffsetRef.current || 0
 
-            if (targetTime) {
-                const nearest = findNearestTime(timesRef.current, targetTime)
+            const to = totalBars - rightOffset
+            const from = to - visibleBars
 
-                if (nearest) {
-                    const index = timesRef.current.indexOf(nearest)
-
-                    const barsToShow = 100
-
-                    timeScale.setVisibleLogicalRange({
-                        from: index - barsToShow,
-                        to: index,
-                    })
-
-                    return
-                }
-            }
-
-            timeScale.scrollToRealTime()
+            timeScale.setVisibleLogicalRange({
+                from: Math.max(0, from),
+                to: Math.max(0, to),
+            })
         }
 
         load()
-    }, [lastRightTimeRef, ticker, timeframe])
+    }, [ticker, timeframe])
 
     return (
         <div

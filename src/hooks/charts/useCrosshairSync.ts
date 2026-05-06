@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { IChartApi, ISeriesApi, Time, MouseEventParams, CandlestickData } from 'lightweight-charts'
-import { eventBus } from '../event/EventBus'
+import { eventBus } from '../../event/EventBus'
 import { findNearestTime } from './useNearestTime'
 
 export function useCrosshairSync(
@@ -10,7 +10,6 @@ export function useCrosshairSync(
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>,
     timesRef: React.RefObject<number[]>,
 ) {
-    // EMIT
     useEffect(() => {
         const chart = chartRef.current
         if (!chart) return
@@ -48,15 +47,10 @@ export function useCrosshairSync(
                 return
             }
 
-            const times = timesRef.current
-            const candleMap = candleMapRef.current
-
-            if (!times || !candleMap) return
-
-            const nearestTime = findNearestTime(times, time)
+            const nearestTime = findNearestTime(timesRef.current, time)
             if (!nearestTime) return
 
-            const candle = candleMap.get(nearestTime)
+            const candle = candleMapRef.current.get(nearestTime)
             if (!candle) return
 
             try {
@@ -67,5 +61,5 @@ export function useCrosshairSync(
         })
 
         return unsubscribe
-    }, [candleMapRef, chartRef, id, seriesRef, timesRef])
+    }, [chartRef, id, seriesRef, candleMapRef, timesRef])
 }
