@@ -23,7 +23,13 @@ export default function ChartFrame({ chart, activeChartId, isActive, onSelect }:
                 border: isActive ? '3px solid #0051ff' : '3px solid black',
             }}
         >
-            <Chart id={chart.id} activeChartId={activeChartId} ticker={chart.ticker} timeframe={chart.timeframe} />
+            <Chart
+                id={chart.id}
+                activeChartId={activeChartId}
+                isActive={isActive}
+                ticker={chart.ticker}
+                timeframe={chart.timeframe}
+            />
         </div>
     )
 }

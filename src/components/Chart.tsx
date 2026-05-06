@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, memo } from 'react'
+import { useEffect, useRef, useCallback, useState, memo } from 'react'
 import {
     createChart,
     CandlestickSeries,
@@ -19,10 +19,9 @@ type Props = {
     id: string
     ticker: Ticker
     timeframe: Timeframe
-    activeChartId: string
 }
 
-function Chart({ id, ticker, timeframe, activeChartId }: Props) {
+function Chart({ id, ticker, timeframe }: Props) {
     const chartContainerRef = useRef<HTMLDivElement | null>(null)
     const chartRef = useRef<IChartApi | null>(null)
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
@@ -34,8 +33,7 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
     const loadingRef = useRef(false)
     const lastLoadRef = useRef(0)
 
-    const isActive = id === activeChartId
-    console.log(isActive)
+    const [isHovered, setIsHovered] = useState(false)
 
     const LOAD_COOLDOWN = 500
 
@@ -54,7 +52,7 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
             crosshair: {
                 mode: CrosshairMode.Normal,
                 horzLine: {
-                    visible: isActive,
+                    visible: false,
                 },
             },
             timeScale: {
@@ -97,8 +95,19 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
     }, [])
 
     useEffect(() => {
-        if (!isActive) return
+        const chart = chartRef.current
+        if (!chart) return
 
+        chart.applyOptions({
+            crosshair: {
+                horzLine: {
+                    visible: isHovered,
+                },
+            },
+        })
+    }, [isHovered])
+
+    useEffect(() => {
         const chart = chartRef.current
         if (!chart) return
 
@@ -119,7 +128,7 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
 
         chart.subscribeCrosshairMove(handler)
         return () => chart.unsubscribeCrosshairMove(handler)
-    }, [id, isActive])
+    }, [id])
 
     useEffect(() => {
         const unsubscribe = eventBus.on('crosshairMove', ({ time, sourceId }) => {
@@ -173,7 +182,6 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
             fileIndexRef.current = totalFiles - 2
 
             seriesRef.current.setData(formatted)
-
             chartRef.current?.timeScale().scrollToRealTime()
         }
 
@@ -270,6 +278,8 @@ function Chart({ id, ticker, timeframe, activeChartId }: Props) {
     return (
         <div
             ref={chartContainerRef}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             style={{
                 width: '100%',
                 height: '100%',
