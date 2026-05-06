@@ -32,6 +32,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     const fileIndexRef = useRef<number>(0)
     const loadingRef = useRef(false)
     const lastLoadRef = useRef(0)
+    const timesRef = useRef<number[]>([])
 
     const [isHovered, setIsHovered] = useState(false)
 

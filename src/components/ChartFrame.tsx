@@ -6,10 +6,9 @@ type Props = {
     chart: ChartState
     isActive: boolean
     onSelect: () => void
-    activeChartId: string
 }
 
-export default function ChartFrame({ chart, activeChartId, isActive, onSelect }: Props) {
+export default function ChartFrame({ chart, isActive, onSelect }: Props) {
     return (
         <div
             onClick={onSelect}
@@ -23,13 +22,7 @@ export default function ChartFrame({ chart, activeChartId, isActive, onSelect }:
                 border: isActive ? '3px solid #0051ff' : '3px solid black',
             }}
         >
-            <Chart
-                id={chart.id}
-                activeChartId={activeChartId}
-                isActive={isActive}
-                ticker={chart.ticker}
-                timeframe={chart.timeframe}
-            />
+            <Chart id={chart.id} ticker={chart.ticker} timeframe={chart.timeframe} />
         </div>
     )
 }
