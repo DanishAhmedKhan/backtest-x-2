@@ -28,15 +28,33 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const allCandlesRef = useRef<CandlestickData<Time>[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
+    const timesRef = useRef<number[]>([])
 
     const fileIndexRef = useRef<number>(0)
     const loadingRef = useRef(false)
     const lastLoadRef = useRef(0)
-    const timesRef = useRef<number[]>([])
 
     const [isHovered, setIsHovered] = useState(false)
 
     const LOAD_COOLDOWN = 500
+
+    function findNearestTime(times: number[], target: number): number | null {
+        if (!times.length) return null
+
+        let left = 0
+        let right = times.length - 1
+
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2)
+
+            if (times[mid] === target) return times[mid]
+
+            if (times[mid] < target) left = mid + 1
+            else right = mid - 1
+        }
+
+        return right >= 0 ? times[right] : times[0]
+    }
 
     useEffect(() => {
         if (!chartContainerRef.current) return
@@ -145,7 +163,14 @@ function Chart({ id, ticker, timeframe }: Props) {
                 return
             }
 
-            const candle = candleMapRef.current.get(time)
+            const nearestTime = findNearestTime(timesRef.current, time)
+
+            if (!nearestTime) {
+                chart.clearCrosshairPosition()
+                return
+            }
+
+            const candle = candleMapRef.current.get(nearestTime)
 
             if (!candle) {
                 chart.clearCrosshairPosition()
@@ -178,6 +203,8 @@ function Chart({ id, ticker, timeframe }: Props) {
             for (const c of formatted) {
                 candleMapRef.current.set(Number(c.time), c)
             }
+
+            timesRef.current = formatted.map((c) => Number(c.time))
 
             const totalFiles = await CandleService.getTotalFiles(ticker)
             fileIndexRef.current = totalFiles - 2
@@ -241,6 +268,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         for (const c of allCandlesRef.current) {
             candleMapRef.current.set(Number(c.time), c)
         }
+
+        timesRef.current = allCandlesRef.current.map((c) => Number(c.time))
 
         seriesRef.current!.setData(allCandlesRef.current)
 
