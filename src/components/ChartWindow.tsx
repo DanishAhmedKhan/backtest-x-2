@@ -49,6 +49,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 <ChartFrame
                     id="1x1-1"
                     chart={charts[0]}
+                    activeChartId={activeChartId}
                     isActive={charts[0].id === activeChartId}
                     onSelect={() => onSelectChart(charts[0].id)}
                 />
@@ -74,6 +75,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     <ChartFrame
                         id="2x1-1"
                         chart={charts[0]}
+                        activeChartId={activeChartId}
                         isActive={charts[0].id === activeChartId}
                         onSelect={() => onSelectChart(charts[0].id)}
                     />
@@ -92,6 +94,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     <ChartFrame
                         id="2x1-2"
                         chart={charts[1]}
+                        activeChartId={activeChartId}
                         isActive={charts[1].id === activeChartId}
                         onSelect={() => onSelectChart(charts[1].id)}
                     />
@@ -122,6 +125,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         <ChartFrame
                             id="2x2-1"
                             chart={charts[0]}
+                            activeChartId={activeChartId}
                             isActive={charts[0].id === activeChartId}
                             onSelect={() => onSelectChart(charts[0].id)}
                         />
@@ -140,6 +144,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         <ChartFrame
                             id="2x2-2"
                             chart={charts[1]}
+                            activeChartId={activeChartId}
                             isActive={charts[1].id === activeChartId}
                             onSelect={() => onSelectChart(charts[1].id)}
                         />
@@ -165,6 +170,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         <ChartFrame
                             id="2x2-3"
                             chart={charts[2]}
+                            activeChartId={activeChartId}
                             isActive={charts[2].id === activeChartId}
                             onSelect={() => onSelectChart(charts[2].id)}
                         />
@@ -183,6 +189,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         <ChartFrame
                             id="2x2-4"
                             chart={charts[3]}
+                            activeChartId={activeChartId}
                             isActive={charts[3].id === activeChartId}
                             onSelect={() => onSelectChart(charts[3].id)}
                         />
