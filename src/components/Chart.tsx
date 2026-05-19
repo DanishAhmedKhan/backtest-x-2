@@ -33,10 +33,21 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const rightOffsetRef = useRef<number>(10)
     const visibleBarsRef = useRef<number>(100)
+    const anchorTimeRef = useRef<number | null>(null)
 
+    const isChangingTimeframe = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
+    const [chartReady, setChartReady] = useState<boolean>(false)
 
-    useViewportSync(chartRef, candlesRef, rightOffsetRef, visibleBarsRef)
+    useViewportSync(
+        chartRef,
+        candlesRef,
+        rightOffsetRef,
+        visibleBarsRef,
+        isChangingTimeframe,
+        anchorTimeRef,
+        chartReady,
+    )
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -56,8 +67,9 @@ function Chart({ id, ticker, timeframe }: Props) {
             },
             timeScale: {
                 timeVisible: true,
-                rightOffset: 10,
+                rightOffset: rightOffsetRef.current,
                 rightBarStaysOnScroll: true,
+                shiftVisibleRangeOnNewBar: false,
             },
         })
 
@@ -72,8 +84,12 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         chartRef.current = chart
         seriesRef.current = series
+        setChartReady(true)
 
-        return () => chart.remove()
+        return () => {
+            chart.remove()
+            setChartReady(false)
+        }
     }, [])
 
     useEffect(() => {
@@ -109,7 +125,15 @@ function Chart({ id, ticker, timeframe }: Props) {
         const load = async () => {
             const chart = chartRef.current
             const series = seriesRef.current
-            if (!chart || !series) return
+            if (!chart || !series || !chartReady) return
+
+            const timeScale = chart.timeScale()
+
+            const savedOffset = rightOffsetRef.current
+            const savedVisibleBars = visibleBarsRef.current
+            const savedAnchorTime = anchorTimeRef.current
+
+            isChangingTimeframe.current = true
 
             const raw = await CandleService.getCandles(ticker, timeframe)
 
@@ -122,33 +146,49 @@ function Chart({ id, ticker, timeframe }: Props) {
             }))
 
             candlesRef.current = formatted
-
             candleMapRef.current.clear()
             formatted.forEach((c) => {
                 candleMapRef.current.set(Number(c.time), c)
             })
 
-            timesRef.current = formatted.map((c) => Number(c.time))
+            const newTimes = formatted.map((c) => Number(c.time))
+            timesRef.current = newTimes
 
             series.setData(formatted)
 
-            const timeScale = chart.timeScale()
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (formatted.length === 0) {
+                        isChangingTimeframe.current = false
+                        return
+                    }
 
-            const totalBars = formatted.length
-            const visibleBars = visibleBarsRef.current || 100
-            const rightOffset = rightOffsetRef.current || 0
+                    let targetRightIndex = formatted.length - 1
 
-            const to = totalBars - rightOffset
-            const from = to - visibleBars
+                    if (savedAnchorTime !== null && newTimes.length > 0) {
+                        const exactMatchIndex = newTimes.findIndex((t) => t >= savedAnchorTime)
+                        if (exactMatchIndex !== -1) {
+                            targetRightIndex = exactMatchIndex
+                        }
+                    }
 
-            timeScale.setVisibleLogicalRange({
-                from: Math.max(0, from),
-                to: Math.max(0, to),
+                    const targetTo = targetRightIndex - savedOffset
+                    const targetFrom = targetTo - savedVisibleBars
+
+                    timeScale.setVisibleLogicalRange({
+                        from: targetFrom,
+                        to: targetTo,
+                    })
+
+                    setTimeout(() => {
+                        isChangingTimeframe.current = false
+                    }, 60)
+                })
             })
         }
 
         load()
-    }, [ticker, timeframe])
+    }, [ticker, timeframe, chartReady])
 
     return (
         <div
