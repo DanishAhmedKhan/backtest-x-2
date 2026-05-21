@@ -62,6 +62,15 @@ export default function TopBar({
                 <option value="2x1">2 Charts</option>
                 <option value="2x2">4 Charts</option>
             </select>
+
+            <button
+                style={{
+                    padding: '0px 10px',
+                    cursor: 'pointer',
+                }}
+            >
+                Replay
+            </button>
         </div>
     )
 }
