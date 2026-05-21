@@ -35,6 +35,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const visibleBarsRef = useRef<number>(100)
     const anchorTimeRef = useRef<number | null>(null)
 
+    const whitespaceRatioRef = useRef<number>(0.1)
+
     const isChangingTimeframe = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
     const [chartReady, setChartReady] = useState<boolean>(false)
@@ -46,6 +48,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         visibleBarsRef,
         isChangingTimeframe,
         anchorTimeRef,
+        whitespaceRatioRef,
         chartReady,
     )
 
@@ -132,6 +135,7 @@ function Chart({ id, ticker, timeframe }: Props) {
             const savedOffset = rightOffsetRef.current
             const savedVisibleBars = visibleBarsRef.current
             const savedAnchorTime = anchorTimeRef.current
+            const savedRatio = whitespaceRatioRef.current
 
             isChangingTimeframe.current = true
 
@@ -172,12 +176,23 @@ function Chart({ id, ticker, timeframe }: Props) {
                         }
                     }
 
-                    const targetTo = targetRightIndex - savedOffset
-                    const targetFrom = targetTo - savedVisibleBars
+                    let finalTo = targetRightIndex - savedOffset
+                    let finalFrom = finalTo - savedVisibleBars
+
+                    if (savedVisibleBars <= 5) {
+                        const dataRatio = 1 - savedRatio
+                        if (dataRatio > 0) {
+                            const calculatedTotalSlots = savedVisibleBars / dataRatio
+                            const adjustedOffset = Math.round(calculatedTotalSlots * savedRatio)
+
+                            finalTo = targetRightIndex + adjustedOffset
+                            finalFrom = finalTo - Math.round(calculatedTotalSlots)
+                        }
+                    }
 
                     timeScale.setVisibleLogicalRange({
-                        from: targetFrom,
-                        to: targetTo,
+                        from: finalFrom,
+                        to: finalTo,
                     })
 
                     setTimeout(() => {

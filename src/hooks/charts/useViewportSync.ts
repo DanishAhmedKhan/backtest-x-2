@@ -8,6 +8,7 @@ export function useViewportSync(
     visibleBarsRef: React.RefObject<number>,
     isChangingTimeframeRef: React.RefObject<boolean>,
     anchorTimeRef: React.RefObject<number | null>,
+    whitespaceRatioRef: React.RefObject<number>,
     chartReady: boolean,
 ) {
     useEffect(() => {
@@ -26,27 +27,24 @@ export function useViewportSync(
 
             const totalBars = candles.length
 
+            const currentOffset = timeScale.options().rightOffset
+            const totalScreenSlots = range.to - range.from
+            const visibleCandlesCount = totalScreenSlots - currentOffset
+
+            if (totalScreenSlots > 0) {
+                whitespaceRatioRef.current = currentOffset / totalScreenSlots
+            }
+
             const calculatedOffset = totalBars - 1 - range.to
             rightOffsetRef.current = Math.round(calculatedOffset)
-
-            const totalScreenSlots = range.to - range.from
-            const visibleCandlesCount = totalScreenSlots - timeScale.options().rightOffset
             visibleBarsRef.current = Math.max(1, Math.round(visibleCandlesCount))
 
-            const rightCandleIndex = Math.max(
-                0,
-                Math.min(totalBars - 1, Math.floor(range.to - timeScale.options().rightOffset)),
-            )
+            const rightCandleIndex = Math.max(0, Math.min(totalBars - 1, Math.floor(range.to - currentOffset)))
             const targetRightCandle = candles[rightCandleIndex]
 
             if (targetRightCandle) {
                 anchorTimeRef.current = Number(targetRightCandle.time)
             }
-
-            // console.log('=== TRADINGVIEW VIEWPORT SYNCHRONIZED ===')
-            // console.log('Live Calculated Offset:', rightOffsetRef.current)
-            // console.log('Live Visible Candles (Clamped):', visibleBarsRef.current)
-            // console.log('Anchor Time:', new Date((anchorTimeRef.current || 0) * 1000).toUTCString())
         }
 
         timeScale.subscribeVisibleLogicalRangeChange(handler)
@@ -54,5 +52,14 @@ export function useViewportSync(
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [chartRef, candlesRef, rightOffsetRef, visibleBarsRef, isChangingTimeframeRef, anchorTimeRef, chartReady])
+    }, [
+        chartRef,
+        candlesRef,
+        rightOffsetRef,
+        visibleBarsRef,
+        isChangingTimeframeRef,
+        anchorTimeRef,
+        whitespaceRatioRef,
+        chartReady,
+    ])
 }
