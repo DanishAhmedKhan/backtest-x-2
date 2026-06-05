@@ -16,6 +16,7 @@ import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
+import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 
 type Props = {
     id: string
@@ -42,6 +43,10 @@ function Chart({ id, ticker, timeframe }: Props) {
     const [isHovered, setIsHovered] = useState(false)
     const [chartReady, setChartReady] = useState<boolean>(false)
 
+    const oldestLoadedFileRef = useRef(0)
+    const totalFilesRef = useRef(0)
+    const isLoadingOlderRef = useRef(false)
+
     useViewportSync(
         chartRef,
         candlesRef,
@@ -52,6 +57,20 @@ function Chart({ id, ticker, timeframe }: Props) {
         whitespaceRatioRef,
         chartReady,
     )
+
+    useInfiniteScroll({
+        chartRef,
+        seriesRef,
+        candlesRef,
+        candleMapRef,
+        timesRef,
+        ticker,
+        timeframe,
+        chartReady,
+        oldestLoadedFileRef,
+        totalFilesRef,
+        isLoadingOlderRef,
+    })
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -118,6 +137,10 @@ function Chart({ id, ticker, timeframe }: Props) {
             isChangingTimeframe.current = true
 
             const raw = await CandleService.getCandles(ticker, timeframe)
+
+            const totalFiles = await CandleService.getTotalFiles(ticker)
+            totalFilesRef.current = totalFiles
+            oldestLoadedFileRef.current = Math.max(0, totalFiles - 2)
 
             const formatted: CandlestickData<Time>[] = raw.map((c) => ({
                 time: c.time as Time,
