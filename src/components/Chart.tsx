@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, memo } from 'react'
 import {
     createChart,
     CandlestickSeries,
-    CrosshairMode,
     type CandlestickData,
     type Time,
     type IChartApi,
@@ -15,6 +14,8 @@ import { CandleService } from '../core/CandleService'
 
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
+import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
+import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
 
 type Props = {
     id: string
@@ -55,35 +56,12 @@ function Chart({ id, ticker, timeframe }: Props) {
     useEffect(() => {
         if (!containerRef.current) return
 
-        const chart = createChart(containerRef.current, {
-            layout: {
-                background: { color: '#0f0f0f' },
-                textColor: '#d1d4dc',
-            },
-            grid: {
-                vertLines: { color: '#1e1e1e' },
-                horzLines: { color: '#1e1e1e' },
-            },
-            crosshair: {
-                mode: CrosshairMode.Normal,
-                horzLine: { visible: false },
-            },
-            timeScale: {
-                timeVisible: true,
-                rightOffset: rightOffsetRef.current,
-                rightBarStaysOnScroll: true,
-                shiftVisibleRangeOnNewBar: false,
-            },
-        })
+        const chartConfig = DEFAULT_CHART_CONFIG
+        chartConfig.timeScale.rightOffset = rightOffsetRef.current
+        const chart = createChart(containerRef.current, chartConfig)
 
-        const series = chart.addSeries(CandlestickSeries, {
-            upColor: '#26a69a',
-            downColor: '#ef5350',
-            wickUpColor: '#26a69a',
-            wickDownColor: '#ef5350',
-            borderVisible: false,
-            priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
-        })
+        const timeSeriesConfig = TIME_SERIES_CONFIG
+        const series = chart.addSeries(CandlestickSeries, timeSeriesConfig)
 
         chartRef.current = chart
         seriesRef.current = series
