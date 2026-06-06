@@ -3,6 +3,14 @@ type EventMap = {
         time: number | null
         sourceId: string
     }
+
+    replayStart: {
+        time: number
+    }
+
+    replayStop: {
+        time: number
+    }
 }
 
 type EventKey = keyof EventMap
@@ -12,7 +20,7 @@ class EventBus {
         [K in EventKey]?: Set<(payload: EventMap[K]) => void>
     } = {}
 
-    on<K extends EventKey>(event: K, callback: (payload: EventMap[K]) => void) {
+    public on<K extends EventKey>(event: K, callback: (payload: EventMap[K]) => void) {
         if (!this.listeners[event]) {
             this.listeners[event] = new Set()
         }
@@ -24,7 +32,7 @@ class EventBus {
         }
     }
 
-    emit<K extends EventKey>(event: K, payload: EventMap[K]) {
+    public emit<K extends EventKey>(event: K, payload: EventMap[K]) {
         this.listeners[event]?.forEach((cb) => cb(payload))
     }
 }
