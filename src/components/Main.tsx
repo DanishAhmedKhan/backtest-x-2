@@ -6,6 +6,7 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import ToolBar from './ToolBar'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
+import ReplayToolbar from './ReplayToolbar'
 
 const createCharts = (count: number): ChartState[] => {
     return Array.from({ length: count }).map((_, i) => ({
@@ -19,6 +20,7 @@ export default function Main() {
     const [layout, setLayout] = useState<LayoutType>('2x1')
     const [charts, setCharts] = useState<ChartState[]>(createCharts(2))
     const [activeChartId, setActiveChartId] = useState('chart-1')
+    const [showReplayToolbar, setShowReplayToolbar] = useState(false)
 
     const activeChart = charts.find((c) => c.id === activeChartId)!
 
@@ -36,6 +38,7 @@ export default function Main() {
         }
 
         const newCount = countMap[newLayout]
+
         setCharts(createCharts(newCount))
         setActiveChartId('chart-1')
     }
@@ -60,6 +63,7 @@ export default function Main() {
                     onTickerChange={(t) => updateActiveChart({ ticker: t })}
                     onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
                     onLayoutChange={handleLayoutChange}
+                    onReplayClick={() => setShowReplayToolbar(true)}
                 />
             </div>
 
@@ -71,6 +75,8 @@ export default function Main() {
                 onSelectChart={setActiveChartId}
                 layout={layout}
             />
+
+            {showReplayToolbar && <ReplayToolbar />}
         </div>
     )
 }

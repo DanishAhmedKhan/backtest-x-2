@@ -10,13 +10,15 @@ import {
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
-import { CandleService } from '../core/CandleService'
 
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
+import { eventBus } from '../event/EventBus'
+import { replayStore } from '../replay/ReplayStore'
+import { useChartData } from '../hooks/charts/useChartData'
 
 type Props = {
     id: string
@@ -47,6 +49,9 @@ function Chart({ id, ticker, timeframe }: Props) {
     const totalFilesRef = useRef(0)
     const isLoadingOlderRef = useRef(false)
 
+    const [previewTime, setPreviewTime] = useState<number | null>(null)
+    const [previewX, setPreviewX] = useState<number | null>(null)
+
     useViewportSync(
         chartRef,
         candlesRef,
@@ -71,6 +76,32 @@ function Chart({ id, ticker, timeframe }: Props) {
         totalFilesRef,
         isLoadingOlderRef,
     })
+
+    useEffect(() => {
+        const unsubscribe = eventBus.on('replayPreviewMove', ({ time }) => {
+            setPreviewTime(time)
+        })
+
+        return unsubscribe
+    }, [])
+
+    useEffect(() => {
+        const chart = chartRef.current
+
+        if (!chart || previewTime === null) {
+            setPreviewX(null)
+            return
+        }
+
+        const x = chart.timeScale().timeToCoordinate(previewTime as Time)
+
+        if (x === null) {
+            setPreviewX(null)
+            return
+        }
+
+        setPreviewX(x)
+    }, [previewTime])
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -121,98 +152,56 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useCrosshairSync(id, chartRef, seriesRef, candleMapRef, timesRef)
 
-    useEffect(() => {
-        const load = async () => {
-            const chart = chartRef.current
-            const series = seriesRef.current
-            if (!chart || !series || !chartReady) return
-
-            const timeScale = chart.timeScale()
-
-            const savedOffset = rightOffsetRef.current
-            const savedVisibleBars = visibleBarsRef.current
-            const savedAnchorTime = anchorTimeRef.current
-            const savedRatio = whitespaceRatioRef.current
-
-            isChangingTimeframe.current = true
-
-            const raw = await CandleService.getCandles(ticker, timeframe)
-
-            const totalFiles = await CandleService.getTotalFiles(ticker)
-            totalFilesRef.current = totalFiles
-            oldestLoadedFileRef.current = Math.max(0, totalFiles - 2)
-
-            const formatted: CandlestickData<Time>[] = raw.map((c) => ({
-                time: c.time as Time,
-                open: c.open,
-                high: c.high,
-                low: c.low,
-                close: c.close,
-            }))
-
-            candlesRef.current = formatted
-            candleMapRef.current.clear()
-            formatted.forEach((c) => {
-                candleMapRef.current.set(Number(c.time), c)
-            })
-
-            const newTimes = formatted.map((c) => Number(c.time))
-            timesRef.current = newTimes
-
-            series.setData(formatted)
-
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (formatted.length === 0) {
-                        isChangingTimeframe.current = false
-                        return
-                    }
-
-                    let targetRightIndex = formatted.length - 1
-
-                    if (savedAnchorTime !== null && newTimes.length > 0) {
-                        const exactMatchIndex = newTimes.findIndex((t) => t >= savedAnchorTime)
-                        if (exactMatchIndex !== -1) {
-                            targetRightIndex = exactMatchIndex
-                        }
-                    }
-
-                    let finalTo = targetRightIndex - savedOffset
-                    let finalFrom = finalTo - savedVisibleBars
-
-                    if (savedVisibleBars <= 5) {
-                        const dataRatio = 1 - savedRatio
-                        if (dataRatio > 0) {
-                            const calculatedTotalSlots = savedVisibleBars / dataRatio
-                            const adjustedOffset = Math.round(calculatedTotalSlots * savedRatio)
-
-                            finalTo = targetRightIndex + adjustedOffset
-                            finalFrom = finalTo - Math.round(calculatedTotalSlots)
-                        }
-                    }
-
-                    timeScale.setVisibleLogicalRange({
-                        from: finalFrom,
-                        to: finalTo,
-                    })
-
-                    setTimeout(() => {
-                        isChangingTimeframe.current = false
-                    }, 60)
-                })
-            })
-        }
-
-        load()
-    }, [ticker, timeframe, chartReady])
+    useChartData({
+        ticker,
+        timeframe,
+        chartReady,
+        chartRef,
+        seriesRef,
+        candlesRef,
+        candleMapRef,
+        timesRef,
+        rightOffsetRef,
+        visibleBarsRef,
+        anchorTimeRef,
+        whitespaceRatioRef,
+        oldestLoadedFileRef,
+        totalFilesRef,
+        setIsChangingTimeframe: (value) => {
+            isChangingTimeframe.current = value
+        },
+    })
 
     return (
         <div
-            ref={containerRef}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{ width: '100%', height: '100%' }}
-        />
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+            }}
+        >
+            <div
+                ref={containerRef}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                style={{ width: '100%', height: '100%' }}
+            />
+
+            {replayStore.showToolbar && previewX !== null && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: previewX,
+                        top: 0,
+                        bottom: 0,
+                        width: 2,
+                        background: '#2962ff',
+                        pointerEvents: 'none',
+                        zIndex: 1000,
+                    }}
+                />
+            )}
+        </div>
     )
 }
 

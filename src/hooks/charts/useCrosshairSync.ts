@@ -28,23 +28,24 @@ export function useCrosshairSync(
         // }
 
         const handler = (param: MouseEventParams<Time>) => {
-            if (!param.time || typeof param.time !== 'number') {
-                replayStore.setCrosshairTime(null)
+            const time = typeof param.time === 'number' ? param.time : null
 
-                eventBus.emit('crosshairMove', {
-                    time: null,
-                    sourceId: id,
-                })
+            eventBus.emit('crosshairMove', {
+                time,
+                sourceId: id,
+            })
 
+            if (!replayStore.showToolbar) {
                 return
             }
 
-            replayStore.setCrosshairTime(param.time)
+            replayStore.previewTime = time
 
-            eventBus.emit('crosshairMove', {
-                time: param.time,
-                sourceId: id,
-            })
+            if (time !== null) {
+                eventBus.emit('replayPreviewMove', {
+                    time,
+                })
+            }
         }
 
         chart.subscribeCrosshairMove(handler)

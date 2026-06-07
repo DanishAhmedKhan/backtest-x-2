@@ -3,8 +3,6 @@ import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import type { LayoutType } from '../types/Layout'
-import { replayStore } from '../replay/ReplayStore'
-import { eventBus } from '../event/EventBus'
 
 type Props = {
     ticker: Ticker
@@ -13,6 +11,7 @@ type Props = {
     onTickerChange: (t: Ticker) => void
     onTimeframeChange: (t: Timeframe) => void
     onLayoutChange: (l: LayoutType) => void
+    onReplayClick: () => void
 }
 
 export default function TopBar({
@@ -22,24 +21,8 @@ export default function TopBar({
     onTickerChange,
     onTimeframeChange,
     onLayoutChange,
+    onReplayClick,
 }: Props) {
-    const handleReplayClick = () => {
-        const time = replayStore.currentCrosshairTime
-
-        if (!time) {
-            console.log('No crosshair position selected')
-            return
-        }
-
-        replayStore.start(time)
-
-        eventBus.emit('replayStart', {
-            time,
-        })
-
-        console.log('Replay started at:', time)
-    }
-
     return (
         <div
             style={{
@@ -83,7 +66,7 @@ export default function TopBar({
             </select>
 
             <button
-                onClick={handleReplayClick}
+                onClick={onReplayClick}
                 style={{
                     padding: '0px 10px',
                     cursor: 'pointer',

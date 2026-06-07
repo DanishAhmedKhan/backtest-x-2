@@ -4,6 +4,10 @@ type EventMap = {
         sourceId: string
     }
 
+    replayPreviewMove: {
+        time: number
+    }
+
     replayStart: {
         time: number
     }

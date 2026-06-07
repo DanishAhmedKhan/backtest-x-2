@@ -1,9 +1,11 @@
 class ReplayStore {
     public enabled = false
 
-    public startTime: number | null = null
+    public showToolbar = false
 
-    public currentCrosshairTime: number | null = null
+    public previewTime: number | null = null
+
+    public startTime: number | null = null
 
     public start(time: number) {
         this.enabled = true
@@ -13,10 +15,16 @@ class ReplayStore {
     public stop() {
         this.enabled = false
         this.startTime = null
+        this.previewTime = null
     }
 
-    public setCrosshairTime(time: number | null) {
-        this.currentCrosshairTime = time
+    public openToolbar() {
+        this.showToolbar = true
+    }
+
+    public closeToolbar() {
+        this.showToolbar = false
+        this.previewTime = null
     }
 }
 
