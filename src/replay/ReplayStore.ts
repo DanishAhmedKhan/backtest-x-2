@@ -1,17 +1,22 @@
-// core/ReplayStore.ts
-
 class ReplayStore {
-    enabled = false
-    startTime: number | null = null
+    public enabled = false
 
-    start(time: number) {
+    public startTime: number | null = null
+
+    public currentCrosshairTime: number | null = null
+
+    public start(time: number) {
         this.enabled = true
         this.startTime = time
     }
 
-    stop() {
+    public stop() {
         this.enabled = false
         this.startTime = null
+    }
+
+    public setCrosshairTime(time: number | null) {
+        this.currentCrosshairTime = time
     }
 }
 

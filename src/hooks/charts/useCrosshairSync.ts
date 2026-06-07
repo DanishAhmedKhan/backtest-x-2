@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { IChartApi, ISeriesApi, Time, MouseEventParams, CandlestickData } from 'lightweight-charts'
 import { eventBus } from '../../event/EventBus'
 import { findNearestTime } from './useNearestTime'
+import { replayStore } from '../../replay/ReplayStore'
 
 export function useCrosshairSync(
     id: string,
@@ -14,11 +15,31 @@ export function useCrosshairSync(
         const chart = chartRef.current
         if (!chart) return
 
+        // const handler = (param: MouseEventParams<Time>) => {
+        //     if (!param.time || typeof param.time !== 'number') {
+        //         eventBus.emit('crosshairMove', { time: null, sourceId: id })
+        //         return
+        //     }
+
+        //     eventBus.emit('crosshairMove', {
+        //         time: param.time,
+        //         sourceId: id,
+        //     })
+        // }
+
         const handler = (param: MouseEventParams<Time>) => {
             if (!param.time || typeof param.time !== 'number') {
-                eventBus.emit('crosshairMove', { time: null, sourceId: id })
+                replayStore.setCrosshairTime(null)
+
+                eventBus.emit('crosshairMove', {
+                    time: null,
+                    sourceId: id,
+                })
+
                 return
             }
+
+            replayStore.setCrosshairTime(param.time)
 
             eventBus.emit('crosshairMove', {
                 time: param.time,
