@@ -7,6 +7,7 @@ import ToolBar from './ToolBar'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
 import ReplayToolbar from './ReplayToolbar'
+import { replayStore } from '../replay/ReplayStore'
 
 const createCharts = (count: number): ChartState[] => {
     return Array.from({ length: count }).map((_, i) => ({
@@ -63,7 +64,10 @@ export default function Main() {
                     onTickerChange={(t) => updateActiveChart({ ticker: t })}
                     onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
                     onLayoutChange={handleLayoutChange}
-                    onReplayClick={() => setShowReplayToolbar(true)}
+                    onReplayClick={() => {
+                        replayStore.openToolbar()
+                        setShowReplayToolbar(true)
+                    }}
                 />
             </div>
 

@@ -19,6 +19,7 @@ import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import { useChartData } from '../hooks/charts/useChartData'
+import ReplayOverlay from './ReplayOverlay'
 
 type Props = {
     id: string
@@ -187,20 +188,7 @@ function Chart({ id, ticker, timeframe }: Props) {
                 style={{ width: '100%', height: '100%' }}
             />
 
-            {replayStore.showToolbar && previewX !== null && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        left: previewX,
-                        top: 0,
-                        bottom: 0,
-                        width: 2,
-                        background: '#2962ff',
-                        pointerEvents: 'none',
-                        zIndex: 1000,
-                    }}
-                />
-            )}
+            {replayStore.showToolbar && previewX !== null && <ReplayOverlay x={previewX} />}
         </div>
     )
 }
