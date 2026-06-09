@@ -9,6 +9,10 @@ class ReplayStore {
 
     public isSelecting = true
 
+    public isPlaying = false
+
+    public replayIndex = -1
+
     public start(time: number) {
         this.enabled = true
         this.startTime = time
@@ -21,6 +25,13 @@ class ReplayStore {
         this.enabled = false
         this.startTime = null
         this.previewTime = null
+        this.replayIndex = -1
+        this.isPlaying = false
+        this.isSelecting = true
+    }
+
+    public pause() {
+        this.isPlaying = false
     }
 
     public openToolbar() {

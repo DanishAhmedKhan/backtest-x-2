@@ -182,6 +182,24 @@ function Chart({ id, ticker, timeframe }: Props) {
         },
     })
 
+    // useEffect(() => {
+    //     const unsubscribe = eventBus.on('replayStart', ({ time }) => {
+    //         const series = seriesRef.current
+
+    //         if (!series) return
+
+    //         const candles = candlesRef.current
+    //         const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
+
+    //         if (replayIndex === -1) return
+
+    //         const visibleCandles = candles.slice(0, replayIndex + 1)
+    //         series.setData(visibleCandles)
+    //     })
+
+    //     return unsubscribe
+    // }, [])
+
     useEffect(() => {
         const unsubscribe = eventBus.on('replayStart', ({ time }) => {
             const series = seriesRef.current
@@ -189,11 +207,39 @@ function Chart({ id, ticker, timeframe }: Props) {
             if (!series) return
 
             const candles = candlesRef.current
+
             const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
 
             if (replayIndex === -1) return
 
+            replayStore.replayIndex = replayIndex
+
             const visibleCandles = candles.slice(0, replayIndex + 1)
+
+            series.setData(visibleCandles)
+        })
+
+        return unsubscribe
+    }, [])
+
+    useEffect(() => {
+        const unsubscribe = eventBus.on('replayNextCandle', () => {
+            const series = seriesRef.current
+
+            if (!series) return
+
+            const candles = candlesRef.current
+
+            replayStore.replayIndex++
+
+            if (replayStore.replayIndex >= candles.length) {
+                replayStore.replayIndex = candles.length - 1
+
+                return
+            }
+
+            const visibleCandles = candles.slice(0, replayStore.replayIndex + 1)
+
             series.setData(visibleCandles)
         })
 

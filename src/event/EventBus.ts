@@ -15,6 +15,8 @@ type EventMap = {
     replayStop: {
         time: number
     }
+
+    replayNextCandle: {}
 }
 
 type EventKey = keyof EventMap

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { eventBus } from '../event/EventBus'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -84,7 +85,13 @@ export default function ReplayToolbar() {
 
             <button>◀◀</button>
 
-            <button>▶</button>
+            <button
+                onClick={() => {
+                    eventBus.emit('replayNextCandle', {})
+                }}
+            >
+                ▶
+            </button>
 
             <button>⏸</button>
 
