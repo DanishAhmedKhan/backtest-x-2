@@ -87,7 +87,7 @@ export default function ReplayToolbar() {
 
             <button
                 onClick={() => {
-                    eventBus.emit('replayNextCandle', {})
+                    eventBus.emit('replayNextCandle')
                 }}
             >
                 ▶

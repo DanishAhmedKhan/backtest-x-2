@@ -52,7 +52,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
-    const [startX, setStartX] = useState<number | null>(null)
+    const [, setStartX] = useState<number | null>(null)
 
     useEffect(() => {
         if (!replayStore.startTime || !chartRef.current) return
@@ -181,24 +181,6 @@ function Chart({ id, ticker, timeframe }: Props) {
             isChangingTimeframe.current = value
         },
     })
-
-    // useEffect(() => {
-    //     const unsubscribe = eventBus.on('replayStart', ({ time }) => {
-    //         const series = seriesRef.current
-
-    //         if (!series) return
-
-    //         const candles = candlesRef.current
-    //         const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
-
-    //         if (replayIndex === -1) return
-
-    //         const visibleCandles = candles.slice(0, replayIndex + 1)
-    //         series.setData(visibleCandles)
-    //     })
-
-    //     return unsubscribe
-    // }, [])
 
     useEffect(() => {
         const unsubscribe = eventBus.on('replayStart', ({ time }) => {

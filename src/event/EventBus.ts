@@ -12,34 +12,37 @@ type EventMap = {
         time: number
     }
 
-    replayStop: {
-        time: number
-    }
+    replayStop: void
 
-    replayNextCandle: {}
+    replayNextCandle: void
 }
 
 type EventKey = keyof EventMap
 
 class EventBus {
-    private listeners: {
-        [K in EventKey]?: Set<(payload: EventMap[K]) => void>
-    } = {}
+    private listeners = new Map<EventKey, Set<(payload: unknown) => void>>()
 
     public on<K extends EventKey>(event: K, callback: (payload: EventMap[K]) => void) {
-        if (!this.listeners[event]) {
-            this.listeners[event] = new Set()
+        let eventListeners = this.listeners.get(event)
+
+        if (!eventListeners) {
+            eventListeners = new Set()
+            this.listeners.set(event, eventListeners)
         }
 
-        this.listeners[event]!.add(callback)
+        eventListeners.add(callback as (payload: unknown) => void)
 
         return () => {
-            this.listeners[event]!.delete(callback)
+            eventListeners.delete(callback as (payload: unknown) => void)
         }
     }
 
-    public emit<K extends EventKey>(event: K, payload: EventMap[K]) {
-        this.listeners[event]?.forEach((cb) => cb(payload))
+    public emit<K extends EventKey>(event: K, ...args: EventMap[K] extends void ? [] : [EventMap[K]]) {
+        const payload = args[0]
+
+        this.listeners.get(event)?.forEach((cb) => {
+            cb(payload)
+        })
     }
 }
 
