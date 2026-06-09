@@ -189,13 +189,11 @@ function Chart({ id, ticker, timeframe }: Props) {
             if (!series) return
 
             const candles = candlesRef.current
-
             const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
 
             if (replayIndex === -1) return
 
             const visibleCandles = candles.slice(0, replayIndex + 1)
-
             series.setData(visibleCandles)
         })
 
@@ -204,12 +202,13 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
-
         if (!replayStore.showToolbar) return
-
         if (previewTime === null) return
 
         replayStore.start(previewTime)
+
+        setPreviewTime(null)
+        setPreviewX(null)
 
         eventBus.emit('replayStart', {
             time: previewTime,
