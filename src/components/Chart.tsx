@@ -52,6 +52,15 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
+    const [startX, setStartX] = useState<number | null>(null)
+
+    useEffect(() => {
+        if (!replayStore.startTime || !chartRef.current) return
+
+        const x = chartRef.current.timeScale().timeToCoordinate(replayStore.startTime as Time)
+
+        setStartX(x)
+    }, [previewTime])
 
     useViewportSync(
         chartRef,
@@ -173,6 +182,40 @@ function Chart({ id, ticker, timeframe }: Props) {
         },
     })
 
+    useEffect(() => {
+        const unsubscribe = eventBus.on('replayStart', ({ time }) => {
+            const series = seriesRef.current
+
+            if (!series) return
+
+            const candles = candlesRef.current
+
+            const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
+
+            if (replayIndex === -1) return
+
+            const visibleCandles = candles.slice(0, replayIndex + 1)
+
+            series.setData(visibleCandles)
+        })
+
+        return unsubscribe
+    }, [])
+
+    const handleReplaySelection = () => {
+        if (!replayStore.isSelecting) return
+
+        if (!replayStore.showToolbar) return
+
+        if (previewTime === null) return
+
+        replayStore.start(previewTime)
+
+        eventBus.emit('replayStart', {
+            time: previewTime,
+        })
+    }
+
     return (
         <div
             style={{
@@ -185,10 +228,11 @@ function Chart({ id, ticker, timeframe }: Props) {
                 ref={containerRef}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onClick={handleReplaySelection}
                 style={{ width: '100%', height: '100%' }}
             />
 
-            {replayStore.showToolbar && previewX !== null && <ReplayOverlay x={previewX} />}
+            {replayStore.showToolbar && replayStore.isSelecting && previewX !== null && <ReplayOverlay x={previewX} />}
         </div>
     )
 }

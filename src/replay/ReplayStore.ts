@@ -7,9 +7,14 @@ class ReplayStore {
 
     public startTime: number | null = null
 
+    public isSelecting = true
+
     public start(time: number) {
         this.enabled = true
         this.startTime = time
+        this.isSelecting = false
+        this.previewTime = null
+        this.showToolbar = false
     }
 
     public stop() {
@@ -20,6 +25,7 @@ class ReplayStore {
 
     public openToolbar() {
         this.showToolbar = true
+        this.isSelecting = true
     }
 
     public closeToolbar() {

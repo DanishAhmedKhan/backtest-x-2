@@ -65,6 +65,7 @@ export default function Main() {
                     onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
                     onLayoutChange={handleLayoutChange}
                     onReplayClick={() => {
+                        replayStore.isSelecting = true
                         replayStore.openToolbar()
                         setShowReplayToolbar(true)
                     }}
