@@ -212,7 +212,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
             const candles = candlesRef.current
 
-            replayStore.replayIndex++
+            // replayStore.replayIndex++
 
             if (replayStore.replayIndex >= candles.length) {
                 replayStore.replayIndex = candles.length - 1

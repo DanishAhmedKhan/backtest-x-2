@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
+import { replayStore } from '../replay/ReplayStore'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -34,12 +35,10 @@ export default function ReplayToolbar() {
             draggingRef.current = false
 
             window.removeEventListener('mousemove', onMouseMove)
-
             window.removeEventListener('mouseup', onMouseUp)
         }
 
         window.addEventListener('mousemove', onMouseMove)
-
         window.addEventListener('mouseup', onMouseUp)
     }
 
@@ -49,26 +48,18 @@ export default function ReplayToolbar() {
                 position: 'fixed',
                 left: position.x,
                 top: position.y,
-
                 zIndex: 9999,
-
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-
                 background: '#1b1b1b',
                 border: '1px solid #333',
                 borderRadius: 8,
-
                 padding: '10px 14px',
-
                 boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-
                 userSelect: 'none',
             }}
         >
-            {/* Drag Handle */}
-
             <div
                 onMouseDown={onMouseDown}
                 style={{
@@ -81,12 +72,11 @@ export default function ReplayToolbar() {
                 ⋮⋮
             </div>
 
-            {/* Replay Controls */}
-
             <button>◀◀</button>
 
             <button
                 onClick={() => {
+                    replayStore.replayIndex++
                     eventBus.emit('replayNextCandle')
                 }}
             >
