@@ -52,16 +52,15 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
-    const [, setStartX] = useState<number | null>(null)
-    const replayIndexRef = useRef(-1)
+    // const [, setStartX] = useState<number | null>(null)
 
-    useEffect(() => {
-        if (!replayStore.startTime || !chartRef.current) return
+    // useEffect(() => {
+    //     if (!replayStore.startTime || !chartRef.current) return
 
-        const x = chartRef.current.timeScale().timeToCoordinate(replayStore.startTime as Time)
+    //     const x = chartRef.current.timeScale().timeToCoordinate(replayStore.startTime as Time)
 
-        setStartX(x)
-    }, [previewTime])
+    //     setStartX(x)
+    // }, [previewTime])
 
     useViewportSync(
         chartRef,
@@ -183,47 +182,35 @@ function Chart({ id, ticker, timeframe }: Props) {
         },
     })
 
+    const rebuildReplay = () => {
+        const series = seriesRef.current
+
+        if (!series) return
+
+        const replayTime = replayStore.currentReplayTime
+
+        if (replayTime === null) return
+
+        const visibleCandles = candlesRef.current.filter((c) => Number(c.time) <= replayTime)
+
+        series.setData(visibleCandles)
+    }
+
     useEffect(() => {
         const unsubscribe = eventBus.on('replayStart', ({ time }) => {
-            const series = seriesRef.current
+            replayStore.currentReplayTime = time
 
-            if (!series) return
-
-            const candles = candlesRef.current
-
-            const replayIndex = candles.findIndex((c) => Number(c.time) >= time)
-
-            if (replayIndex === -1) return
-
-            replayIndexRef.current = replayIndex
-
-            const visibleCandles = candles.slice(0, replayIndexRef.current + 1)
-
-            series.setData(visibleCandles)
+            rebuildReplay()
         })
 
         return unsubscribe
     }, [])
 
     useEffect(() => {
-        const unsubscribe = eventBus.on('replayNextCandle', () => {
-            const series = seriesRef.current
+        const unsubscribe = eventBus.on('replayTimeChanged', ({ time }) => {
+            replayStore.currentReplayTime = time
 
-            if (!series) return
-
-            const candles = candlesRef.current
-
-            replayIndexRef.current++
-
-            if (replayIndexRef.current >= candles.length) {
-                replayIndexRef.current = candles.length - 1
-
-                return
-            }
-
-            const visibleCandles = candles.slice(0, replayIndexRef.current + 1)
-
-            series.setData(visibleCandles)
+            rebuildReplay()
         })
 
         return unsubscribe

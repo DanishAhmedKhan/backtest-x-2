@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
+import { replayStore } from '../replay/ReplayStore'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -41,6 +42,18 @@ export default function ReplayToolbar() {
         window.addEventListener('mouseup', onMouseUp)
     }
 
+    const handlePlay = () => {
+        if (replayStore.currentReplayTime === null) {
+            return
+        }
+
+        replayStore.nextMinute()
+
+        eventBus.emit('replayTimeChanged', {
+            time: replayStore.currentReplayTime,
+        })
+    }
+
     return (
         <div
             style={{
@@ -73,13 +86,7 @@ export default function ReplayToolbar() {
 
             <button>◀◀</button>
 
-            <button
-                onClick={() => {
-                    eventBus.emit('replayNextCandle')
-                }}
-            >
-                ▶
-            </button>
+            <button onClick={handlePlay}>▶</button>
 
             <button>⏸</button>
 
