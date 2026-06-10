@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
-import { replayStore } from '../replay/ReplayStore'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -76,7 +75,6 @@ export default function ReplayToolbar() {
 
             <button
                 onClick={() => {
-                    replayStore.replayIndex++
                     eventBus.emit('replayNextCandle')
                 }}
             >

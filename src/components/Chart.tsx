@@ -53,6 +53,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
     const [, setStartX] = useState<number | null>(null)
+    const replayIndexRef = useRef(-1)
 
     useEffect(() => {
         if (!replayStore.startTime || !chartRef.current) return
@@ -194,9 +195,9 @@ function Chart({ id, ticker, timeframe }: Props) {
 
             if (replayIndex === -1) return
 
-            replayStore.replayIndex = replayIndex
+            replayIndexRef.current = replayIndex
 
-            const visibleCandles = candles.slice(0, replayIndex + 1)
+            const visibleCandles = candles.slice(0, replayIndexRef.current + 1)
 
             series.setData(visibleCandles)
         })
@@ -212,15 +213,15 @@ function Chart({ id, ticker, timeframe }: Props) {
 
             const candles = candlesRef.current
 
-            // replayStore.replayIndex++
+            replayIndexRef.current++
 
-            if (replayStore.replayIndex >= candles.length) {
-                replayStore.replayIndex = candles.length - 1
+            if (replayIndexRef.current >= candles.length) {
+                replayIndexRef.current = candles.length - 1
 
                 return
             }
 
-            const visibleCandles = candles.slice(0, replayStore.replayIndex + 1)
+            const visibleCandles = candles.slice(0, replayIndexRef.current + 1)
 
             series.setData(visibleCandles)
         })

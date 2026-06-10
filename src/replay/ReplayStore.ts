@@ -11,8 +11,6 @@ class ReplayStore {
 
     public isPlaying = false
 
-    public replayIndex = -1
-
     public start(time: number) {
         this.enabled = true
         this.startTime = time
@@ -25,7 +23,6 @@ class ReplayStore {
         this.enabled = false
         this.startTime = null
         this.previewTime = null
-        this.replayIndex = -1
         this.isPlaying = false
         this.isSelecting = true
     }
