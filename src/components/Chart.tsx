@@ -10,6 +10,7 @@ import {
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
+import type { Candle } from '../core/Candle'
 
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
@@ -20,6 +21,7 @@ import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import { useChartData } from '../hooks/charts/useChartData'
 import ReplayOverlay from './ReplayOverlay'
+import { CandleAggregator } from '../data/CandleAggregator'
 
 type Props = {
     id: string
@@ -33,6 +35,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
+    const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
@@ -52,15 +55,6 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
-    // const [, setStartX] = useState<number | null>(null)
-
-    // useEffect(() => {
-    //     if (!replayStore.startTime || !chartRef.current) return
-
-    //     const x = chartRef.current.timeScale().timeToCoordinate(replayStore.startTime as Time)
-
-    //     setStartX(x)
-    // }, [previewTime])
 
     useViewportSync(
         chartRef,
@@ -169,6 +163,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
+        raw1mCandlesRef,
         candleMapRef,
         timesRef,
         rightOffsetRef,
@@ -189,11 +184,39 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         const replayTime = replayStore.currentReplayTime
 
-        if (replayTime === null) return
+        const replayStart = replayStore.startTime
 
-        const visibleCandles = candlesRef.current.filter((c) => Number(c.time) <= replayTime)
+        if (replayTime === null || replayStart === null) {
+            return
+        }
 
-        series.setData(visibleCandles)
+        const tfSeconds = timeframe.toSeconds()
+
+        if (tfSeconds === 60) {
+            const visible = candlesRef.current.filter((c) => Number(c.time) <= replayTime)
+
+            series.setData(visible)
+
+            return
+        }
+
+        const replayBucket = Math.floor(replayStart / tfSeconds) * tfSeconds
+
+        const historical = candlesRef.current.filter((c) => Number(c.time) < replayBucket)
+
+        const replay1m = raw1mCandlesRef.current.filter((c) => c.time >= replayBucket && c.time <= replayTime)
+
+        const rebuilt = CandleAggregator.aggregate(replay1m, tfSeconds / 60)
+
+        const finalData = [...historical, ...rebuilt].map((c) => ({
+            time: c.time as Time,
+            open: c.open,
+            high: c.high,
+            low: c.low,
+            close: c.close,
+        }))
+
+        series.setData(finalData)
     }
 
     useEffect(() => {

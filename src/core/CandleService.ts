@@ -32,6 +32,10 @@ export class CandleService {
         return result
     }
 
+    static async getBaseCandles(ticker: Ticker): Promise<Candle[]> {
+        return CsvCandleLoader.load(ticker.value, 'M', 2)
+    }
+
     static async getOlderCandles(ticker: Ticker, timeframe: Timeframe, startIndex: number, count: number) {
         const tfSeconds = timeframe.toSeconds()
 

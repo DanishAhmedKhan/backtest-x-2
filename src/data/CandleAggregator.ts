@@ -2,42 +2,73 @@ import { Candle } from '../core/Candle'
 
 export class CandleAggregator {
     public static aggregate(candles: Candle[], intervalMinutes: number): Candle[] {
-        if (!candles.length) return []
+        if (!candles.length) {
+            return []
+        }
 
         const intervalSec = intervalMinutes * 60
 
-        const sorted = candles.slice().sort((a, b) => a.time - b.time)
-
         const buckets = new Map<number, Candle[]>()
 
-        for (const candle of sorted) {
-            const bucketTime = Math.floor(candle.time / intervalSec) * intervalSec
+        for (const candle of candles) {
+            const bucket = Math.floor(candle.time / intervalSec) * intervalSec
 
-            if (!buckets.has(bucketTime)) {
-                buckets.set(bucketTime, [])
+            if (!buckets.has(bucket)) {
+                buckets.set(bucket, [])
             }
 
-            buckets.get(bucketTime)!.push(candle)
+            buckets.get(bucket)!.push(candle)
+        }
+
+        return [...buckets.entries()].map(([time, group]) => this.buildBucket(group, time))
+    }
+
+    public static aggregateUntil(candles: Candle[], tfSeconds: number, replayTime: number): Candle[] {
+        if (!candles.length) {
+            return []
         }
 
         const result: Candle[] = []
 
-        for (const [bucketTime, group] of buckets) {
-            const first = group[0]
-            const last = group[group.length - 1]
+        let currentBucket: Candle[] = []
+        let currentStart: number | null = null
 
-            result.push(
-                new Candle({
-                    time: bucketTime,
-                    open: first.open,
-                    high: Math.max(...group.map((c) => c.high)),
-                    low: Math.min(...group.map((c) => c.low)),
-                    close: last.close,
-                    volume: group.reduce((sum, c) => sum + c.volume, 0),
-                }),
-            )
+        for (const candle of candles) {
+            if (candle.time > replayTime) {
+                break
+            }
+
+            const bucket = Math.floor(candle.time / tfSeconds) * tfSeconds
+
+            if (currentStart === null) {
+                currentStart = bucket
+            }
+
+            if (bucket !== currentStart) {
+                result.push(this.buildBucket(currentBucket, currentStart))
+
+                currentBucket = []
+                currentStart = bucket
+            }
+
+            currentBucket.push(candle)
         }
 
-        return result.sort((a, b) => a.time - b.time)
+        if (currentBucket.length) {
+            result.push(this.buildBucket(currentBucket, currentStart!))
+        }
+
+        return result
+    }
+
+    private static buildBucket(group: Candle[], time: number): Candle {
+        return new Candle({
+            time,
+            open: group[0].open,
+            high: Math.max(...group.map((c) => c.high)),
+            low: Math.min(...group.map((c) => c.low)),
+            close: group[group.length - 1].close,
+            volume: group.reduce((sum, c) => sum + c.volume, 0),
+        })
     }
 }

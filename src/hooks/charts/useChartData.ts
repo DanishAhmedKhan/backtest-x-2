@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import type { CandlestickData, Time, IChartApi, ISeriesApi } from 'lightweight-charts'
 import { CandleService } from '../../core/CandleService'
+import type { Candle } from '../../core/Candle'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
+import { TimeframeUnit } from '../../core/TimeframeUnit'
 
 type Props = {
     ticker: Ticker
@@ -13,6 +15,10 @@ type Props = {
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
 
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+
+    // IMPORTANT
+    raw1mCandlesRef: React.RefObject<Candle[]>
+
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
 
@@ -36,6 +42,8 @@ export function useChartData({
     seriesRef,
 
     candlesRef,
+    raw1mCandlesRef,
+
     candleMapRef,
     timesRef,
 
@@ -54,9 +62,7 @@ export function useChartData({
             const chart = chartRef.current
             const series = seriesRef.current
 
-            if (!chart || !series || !chartReady) {
-                return
-            }
+            if (!chart || !series || !chartReady) return
 
             const timeScale = chart.timeScale()
 
@@ -67,15 +73,15 @@ export function useChartData({
 
             setIsChangingTimeframe(true)
 
-            const raw = await CandleService.getCandles(ticker, timeframe)
+            const candles = await CandleService.getCandles(ticker, timeframe)
+            raw1mCandlesRef.current = await CandleService.getCandles(ticker, new Timeframe(1, TimeframeUnit.Minute))
 
             const totalFiles = await CandleService.getTotalFiles(ticker)
 
             totalFilesRef.current = totalFiles
-
             oldestLoadedFileRef.current = Math.max(0, totalFiles - 2)
 
-            const formatted: CandlestickData<Time>[] = raw.map((c) => ({
+            const formatted: CandlestickData<Time>[] = candles.map((c) => ({
                 time: c.time as Time,
                 open: c.open,
                 high: c.high,
@@ -84,49 +90,47 @@ export function useChartData({
             }))
 
             candlesRef.current = formatted
+
             candleMapRef.current.clear()
 
             formatted.forEach((c) => {
                 candleMapRef.current.set(Number(c.time), c)
             })
 
-            const newTimes = formatted.map((c) => Number(c.time))
-
-            timesRef.current = newTimes
+            timesRef.current = formatted.map((c) => Number(c.time))
 
             series.setData(formatted)
 
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    if (formatted.length === 0) {
+                    if (!formatted.length) {
                         setIsChangingTimeframe(false)
                         return
                     }
 
-                    let targetRightIndex = formatted.length - 1
+                    let targetRight = formatted.length - 1
 
-                    if (savedAnchorTime !== null && newTimes.length > 0) {
-                        const exactMatchIndex = newTimes.findIndex((t) => t >= savedAnchorTime)
+                    if (savedAnchorTime !== null) {
+                        const idx = timesRef.current.findIndex((t) => t >= savedAnchorTime)
 
-                        if (exactMatchIndex !== -1) {
-                            targetRightIndex = exactMatchIndex
+                        if (idx !== -1) {
+                            targetRight = idx
                         }
                     }
 
-                    let finalTo = targetRightIndex - savedOffset
+                    let finalTo = targetRight - savedOffset
+
                     let finalFrom = finalTo - savedVisibleBars
 
                     if (savedVisibleBars <= 5) {
-                        const dataRatio = 1 - savedRatio
+                        const ratio = 1 - savedRatio
 
-                        if (dataRatio > 0) {
-                            const calculatedTotalSlots = savedVisibleBars / dataRatio
+                        if (ratio > 0) {
+                            const total = savedVisibleBars / ratio
 
-                            const adjustedOffset = Math.round(calculatedTotalSlots * savedRatio)
+                            finalTo = targetRight + Math.round(total * savedRatio)
 
-                            finalTo = targetRightIndex + adjustedOffset
-
-                            finalFrom = finalTo - Math.round(calculatedTotalSlots)
+                            finalFrom = finalTo - Math.round(total)
                         }
                     }
 
