@@ -47,6 +47,12 @@ export default function ReplayToolbar() {
             return
         }
 
+        console.log(
+            'REPLAY TIME',
+            replayStore.currentReplayTime,
+            new Date(replayStore.currentReplayTime! * 1000).toISOString(),
+        )
+
         replayStore.nextMinute()
 
         eventBus.emit('replayTimeChanged', {

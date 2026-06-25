@@ -180,10 +180,11 @@ function Chart({ id, ticker, timeframe }: Props) {
     const rebuildReplay = () => {
         const series = seriesRef.current
 
-        if (!series) return
+        if (!series) {
+            return
+        }
 
         const replayTime = replayStore.currentReplayTime
-
         const replayStart = replayStore.startTime
 
         if (replayTime === null || replayStart === null) {
@@ -201,11 +202,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
 
         const replayBucket = Math.floor(replayStart / tfSeconds) * tfSeconds
-
         const historical = candlesRef.current.filter((c) => Number(c.time) < replayBucket)
-
         const replay1m = raw1mCandlesRef.current.filter((c) => c.time >= replayBucket && c.time <= replayTime)
-
         const rebuilt = CandleAggregator.aggregate(replay1m, tfSeconds / 60)
 
         const finalData = [...historical, ...rebuilt].map((c) => ({
@@ -219,25 +217,21 @@ function Chart({ id, ticker, timeframe }: Props) {
         series.setData(finalData)
     }
 
-    useEffect(() => {
-        const unsubscribe = eventBus.on('replayStart', ({ time }) => {
-            replayStore.currentReplayTime = time
-
-            rebuildReplay()
-        })
-
-        return unsubscribe
-    }, [])
+    const handleReplayUpdate = (time: number) => {
+        replayStore.currentReplayTime = time
+        rebuildReplay()
+    }
 
     useEffect(() => {
-        const unsubscribe = eventBus.on('replayTimeChanged', ({ time }) => {
-            replayStore.currentReplayTime = time
+        const unsubStart = eventBus.on('replayStart', ({ time }) => handleReplayUpdate(time))
 
-            rebuildReplay()
-        })
+        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => handleReplayUpdate(time))
 
-        return unsubscribe
-    }, [])
+        return () => {
+            unsubStart()
+            unsubChange()
+        }
+    }, [timeframe])
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return

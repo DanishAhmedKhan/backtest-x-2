@@ -15,18 +15,6 @@ export function useCrosshairSync(
         const chart = chartRef.current
         if (!chart) return
 
-        // const handler = (param: MouseEventParams<Time>) => {
-        //     if (!param.time || typeof param.time !== 'number') {
-        //         eventBus.emit('crosshairMove', { time: null, sourceId: id })
-        //         return
-        //     }
-
-        //     eventBus.emit('crosshairMove', {
-        //         time: param.time,
-        //         sourceId: id,
-        //     })
-        // }
-
         const handler = (param: MouseEventParams<Time>) => {
             const time = typeof param.time === 'number' ? param.time : null
 
