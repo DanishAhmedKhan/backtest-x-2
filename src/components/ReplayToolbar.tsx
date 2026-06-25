@@ -142,10 +142,10 @@ export default function ReplayToolbar() {
             <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
                 <option value={1}>1x</option>
                 <option value={2}>2x</option>
-                <option value={5}>4x</option>
-                <option value={10}>8x</option>
-                <option value={30}>16x</option>
-                <option value={60}>32x</option>
+                <option value={5}>5x</option>
+                <option value={10}>10x</option>
+                <option value={30}>30x</option>
+                <option value={60}>60x</option>
             </select>
 
             <button onClick={handleExit}>Exit</button>

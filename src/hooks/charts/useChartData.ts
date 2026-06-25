@@ -10,26 +10,18 @@ type Props = {
     ticker: Ticker
     timeframe: Timeframe
     chartReady: boolean
-
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
-
     candlesRef: React.RefObject<CandlestickData<Time>[]>
-
-    // IMPORTANT
     raw1mCandlesRef: React.RefObject<Candle[]>
-
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
-
     rightOffsetRef: React.RefObject<number>
     visibleBarsRef: React.RefObject<number>
     anchorTimeRef: React.RefObject<number | null>
     whitespaceRatioRef: React.RefObject<number>
-
     oldestLoadedFileRef: React.RefObject<number>
     totalFilesRef: React.RefObject<number>
-
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -37,24 +29,18 @@ export function useChartData({
     ticker,
     timeframe,
     chartReady,
-
     chartRef,
     seriesRef,
-
     candlesRef,
     raw1mCandlesRef,
-
     candleMapRef,
     timesRef,
-
     rightOffsetRef,
     visibleBarsRef,
     anchorTimeRef,
     whitespaceRatioRef,
-
     oldestLoadedFileRef,
     totalFilesRef,
-
     setIsChangingTimeframe,
 }: Props) {
     useEffect(() => {
