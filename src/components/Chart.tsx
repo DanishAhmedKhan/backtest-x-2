@@ -189,7 +189,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
 
-        replayStore.start(previewTime)
+        replayStore.start(previewTime, timeframe.toSeconds())
 
         setPreviewTime(null)
         setPreviewX(null)

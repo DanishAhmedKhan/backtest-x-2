@@ -7,17 +7,33 @@ class ReplayStore {
 
     public startTime: number | null = null
 
-    public isSelecting = true
-
     public currentReplayTime: number | null = null
 
-    public start(time: number) {
+    public isSelecting = true
+
+    public stepSeconds = 60
+
+    public start(time: number, stepSeconds: number) {
         this.enabled = true
         this.startTime = time
         this.currentReplayTime = time
+        this.stepSeconds = stepSeconds
+
         this.isSelecting = false
         this.previewTime = null
         this.showToolbar = false
+    }
+
+    public step() {
+        if (this.currentReplayTime === null) return
+
+        this.currentReplayTime += this.stepSeconds
+    }
+
+    public rewind() {
+        if (this.currentReplayTime === null) return
+
+        this.currentReplayTime -= this.stepSeconds
     }
 
     public stop() {
@@ -26,17 +42,6 @@ class ReplayStore {
         this.currentReplayTime = null
         this.previewTime = null
         this.isSelecting = true
-    }
-    public step(seconds: number) {
-        if (this.currentReplayTime === null) return
-
-        this.currentReplayTime += seconds
-    }
-
-    public rewind(seconds: number) {
-        if (this.currentReplayTime === null) return
-
-        this.currentReplayTime -= seconds
     }
 
     public openToolbar() {

@@ -50,7 +50,7 @@ export default function ReplayToolbar() {
     }
 
     const handleForward = () => {
-        replayStore.step(60)
+        replayStore.step()
 
         if (replayStore.currentReplayTime === null) {
             return
@@ -62,7 +62,7 @@ export default function ReplayToolbar() {
     }
 
     const handleBackward = () => {
-        replayStore.rewind(60)
+        replayStore.rewind()
 
         if (replayStore.currentReplayTime === null) {
             return
@@ -87,7 +87,7 @@ export default function ReplayToolbar() {
         }
 
         const interval = setInterval(() => {
-            replayStore.step(60)
+            replayStore.step()
 
             if (replayStore.currentReplayTime === null) {
                 return
@@ -142,9 +142,10 @@ export default function ReplayToolbar() {
             <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
                 <option value={1}>1x</option>
                 <option value={2}>2x</option>
-                <option value={4}>4x</option>
-                <option value={8}>8x</option>
-                <option value={16}>16x</option>
+                <option value={5}>4x</option>
+                <option value={10}>8x</option>
+                <option value={30}>16x</option>
+                <option value={60}>32x</option>
             </select>
 
             <button onClick={handleExit}>Exit</button>
