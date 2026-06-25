@@ -17,11 +17,11 @@ import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
+import { useReplaySync } from '../hooks/charts/useReplaySync'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import { useChartData } from '../hooks/charts/useChartData'
 import ReplayOverlay from './ReplayOverlay'
-import { CandleAggregator } from '../data/CandleAggregator'
 
 type Props = {
     id: string
@@ -177,61 +177,12 @@ function Chart({ id, ticker, timeframe }: Props) {
         },
     })
 
-    const rebuildReplay = () => {
-        const series = seriesRef.current
-
-        if (!series) {
-            return
-        }
-
-        const replayTime = replayStore.currentReplayTime
-        const replayStart = replayStore.startTime
-
-        if (replayTime === null || replayStart === null) {
-            return
-        }
-
-        const tfSeconds = timeframe.toSeconds()
-
-        if (tfSeconds === 60) {
-            const visible = candlesRef.current.filter((c) => Number(c.time) <= replayTime)
-
-            series.setData(visible)
-
-            return
-        }
-
-        const replayBucket = Math.floor(replayStart / tfSeconds) * tfSeconds
-        const historical = candlesRef.current.filter((c) => Number(c.time) < replayBucket)
-        const replay1m = raw1mCandlesRef.current.filter((c) => c.time >= replayBucket && c.time <= replayTime)
-        const rebuilt = CandleAggregator.aggregate(replay1m, tfSeconds / 60)
-
-        const finalData = [...historical, ...rebuilt].map((c) => ({
-            time: c.time as Time,
-            open: c.open,
-            high: c.high,
-            low: c.low,
-            close: c.close,
-        }))
-
-        series.setData(finalData)
-    }
-
-    const handleReplayUpdate = (time: number) => {
-        replayStore.currentReplayTime = time
-        rebuildReplay()
-    }
-
-    useEffect(() => {
-        const unsubStart = eventBus.on('replayStart', ({ time }) => handleReplayUpdate(time))
-
-        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => handleReplayUpdate(time))
-
-        return () => {
-            unsubStart()
-            unsubChange()
-        }
-    }, [timeframe])
+    useReplaySync({
+        timeframe,
+        seriesRef,
+        candlesRef,
+        raw1mCandlesRef,
+    })
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
