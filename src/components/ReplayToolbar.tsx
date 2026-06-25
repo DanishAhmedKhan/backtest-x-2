@@ -52,24 +52,24 @@ export default function ReplayToolbar() {
     const handleForward = () => {
         replayStore.step()
 
-        if (replayStore.currentReplayTime === null) {
+        if (replayStore.marketTime === null) {
             return
         }
 
         eventBus.emit('replayTimeChanged', {
-            time: replayStore.currentReplayTime,
+            time: replayStore.marketTime,
         })
     }
 
     const handleBackward = () => {
         replayStore.rewind()
 
-        if (replayStore.currentReplayTime === null) {
+        if (replayStore.marketTime === null) {
             return
         }
 
         eventBus.emit('replayTimeChanged', {
-            time: replayStore.currentReplayTime,
+            time: replayStore.marketTime,
         })
     }
 
@@ -89,12 +89,12 @@ export default function ReplayToolbar() {
         const interval = setInterval(() => {
             replayStore.step()
 
-            if (replayStore.currentReplayTime === null) {
+            if (replayStore.marketTime === null) {
                 return
             }
 
             eventBus.emit('replayTimeChanged', {
-                time: replayStore.currentReplayTime,
+                time: replayStore.marketTime,
             })
         }, 1000 / speed)
 

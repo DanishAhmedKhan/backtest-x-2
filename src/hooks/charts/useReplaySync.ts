@@ -24,7 +24,7 @@ export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRe
                 return
             }
 
-            const replayTime = replayStore.currentReplayTime
+            const replayTime = replayStore.marketTime
             const replayStart = replayStore.startTime
 
             if (replayTime === null || replayStart === null) {
@@ -57,15 +57,15 @@ export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRe
             series.setData(finalData)
         }
 
-        const handleReplayUpdate = (time: number) => {
-            replayStore.currentReplayTime = time
+        const unsubStart = eventBus.on('replayStart', () => {
+            rebuildReplay()
+        })
+
+        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => {
+            replayStore.marketTime = time
 
             rebuildReplay()
-        }
-
-        const unsubStart = eventBus.on('replayStart', ({ time }) => handleReplayUpdate(time))
-
-        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => handleReplayUpdate(time))
+        })
 
         return () => {
             unsubStart()
