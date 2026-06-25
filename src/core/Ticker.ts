@@ -12,6 +12,10 @@ export class Ticker {
             throw new Error('Ticker value cannot be empty')
         }
 
+        if (value.length > 16) {
+            throw new Error('Ticker length exceeds the max ticker length')
+        }
+
         this.value = value.toUpperCase()
         this.assetType = assetType
         this.description = description
@@ -27,5 +31,14 @@ export class Ticker {
 
     public equals(ticker?: Ticker): boolean {
         return this.value === ticker?.value
+    }
+
+    public static stringify(ticker: Ticker) {
+        return `${ticker.value} ${ticker.assetType} ${ticker.description}`
+    }
+
+    public static parse(ticker: string) {
+        const arr = ticker.split(' ')
+        return new Ticker(arr[0], arr[1] as AssetType, arr[2])
     }
 }

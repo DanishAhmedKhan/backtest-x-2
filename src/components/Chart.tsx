@@ -17,7 +17,6 @@ import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
-import { useReplayAutoFollow } from '../hooks/charts/useReplayAutoFollow'
 
 import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'

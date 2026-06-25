@@ -27,6 +27,31 @@ export class Timeframe {
         return `${this.value}${this.unit}`
     }
 
+    public toSeconds(): number {
+        switch (this.unit) {
+            case TimeframeUnit.Second:
+                return this.value
+            case TimeframeUnit.Minute:
+                return this.value * 60
+            case TimeframeUnit.Hour:
+                return this.value * 3600
+            case TimeframeUnit.Day:
+                return this.value * 86400
+        }
+    }
+
+    public toKey(): string {
+        return `${this.value}${this.unit}`
+    }
+
+    public equals(timeframe: Timeframe): boolean {
+        return this.value === timeframe.value && this.unit === timeframe.unit
+    }
+
+    public static stringfy(timeframe: Timeframe) {
+        return `${timeframe.value}${timeframe.unit}`
+    }
+
     public static parse(tf: string): Timeframe {
         if (!tf || typeof tf !== 'string') {
             throw new Error('Timeframe must be a non-empty string')
@@ -57,26 +82,5 @@ export class Timeframe {
         }
 
         return new Timeframe(amount, unit)
-    }
-
-    public toSeconds(): number {
-        switch (this.unit) {
-            case TimeframeUnit.Second:
-                return this.value
-            case TimeframeUnit.Minute:
-                return this.value * 60
-            case TimeframeUnit.Hour:
-                return this.value * 3600
-            case TimeframeUnit.Day:
-                return this.value * 86400
-        }
-    }
-
-    public toKey(): string {
-        return `${this.value}${this.unit}`
-    }
-
-    public equals(timeframe: Timeframe): boolean {
-        return this.value === timeframe.value && this.unit === timeframe.unit
     }
 }

@@ -1,25 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TopBar from './TopBar'
 import ChartWindow from './ChartWindow'
-import { TickerRegistry } from '../core/TickerRegstry'
-import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import ToolBar from './ToolBar'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
 import ReplayToolbar from './ReplayToolbar'
 import { replayStore } from '../replay/ReplayStore'
+import { LocalStorageProvider } from '../storage/LocalStorageProvider'
+import { STORAGE_KEYS } from '../storage/key'
+import type { AppConfig } from '../types/AppConfig'
+import { Ticker } from '../core/Ticker'
+import { Timeframe } from '../core/Timeframe'
 
-const createCharts = (count: number): ChartState[] => {
-    return Array.from({ length: count }).map((_, i) => ({
-        id: `chart-${i + 1}`,
-        ticker: TickerRegistry.getDefault(),
-        timeframe: TimeframeRegistry.getDefault(),
+const storage = new LocalStorageProvider()
+
+const loadConfig = () => {
+    const config = storage.get<AppConfig>(STORAGE_KEYS.APP_CONFIG)
+
+    if (!config) {
+        return {
+            layout: '2x1' as LayoutType,
+            charts: [
+                {
+                    ticker: 'EURUSD',
+                    timeframe: '1m',
+                },
+                {
+                    ticker: 'EURUSD',
+                    timeframe: '5m',
+                },
+            ],
+        }
+    }
+
+    return config
+}
+
+const createCharts = (charts): ChartState[] => {
+    return charts.map((chart, i) => ({
+        id: `chart-${i}`,
+        ticker: Ticker.parse(chart.ticker),
+        timeframe: Timeframe.parse(chart.timeframe),
     }))
 }
 
 export default function Main() {
-    const [layout, setLayout] = useState<LayoutType>('2x1')
-    const [charts, setCharts] = useState<ChartState[]>(createCharts(2))
+    const config = loadConfig()
+
+    const [layout, setLayout] = useState<LayoutType>(config.layout)
+    const [charts, setCharts] = useState<ChartState[]>(createCharts(config.charts))
     const [activeChartId, setActiveChartId] = useState('chart-1')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
 
@@ -43,6 +72,18 @@ export default function Main() {
         setCharts(createCharts(newCount))
         setActiveChartId('chart-1')
     }
+
+    useEffect(() => {
+        const config = {
+            layout: layout,
+            charts: charts.map((chart) => ({
+                ticker: Ticker.stringify(chart.ticker),
+                timeframe: Timeframe.stringfy(chart.timeframe),
+            })),
+        }
+
+        storage.set(STORAGE_KEYS.APP_CONFIG, config)
+    }, [layout, charts])
 
     return (
         <div
