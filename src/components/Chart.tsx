@@ -12,15 +12,18 @@ import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import type { Candle } from '../core/Candle'
 
+import { useChartData } from '../hooks/charts/useChartData'
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
-import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
-import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
+import { useReplayAutoFollow } from '../hooks/charts/useReplayAutoFollow'
+
+import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
+import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
+
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
-import { useChartData } from '../hooks/charts/useChartData'
 import ReplayOverlay from './ReplayOverlay'
 
 type Props = {
@@ -179,6 +182,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useReplaySync({
         timeframe,
+        chartRef,
         seriesRef,
         candlesRef,
         raw1mCandlesRef,

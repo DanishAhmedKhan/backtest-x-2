@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import type { CandlestickData, ISeriesApi, Time } from 'lightweight-charts'
+import { useEffect, useRef } from 'react'
+import type { CandlestickData, ISeriesApi, IChartApi, Time } from 'lightweight-charts'
 
 import { Timeframe } from '../../core/Timeframe'
 import type { Candle } from '../../core/Candle'
@@ -10,13 +10,48 @@ import { CandleAggregator } from '../../data/CandleAggregator'
 
 type Props = {
     timeframe: Timeframe
+    chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     raw1mCandlesRef: React.RefObject<Candle[]>
 }
 
-export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRef }: Props) {
+export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef }: Props) {
+    const previousCountRef = useRef<number>(0)
+
     useEffect(() => {
+        const preserveViewport = (currentCount: number) => {
+            const chart = chartRef.current
+
+            if (!chart) {
+                return
+            }
+
+            if (previousCountRef.current === 0) {
+                previousCountRef.current = currentCount
+                return
+            }
+
+            const addedBars = currentCount - previousCountRef.current
+
+            previousCountRef.current = currentCount
+
+            if (addedBars <= 0) {
+                return
+            }
+
+            const range = chart.timeScale().getVisibleLogicalRange()
+
+            if (!range) {
+                return
+            }
+
+            chart.timeScale().setVisibleLogicalRange({
+                from: range.from + addedBars,
+                to: range.to + addedBars,
+            })
+        }
+
         const rebuildReplay = () => {
             const series = seriesRef.current
 
@@ -38,6 +73,8 @@ export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRe
 
                 series.setData(visible)
 
+                preserveViewport(visible.length)
+
                 return
             }
 
@@ -55,9 +92,12 @@ export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRe
             }))
 
             series.setData(finalData)
+
+            preserveViewport(finalData.length)
         }
 
         const unsubStart = eventBus.on('replayStart', () => {
+            previousCountRef.current = 0
             rebuildReplay()
         })
 
@@ -71,5 +111,5 @@ export function useReplaySync({ timeframe, seriesRef, candlesRef, raw1mCandlesRe
             unsubStart()
             unsubChange()
         }
-    }, [timeframe, seriesRef, candlesRef, raw1mCandlesRef])
+    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef])
 }

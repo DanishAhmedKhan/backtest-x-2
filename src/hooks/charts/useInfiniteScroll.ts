@@ -4,6 +4,7 @@ import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-c
 import { CandleService } from '../../core/CandleService'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
+import { replayStore } from '../../replay/ReplayStore'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -43,6 +44,10 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
+            if (replayStore.enabled) {
+                return
+            }
+
             if (isLoadingOlderRef.current) {
                 return
             }
