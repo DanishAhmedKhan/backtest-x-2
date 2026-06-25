@@ -9,8 +9,6 @@ class ReplayStore {
 
     public isSelecting = true
 
-    public isPlaying = false
-
     public currentReplayTime: number | null = null
 
     public start(time: number) {
@@ -25,19 +23,20 @@ class ReplayStore {
     public stop() {
         this.enabled = false
         this.startTime = null
+        this.currentReplayTime = null
         this.previewTime = null
-        this.isPlaying = false
         this.isSelecting = true
     }
-
-    public pause() {
-        this.isPlaying = false
-    }
-
-    public nextMinute() {
+    public step(seconds: number) {
         if (this.currentReplayTime === null) return
 
-        this.currentReplayTime += 60
+        this.currentReplayTime += seconds
+    }
+
+    public rewind(seconds: number) {
+        if (this.currentReplayTime === null) return
+
+        this.currentReplayTime -= seconds
     }
 
     public openToolbar() {

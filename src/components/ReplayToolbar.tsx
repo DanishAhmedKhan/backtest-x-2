@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 
@@ -13,6 +13,9 @@ export default function ReplayToolbar() {
         x: 0,
         y: 0,
     })
+
+    const [isPlaying, setIsPlaying] = useState(false)
+    const [speed, setSpeed] = useState(1)
 
     const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         draggingRef.current = true
@@ -42,23 +45,61 @@ export default function ReplayToolbar() {
         window.addEventListener('mouseup', onMouseUp)
     }
 
-    const handlePlay = () => {
+    const handleTogglePlay = () => {
+        setIsPlaying((prev) => !prev)
+    }
+
+    const handleForward = () => {
+        replayStore.step(60)
+
         if (replayStore.currentReplayTime === null) {
             return
         }
-
-        console.log(
-            'REPLAY TIME',
-            replayStore.currentReplayTime,
-            new Date(replayStore.currentReplayTime! * 1000).toISOString(),
-        )
-
-        replayStore.nextMinute()
 
         eventBus.emit('replayTimeChanged', {
             time: replayStore.currentReplayTime,
         })
     }
+
+    const handleBackward = () => {
+        replayStore.rewind(60)
+
+        if (replayStore.currentReplayTime === null) {
+            return
+        }
+
+        eventBus.emit('replayTimeChanged', {
+            time: replayStore.currentReplayTime,
+        })
+    }
+
+    const handleExit = () => {
+        setIsPlaying(false)
+
+        replayStore.stop()
+
+        eventBus.emit('replayStop')
+    }
+
+    useEffect(() => {
+        if (!isPlaying) {
+            return
+        }
+
+        const interval = setInterval(() => {
+            replayStore.step(60)
+
+            if (replayStore.currentReplayTime === null) {
+                return
+            }
+
+            eventBus.emit('replayTimeChanged', {
+                time: replayStore.currentReplayTime,
+            })
+        }, 1000 / speed)
+
+        return () => clearInterval(interval)
+    }, [isPlaying, speed])
 
     return (
         <div
@@ -90,25 +131,23 @@ export default function ReplayToolbar() {
                 ⋮⋮
             </div>
 
-            <button>◀◀</button>
+            <button onClick={handleBackward}>◀◀</button>
 
-            <button onClick={handlePlay}>▶</button>
+            <button onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
 
-            <button>⏸</button>
-
-            <button>▶▶</button>
+            <button onClick={handleForward}>▶▶</button>
 
             <button>Step</button>
 
-            <select>
-                <option>1x</option>
-                <option>2x</option>
-                <option>4x</option>
-                <option>8x</option>
-                <option>16x</option>
+            <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
+                <option value={1}>1x</option>
+                <option value={2}>2x</option>
+                <option value={4}>4x</option>
+                <option value={8}>8x</option>
+                <option value={16}>16x</option>
             </select>
 
-            <button>Exit</button>
+            <button onClick={handleExit}>Exit</button>
         </div>
     )
 }
