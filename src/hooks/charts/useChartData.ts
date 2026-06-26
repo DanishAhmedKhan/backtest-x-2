@@ -6,7 +6,7 @@ import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
 
-type Props = {
+type Params = {
     ticker: Ticker
     timeframe: Timeframe
     chartReady: boolean
@@ -19,7 +19,9 @@ type Props = {
     rightOffsetRef: React.RefObject<number>
     visibleBarsRef: React.RefObject<number>
     anchorTimeRef: React.RefObject<number | null>
-    whitespaceRatioRef: React.RefObject<number>
+    anchorPositionRef: React.RefObject<number>
+    whitespaceRatioRef: React.RefObject<number | null>
+    visibleRatioRef: React.RefObject<number>
     oldestLoadedFileRef: React.RefObject<number>
     totalFilesRef: React.RefObject<number>
     setIsChangingTimeframe: (value: boolean) => void
@@ -35,14 +37,13 @@ export function useChartData({
     raw1mCandlesRef,
     candleMapRef,
     timesRef,
-    rightOffsetRef,
     visibleBarsRef,
     anchorTimeRef,
     whitespaceRatioRef,
     oldestLoadedFileRef,
     totalFilesRef,
     setIsChangingTimeframe,
-}: Props) {
+}: Params) {
     useEffect(() => {
         const load = async () => {
             const chart = chartRef.current
@@ -52,10 +53,8 @@ export function useChartData({
 
             const timeScale = chart.timeScale()
 
-            const savedOffset = rightOffsetRef.current
             const savedVisibleBars = visibleBarsRef.current
             const savedAnchorTime = anchorTimeRef.current
-            const savedRatio = whitespaceRatioRef.current
 
             setIsChangingTimeframe(true)
 
@@ -104,21 +103,22 @@ export function useChartData({
                         }
                     }
 
-                    let finalTo = targetRight - savedOffset
+                    const viewportWidth = savedVisibleBars
 
-                    let finalFrom = finalTo - savedVisibleBars
+                    const whitespaceBars = viewportWidth * whitespaceRatioRef.current
 
-                    if (savedVisibleBars <= 5) {
-                        const ratio = 1 - savedRatio
+                    const finalTo = targetRight + whitespaceBars
 
-                        if (ratio > 0) {
-                            const total = savedVisibleBars / ratio
+                    const finalFrom = finalTo - viewportWidth
 
-                            finalTo = targetRight + Math.round(total * savedRatio)
-
-                            finalFrom = finalTo - Math.round(total)
-                        }
-                    }
+                    console.log({
+                        timeframe: timeframe.toKey(),
+                        targetRight,
+                        formattedLength: formatted.length,
+                        savedAnchorTime,
+                        whitespaceRatio: whitespaceRatioRef.current,
+                        visibleBars: savedVisibleBars,
+                    })
 
                     timeScale.setVisibleLogicalRange({
                         from: finalFrom,

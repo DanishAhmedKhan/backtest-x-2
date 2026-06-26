@@ -15,7 +15,7 @@ export const DEFAULT_CHART_CONFIG = {
     },
     timeScale: {
         timeVisible: true,
-        rightOffset: 10,
+        rightOffset: 20,
         rightBarStaysOnScroll: true,
         shiftVisibleRangeOnNewBar: false,
     },

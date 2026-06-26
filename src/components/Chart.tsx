@@ -41,13 +41,14 @@ function Chart({ id, ticker, timeframe }: Props) {
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
-    const rightOffsetRef = useRef<number>(10)
+    const rightOffsetRef = useRef<number>(20)
     const visibleBarsRef = useRef<number>(100)
     const anchorTimeRef = useRef<number | null>(null)
+    const anchorPositionRef = useRef(0.5)
+    const visibleRatioRef = useRef<number>(0.3)
+    const whitespaceRatioRef = useRef<number>(0.2)
 
-    const whitespaceRatioRef = useRef<number>(0.1)
-
-    const isChangingTimeframe = useRef<boolean>(false)
+    const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
     const [chartReady, setChartReady] = useState<boolean>(false)
 
@@ -58,16 +59,16 @@ function Chart({ id, ticker, timeframe }: Props) {
     const [previewTime, setPreviewTime] = useState<number | null>(null)
     const [previewX, setPreviewX] = useState<number | null>(null)
 
-    useViewportSync(
+    useViewportSync({
         chartRef,
         candlesRef,
         rightOffsetRef,
         visibleBarsRef,
-        isChangingTimeframe,
+        isChangingTimeframeRef,
         anchorTimeRef,
         whitespaceRatioRef,
         chartReady,
-    )
+    })
 
     useInfiniteScroll({
         chartRef,
@@ -114,7 +115,14 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         const chartConfig = DEFAULT_CHART_CONFIG
         chartConfig.timeScale.rightOffset = rightOffsetRef.current
-        const chart = createChart(containerRef.current, chartConfig)
+
+        const chart = createChart(containerRef.current, {
+            ...DEFAULT_CHART_CONFIG,
+            timeScale: {
+                ...DEFAULT_CHART_CONFIG.timeScale,
+                rightOffset: rightOffsetRef.current,
+            },
+        })
 
         const timeSeriesConfig = TIME_SERIES_CONFIG
         const series = chart.addSeries(CandlestickSeries, timeSeriesConfig)
@@ -171,11 +179,13 @@ function Chart({ id, ticker, timeframe }: Props) {
         rightOffsetRef,
         visibleBarsRef,
         anchorTimeRef,
+        anchorPositionRef,
+        visibleRatioRef,
         whitespaceRatioRef,
         oldestLoadedFileRef,
         totalFilesRef,
         setIsChangingTimeframe: (value) => {
-            isChangingTimeframe.current = value
+            isChangingTimeframeRef.current = value
         },
     })
 

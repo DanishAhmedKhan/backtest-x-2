@@ -1,18 +1,30 @@
 import { useEffect } from 'react'
 import type { IChartApi, Time, CandlestickData } from 'lightweight-charts'
 
-export function useViewportSync(
-    chartRef: React.RefObject<IChartApi | null>,
-    candlesRef: React.RefObject<CandlestickData<Time>[]>,
-    rightOffsetRef: React.RefObject<number>,
-    visibleBarsRef: React.RefObject<number>,
-    isChangingTimeframeRef: React.RefObject<boolean>,
-    anchorTimeRef: React.RefObject<number | null>,
-    whitespaceRatioRef: React.RefObject<number>,
-    chartReady: boolean,
-) {
+type Params = {
+    chartRef: React.RefObject<IChartApi | null>
+    candlesRef: React.RefObject<CandlestickData<Time>[]>
+    rightOffsetRef: React.RefObject<number>
+    visibleBarsRef: React.RefObject<number>
+    isChangingTimeframeRef: React.RefObject<boolean>
+    anchorTimeRef: React.RefObject<number | null>
+    whitespaceRatioRef: React.RefObject<number | null>
+    chartReady: boolean
+}
+
+export function useViewportSync({
+    chartRef,
+    candlesRef,
+    rightOffsetRef,
+    visibleBarsRef,
+    isChangingTimeframeRef,
+    anchorTimeRef,
+    whitespaceRatioRef,
+    chartReady,
+}: Params) {
     useEffect(() => {
         const chart = chartRef.current
+
         if (!chart || !chartReady) return
 
         const timeScale = chart.timeScale()
@@ -27,23 +39,18 @@ export function useViewportSync(
 
             const totalBars = candles.length
 
-            const currentOffset = timeScale.options().rightOffset
-            const totalScreenSlots = range.to - range.from
-            const visibleCandlesCount = totalScreenSlots - currentOffset
+            const visibleWidth = range.to - range.from
+            visibleBarsRef.current = Math.max(1, Math.round(visibleWidth))
 
-            if (totalScreenSlots > 0) {
-                whitespaceRatioRef.current = currentOffset / totalScreenSlots
-            }
+            const rightmostCandleIndex = totalBars - 1
+            const whitespaceBars = range.to - rightmostCandleIndex
+            whitespaceRatioRef.current = whitespaceBars / visibleWidth
 
-            const calculatedOffset = totalBars - 1 - range.to
-            rightOffsetRef.current = Math.round(calculatedOffset)
-            visibleBarsRef.current = Math.max(1, Math.round(visibleCandlesCount))
+            const anchorIndex = Math.max(0, Math.min(totalBars - 1, Math.floor(rightmostCandleIndex)))
+            const anchorCandle = candles[anchorIndex]
 
-            const rightCandleIndex = Math.max(0, Math.min(totalBars - 1, Math.floor(range.to - currentOffset)))
-            const targetRightCandle = candles[rightCandleIndex]
-
-            if (targetRightCandle) {
-                anchorTimeRef.current = Number(targetRightCandle.time)
+            if (anchorCandle) {
+                anchorTimeRef.current = Number(anchorCandle.time)
             }
         }
 
@@ -59,7 +66,7 @@ export function useViewportSync(
         visibleBarsRef,
         isChangingTimeframeRef,
         anchorTimeRef,
-        whitespaceRatioRef,
         chartReady,
+        whitespaceRatioRef,
     ])
 }
