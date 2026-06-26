@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import TopBar from './TopBar'
 import ChartWindow from './ChartWindow'
 import ToolBar from './ToolBar'
+import ReplayToolbar from './ReplayToolbar'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
-import ReplayToolbar from './ReplayToolbar'
 import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
@@ -23,14 +23,8 @@ const loadConfig = () => {
         return {
             layout: '2x1' as LayoutType,
             charts: [
-                {
-                    ticker: 'EURUSD',
-                    timeframe: '1m',
-                },
-                {
-                    ticker: 'EURUSD',
-                    timeframe: '5m',
-                },
+                { ticker: 'EURUSD', timeframe: '1m' },
+                { ticker: 'EURUSD', timeframe: '5m' },
             ],
         }
     }
@@ -46,9 +40,9 @@ const createCharts = (charts: ChartConfig[]): ChartState[] => {
     }))
 }
 
-const createNewCharts = (chartCount: number): ChartState[] => {
-    return Array.from({ length: chartCount }).map((_, i) => ({
-        id: `chart-${i}`,
+const createNewCharts = (count: number, startIndex: number = 0): ChartState[] => {
+    return Array.from({ length: count }).map((_, i) => ({
+        id: `chart-${startIndex + i}`,
         ticker: TickerRegistry.getDefault(),
         timeframe: TimeframeRegistry.getDefault(),
     }))
@@ -62,7 +56,7 @@ export default function Main() {
     const [activeChartId, setActiveChartId] = useState('chart-1')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
 
-    const activeChart = charts.find((c) => c.id === activeChartId)!
+    const activeChart = charts.find((c) => c.id === activeChartId) ?? charts[0]
 
     const updateActiveChart = (partial: Partial<ChartState>) => {
         setCharts((prev) => prev.map((c) => (c.id === activeChartId ? { ...c, ...partial } : c)))
@@ -84,14 +78,13 @@ export default function Main() {
         let newCharts = []
 
         if (newChartCount > oldChartCount) {
-            newCharts = [...charts, ...createNewCharts(newChartCount)]
+            newCharts = [...charts, ...createNewCharts(newChartCount - charts.length, charts.length)]
         } else if (newChartCount < oldChartCount) {
-            newCharts = charts.splice(0, newChartCount)
+            newCharts = charts.slice(0, newChartCount)
         }
 
-        // setCharts(createNewCharts(newChartCount))
         setCharts(newCharts)
-        setActiveChartId('chart-1')
+        setActiveChartId(newCharts[0].id)
     }
 
     useEffect(() => {

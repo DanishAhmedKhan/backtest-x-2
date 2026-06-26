@@ -43,15 +43,19 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
 
     const { width, height } = size
 
+    const renderChart = (chart: ChartState, frameId: string) => (
+        <ChartFrame
+            id={frameId}
+            chart={chart}
+            isActive={chart.id === activeChartId}
+            onSelect={() => onSelectChart(chart.id)}
+        />
+    )
+
     if (layout === '1x1') {
         return (
             <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-                <ChartFrame
-                    id="1x1-1"
-                    chart={charts[0]}
-                    isActive={charts[0].id === activeChartId}
-                    onSelect={() => onSelectChart(charts[0].id)}
-                />
+                {renderChart(charts[0], '2x1-1')}
             </div>
         )
     }
@@ -70,14 +74,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     overflow: 'hidden',
                 }}
             >
-                <div style={{ width: leftPx, minWidth: 0 }}>
-                    <ChartFrame
-                        id="2x1-1"
-                        chart={charts[0]}
-                        isActive={charts[0].id === activeChartId}
-                        onSelect={() => onSelectChart(charts[0].id)}
-                    />
-                </div>
+                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '2x1-1')}</div>
 
                 <div
                     onMouseDown={resize.startDrag('vertical')}
@@ -88,14 +85,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     }}
                 />
 
-                <div style={{ width: rightPx, minWidth: 0 }}>
-                    <ChartFrame
-                        id="2x1-2"
-                        chart={charts[1]}
-                        isActive={charts[1].id === activeChartId}
-                        onSelect={() => onSelectChart(charts[1].id)}
-                    />
-                </div>
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '2x1-2')}</div>
             </div>
         )
     }
@@ -105,7 +95,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         const rightPx = width - leftPx - HANDLE_SIZE
 
         const topPx = horizontal.size ?? height / 2
-        const bottomPx = height - topPx - HANDLE_SIZE
+        const bottomPx = height - topPx
 
         return (
             <div
@@ -118,14 +108,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 }}
             >
                 <div style={{ display: 'flex', height: topPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>
-                        <ChartFrame
-                            id="2x2-1"
-                            chart={charts[0]}
-                            isActive={charts[0].id === activeChartId}
-                            onSelect={() => onSelectChart(charts[0].id)}
-                        />
-                    </div>
+                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '2x2-1')}</div>
 
                     <div
                         onMouseDown={vertical.startDrag('vertical')}
@@ -136,14 +119,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         }}
                     />
 
-                    <div style={{ width: rightPx, minWidth: 0 }}>
-                        <ChartFrame
-                            id="2x2-2"
-                            chart={charts[1]}
-                            isActive={charts[1].id === activeChartId}
-                            onSelect={() => onSelectChart(charts[1].id)}
-                        />
-                    </div>
+                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '2x2-2')}</div>
                 </div>
 
                 <div
@@ -161,14 +137,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 />
 
                 <div style={{ display: 'flex', height: bottomPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>
-                        <ChartFrame
-                            id="2x2-3"
-                            chart={charts[2]}
-                            isActive={charts[2].id === activeChartId}
-                            onSelect={() => onSelectChart(charts[2].id)}
-                        />
-                    </div>
+                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[2], '2x2-3')}</div>
 
                     <div
                         onMouseDown={vertical.startDrag('vertical')}
@@ -179,14 +148,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                         }}
                     />
 
-                    <div style={{ width: rightPx, minWidth: 0 }}>
-                        <ChartFrame
-                            id="2x2-4"
-                            chart={charts[3]}
-                            isActive={charts[3].id === activeChartId}
-                            onSelect={() => onSelectChart(charts[3].id)}
-                        />
-                    </div>
+                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[3], '2x2-4')}</div>
                 </div>
             </div>
         )
