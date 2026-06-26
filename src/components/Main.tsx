@@ -8,9 +8,11 @@ import ReplayToolbar from './ReplayToolbar'
 import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
-import type { AppConfig } from '../types/AppConfig'
+import type { AppConfig, ChartConfig } from '../types/AppConfig'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
+import { TickerRegistry } from '../core/TickerRegstry'
+import { TimeframeRegistry } from '../core/TimeframeRegistry'
 
 const storage = new LocalStorageProvider()
 
@@ -36,11 +38,19 @@ const loadConfig = () => {
     return config
 }
 
-const createCharts = (charts): ChartState[] => {
+const createCharts = (charts: ChartConfig[]): ChartState[] => {
     return charts.map((chart, i) => ({
         id: `chart-${i}`,
         ticker: Ticker.parse(chart.ticker),
         timeframe: Timeframe.parse(chart.timeframe),
+    }))
+}
+
+const createNewCharts = (chartCount: number): ChartState[] => {
+    return Array.from({ length: chartCount }).map((_, i) => ({
+        id: `chart-${i}`,
+        ticker: TickerRegistry.getDefault(),
+        timeframe: TimeframeRegistry.getDefault(),
     }))
 }
 
@@ -59,6 +69,7 @@ export default function Main() {
     }
 
     const handleLayoutChange = (newLayout: LayoutType) => {
+        const oldLayout = layout
         setLayout(newLayout)
 
         const countMap = {
@@ -67,9 +78,19 @@ export default function Main() {
             '2x2': 4,
         }
 
-        const newCount = countMap[newLayout]
+        const oldChartCount = countMap[oldLayout]
+        const newChartCount = countMap[newLayout]
 
-        setCharts(createCharts(newCount))
+        let newCharts = []
+
+        if (newChartCount > oldChartCount) {
+            newCharts = [...charts, ...createNewCharts(newChartCount)]
+        } else if (newChartCount < oldChartCount) {
+            newCharts = charts.splice(0, newChartCount)
+        }
+
+        // setCharts(createNewCharts(newChartCount))
+        setCharts(newCharts)
         setActiveChartId('chart-1')
     }
 
