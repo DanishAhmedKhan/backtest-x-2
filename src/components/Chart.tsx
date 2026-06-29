@@ -42,11 +42,9 @@ function Chart({ id, ticker, timeframe }: Props) {
     const timesRef = useRef<number[]>([])
 
     const rightOffsetRef = useRef<number>(20)
-    const visibleBarsRef = useRef<number>(100)
-    const anchorTimeRef = useRef<number | null>(null)
-    const anchorPositionRef = useRef(0.5)
-    const visibleRatioRef = useRef<number>(0.3)
-    const whitespaceRatioRef = useRef<number>(0.2)
+
+    const candleCountRef = useRef<number>(10)
+    const spaceCountRef = useRef<number>(1)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
@@ -61,13 +59,12 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useViewportSync({
         chartRef,
+        seriesRef,
         candlesRef,
-        rightOffsetRef,
-        visibleBarsRef,
         isChangingTimeframeRef,
-        anchorTimeRef,
-        whitespaceRatioRef,
         chartReady,
+        candleCountRef,
+        spaceCountRef,
     })
 
     useInfiniteScroll({
@@ -176,14 +173,10 @@ function Chart({ id, ticker, timeframe }: Props) {
         raw1mCandlesRef,
         candleMapRef,
         timesRef,
-        rightOffsetRef,
-        visibleBarsRef,
-        anchorTimeRef,
-        anchorPositionRef,
-        visibleRatioRef,
-        whitespaceRatioRef,
         oldestLoadedFileRef,
         totalFilesRef,
+        candleCountRef,
+        spaceCountRef,
         setIsChangingTimeframe: (value) => {
             isChangingTimeframeRef.current = value
         },

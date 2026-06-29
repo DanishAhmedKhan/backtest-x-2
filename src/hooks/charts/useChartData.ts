@@ -16,14 +16,10 @@ type Params = {
     raw1mCandlesRef: React.RefObject<Candle[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
-    rightOffsetRef: React.RefObject<number>
-    visibleBarsRef: React.RefObject<number>
-    anchorTimeRef: React.RefObject<number | null>
-    anchorPositionRef: React.RefObject<number>
-    whitespaceRatioRef: React.RefObject<number | null>
-    visibleRatioRef: React.RefObject<number>
     oldestLoadedFileRef: React.RefObject<number>
     totalFilesRef: React.RefObject<number>
+    candleCountRef: React.RefObject<number | null>
+    spaceCountRef: React.RefObject<number | null>
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -37,11 +33,10 @@ export function useChartData({
     raw1mCandlesRef,
     candleMapRef,
     timesRef,
-    visibleBarsRef,
-    anchorTimeRef,
-    whitespaceRatioRef,
     oldestLoadedFileRef,
     totalFilesRef,
+    candleCountRef,
+    spaceCountRef,
     setIsChangingTimeframe,
 }: Params) {
     useEffect(() => {
@@ -53,8 +48,8 @@ export function useChartData({
 
             const timeScale = chart.timeScale()
 
-            const savedVisibleBars = visibleBarsRef.current
-            const savedAnchorTime = anchorTimeRef.current
+            const savedCandleCount = candleCountRef.current
+            const savedSpaceCount = spaceCountRef.current
 
             setIsChangingTimeframe(true)
 
@@ -86,50 +81,12 @@ export function useChartData({
 
             series.setData(formatted)
 
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (!formatted.length) {
-                        setIsChangingTimeframe(false)
-                        return
-                    }
-
-                    let targetRight = formatted.length - 1
-
-                    if (savedAnchorTime !== null) {
-                        const idx = timesRef.current.findIndex((t) => t >= savedAnchorTime)
-
-                        if (idx !== -1) {
-                            targetRight = idx
-                        }
-                    }
-
-                    const viewportWidth = savedVisibleBars
-
-                    const whitespaceBars = viewportWidth * whitespaceRatioRef.current
-
-                    const finalTo = targetRight + whitespaceBars
-
-                    const finalFrom = finalTo - viewportWidth
-
-                    console.log({
-                        timeframe: timeframe.toKey(),
-                        targetRight,
-                        formattedLength: formatted.length,
-                        savedAnchorTime,
-                        whitespaceRatio: whitespaceRatioRef.current,
-                        visibleBars: savedVisibleBars,
-                    })
-
-                    timeScale.setVisibleLogicalRange({
-                        from: finalFrom,
-                        to: finalTo,
-                    })
-
-                    setTimeout(() => {
-                        setIsChangingTimeframe(false)
-                    }, 60)
-                })
+            timeScale.setVisibleLogicalRange({
+                from: formatted.length - savedCandleCount,
+                to: formatted.length + savedSpaceCount,
             })
+
+            setIsChangingTimeframe(false)
         }
 
         load()

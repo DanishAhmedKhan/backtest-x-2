@@ -1,57 +1,51 @@
 import { useEffect } from 'react'
-import type { IChartApi, Time, CandlestickData } from 'lightweight-charts'
+import type { IChartApi, Time, CandlestickData, ISeriesApi } from 'lightweight-charts'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
+    seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
-    rightOffsetRef: React.RefObject<number>
-    visibleBarsRef: React.RefObject<number>
     isChangingTimeframeRef: React.RefObject<boolean>
-    anchorTimeRef: React.RefObject<number | null>
-    whitespaceRatioRef: React.RefObject<number | null>
     chartReady: boolean
+    candleCountRef: React.RefObject<number | null>
+    spaceCountRef: React.RefObject<number | null>
 }
 
 export function useViewportSync({
     chartRef,
+    seriesRef,
     candlesRef,
-    rightOffsetRef,
-    visibleBarsRef,
     isChangingTimeframeRef,
-    anchorTimeRef,
-    whitespaceRatioRef,
     chartReady,
+    candleCountRef,
+    spaceCountRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
+        const series = seriesRef.current
 
         if (!chart || !chartReady) return
 
         const timeScale = chart.timeScale()
 
-        const handler = () => {
+        const handler = (logicalRange) => {
             if (isChangingTimeframeRef.current) return
 
-            const range = timeScale.getVisibleLogicalRange()
-            const candles = candlesRef.current
+            if (!logicalRange) return
 
-            if (!range || !candles.length) return
+            const totalCandles = series.data().length
+            if (totalCandles === 0) return
 
-            const totalBars = candles.length
+            const lastDataIndex = totalCandles - 1
+            const { from, to } = logicalRange
 
-            const visibleWidth = range.to - range.from
-            visibleBarsRef.current = Math.max(1, Math.round(visibleWidth))
+            const visibleFrom = Math.max(0, Math.ceil(from))
+            const visibleTo = Math.min(lastDataIndex, Math.floor(to))
+            const visibleCandleCount = Math.max(0, visibleTo - visibleFrom + 1)
+            const whiteSpaceBars = to > lastDataIndex ? Math.floor(to) - lastDataIndex : 0
 
-            const rightmostCandleIndex = totalBars - 1
-            const whitespaceBars = range.to - rightmostCandleIndex
-            whitespaceRatioRef.current = whitespaceBars / visibleWidth
-
-            const anchorIndex = Math.max(0, Math.min(totalBars - 1, Math.floor(rightmostCandleIndex)))
-            const anchorCandle = candles[anchorIndex]
-
-            if (anchorCandle) {
-                anchorTimeRef.current = Number(anchorCandle.time)
-            }
+            candleCountRef.current = visibleCandleCount
+            spaceCountRef.current = whiteSpaceBars
         }
 
         timeScale.subscribeVisibleLogicalRangeChange(handler)
@@ -59,14 +53,5 @@ export function useViewportSync({
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [
-        chartRef,
-        candlesRef,
-        rightOffsetRef,
-        visibleBarsRef,
-        isChangingTimeframeRef,
-        anchorTimeRef,
-        chartReady,
-        whitespaceRatioRef,
-    ])
+    }, [chartRef, candlesRef, isChangingTimeframeRef, chartReady, seriesRef, candleCountRef, spaceCountRef])
 }
