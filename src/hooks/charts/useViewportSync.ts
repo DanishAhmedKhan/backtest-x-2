@@ -34,18 +34,22 @@ export function useViewportSync({
             if (!logicalRange) return
 
             const totalCandles = series.data().length
-            if (totalCandles === 0) return
 
-            const lastDataIndex = totalCandles - 1
+            if (!totalCandles) return
+
+            const lastIndex = totalCandles - 1
+
             const { from, to } = logicalRange
 
-            const visibleFrom = Math.max(0, Math.ceil(from))
-            const visibleTo = Math.min(lastDataIndex, Math.floor(to))
-            const visibleCandleCount = Math.max(0, visibleTo - visibleFrom + 1)
-            const whiteSpaceBars = to > lastDataIndex ? Math.floor(to) - lastDataIndex : 0
+            const visibleStart = Math.max(from, 0)
+            const visibleEnd = Math.min(to, lastIndex)
 
-            candleCountRef.current = visibleCandleCount
-            spaceCountRef.current = whiteSpaceBars
+            const visibleCandles = Math.max(0, visibleEnd - visibleStart + 1)
+
+            const whitespace = Math.max(0, to - lastIndex)
+
+            candleCountRef.current = visibleCandles
+            spaceCountRef.current = whitespace
         }
 
         timeScale.subscribeVisibleLogicalRangeChange(handler)

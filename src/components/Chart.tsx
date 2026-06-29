@@ -41,10 +41,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
-    const rightOffsetRef = useRef<number>(20)
-
-    const candleCountRef = useRef<number>(10)
-    const spaceCountRef = useRef<number>(1)
+    const candleCountRef = useRef<number>(100)
+    const spaceCountRef = useRef<number>(30)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
@@ -110,17 +108,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     useEffect(() => {
         if (!containerRef.current) return
 
-        const chartConfig = DEFAULT_CHART_CONFIG
-        chartConfig.timeScale.rightOffset = rightOffsetRef.current
-
-        const chart = createChart(containerRef.current, {
-            ...DEFAULT_CHART_CONFIG,
-            timeScale: {
-                ...DEFAULT_CHART_CONFIG.timeScale,
-                rightOffset: rightOffsetRef.current,
-            },
-        })
-
+        const chart = createChart(containerRef.current, DEFAULT_CHART_CONFIG)
         const timeSeriesConfig = TIME_SERIES_CONFIG
         const series = chart.addSeries(CandlestickSeries, timeSeriesConfig)
 

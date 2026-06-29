@@ -48,9 +48,6 @@ export function useChartData({
 
             const timeScale = chart.timeScale()
 
-            const savedCandleCount = candleCountRef.current
-            const savedSpaceCount = spaceCountRef.current
-
             setIsChangingTimeframe(true)
 
             const candles = await CandleService.getCandles(ticker, timeframe)
@@ -81,9 +78,12 @@ export function useChartData({
 
             series.setData(formatted)
 
+            const visible = candleCountRef.current ?? 0
+            const whitespace = spaceCountRef.current ?? 0
+
             timeScale.setVisibleLogicalRange({
-                from: formatted.length - savedCandleCount,
-                to: formatted.length + savedSpaceCount,
+                from: formatted.length - visible,
+                to: formatted.length + whitespace,
             })
 
             setIsChangingTimeframe(false)
