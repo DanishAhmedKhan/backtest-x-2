@@ -2,7 +2,7 @@ import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
-import type { LayoutType } from '../types/Layout'
+import { LAYOUT_TYPES, type LayoutType } from '../types/Layout'
 
 type Props = {
     ticker: Ticker
@@ -60,9 +60,11 @@ export default function TopBar({
             </select>
 
             <select value={layout} onChange={(e) => onLayoutChange(e.target.value as LayoutType)}>
-                <option value="1x1">1 Chart</option>
-                <option value="2x1">2 Charts</option>
-                <option value="2x2">4 Charts</option>
+                {LAYOUT_TYPES.map((layoutType) => (
+                    <option key={layoutType} value={layoutType}>
+                        {layoutType}
+                    </option>
+                ))}
             </select>
 
             <button

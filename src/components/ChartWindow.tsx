@@ -154,5 +154,46 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         )
     }
 
+    if (layout === '3x1') {
+        const leftPx = resize.size ?? width / 2
+        const rightPx = width - leftPx - HANDLE_SIZE
+
+        return (
+            <div
+                ref={containerRef}
+                style={{
+                    display: 'flex',
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'hidden',
+                }}
+            >
+                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '3x1-1')}</div>
+
+                <div
+                    onMouseDown={resize.startDrag('vertical')}
+                    style={{
+                        width: HANDLE_SIZE,
+                        background: '#3a3a3a',
+                        cursor: 'col-resize',
+                    }}
+                />
+
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '3x1-2')}</div>
+
+                <div
+                    onMouseDown={resize.startDrag('vertical')}
+                    style={{
+                        width: HANDLE_SIZE,
+                        background: '#3a3a3a',
+                        cursor: 'col-resize',
+                    }}
+                />
+
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[2], '3x1-2')}</div>
+            </div>
+        )
+    }
+
     return null
 }

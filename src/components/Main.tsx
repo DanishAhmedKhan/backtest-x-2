@@ -4,7 +4,7 @@ import ChartWindow from './ChartWindow'
 import ToolBar from './ToolBar'
 import ReplayToolbar from './ReplayToolbar'
 import type { ChartState } from '../types/ChartState'
-import type { LayoutType } from '../types/Layout'
+import { LAYOUTS, type LayoutType } from '../types/Layout'
 import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
@@ -66,14 +66,8 @@ export default function Main() {
         const oldLayout = layout
         setLayout(newLayout)
 
-        const countMap = {
-            '1x1': 1,
-            '2x1': 2,
-            '2x2': 4,
-        }
-
-        const oldChartCount = countMap[oldLayout]
-        const newChartCount = countMap[newLayout]
+        const oldChartCount = LAYOUTS[oldLayout]
+        const newChartCount = LAYOUTS[newLayout]
 
         let newCharts = []
 
