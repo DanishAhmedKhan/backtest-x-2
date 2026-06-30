@@ -1,8 +1,8 @@
 import { useRef, useState, useLayoutEffect } from 'react'
 import ChartFrame from './ChartFrame'
-import { useResize } from '../hooks/useResize'
 import type { ChartState } from '../types/ChartState'
-import type { LayoutType } from '../types/Layout'
+import type { LayoutNode, LayoutType } from '../types/Layout'
+import { createLayout } from '../layout/layoutTemplates'
 
 type Props = {
     charts: ChartState[]
@@ -16,11 +16,7 @@ const HANDLE_SIZE = 6
 export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
-    const [size, setSize] = useState({ width: 0, height: 0 })
-
-    const resize = useResize(containerRef)
-    const vertical = useResize(containerRef)
-    const horizontal = useResize(containerRef)
+    const [, setSize] = useState({ width: 0, height: 0 })
 
     useLayoutEffect(() => {
         const el = containerRef.current
@@ -41,8 +37,6 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         return () => observer.disconnect()
     }, [])
 
-    const { width, height } = size
-
     const renderChart = (chart: ChartState, frameId: string) => (
         <ChartFrame
             id={frameId}
@@ -52,135 +46,125 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         />
     )
 
-    const chartId = (index: number) => `${layout}-${index + 1}`
+    const renderNode = (node: LayoutNode): React.ReactNode => {
+        if (node.type === 'chart') {
+            const chart = charts[node.chartIndex]
 
-    const renderVerticalHandle = (onMouseDown: React.MouseEventHandler<HTMLDivElement>) => (
-        <div
-            onMouseDown={onMouseDown}
-            style={{
-                width: HANDLE_SIZE,
-                background: '#3a3a3a',
-                cursor: 'col-resize',
-            }}
-        />
-    )
+            return (
+                <div
+                    key={node.id}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        minWidth: 0,
+                        minHeight: 0,
+                    }}
+                >
+                    {renderChart(chart, node.id)}
+                </div>
+            )
+        }
 
-    const renderHorizontalHandle = (
-        onMouseDown: React.MouseEventHandler<HTMLDivElement>,
-        style?: React.CSSProperties,
-    ) => (
-        <div
-            onMouseDown={onMouseDown}
-            style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                height: HANDLE_SIZE,
-                background: '#3a3a3a',
-                cursor: 'row-resize',
-                zIndex: 10,
-                ...style,
-            }}
-        />
-    )
+        const firstPercent = node.split * 100
+        const secondPercent = (1 - node.split) * 100
 
-    if (layout === '1x1') {
-        return (
-            <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-                {renderChart(charts[0], chartId(0))}
-            </div>
-        )
-    }
+        if (node.direction === 'vertical') {
+            return (
+                <div
+                    key={node.id}
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        height: '100%',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <div
+                        style={{
+                            width: `calc(${firstPercent}% - ${HANDLE_SIZE / 2}px)`,
+                            height: '100%',
+                            minWidth: 0,
+                        }}
+                    >
+                        {renderNode(node.first)}
+                    </div>
 
-    if (layout === '2x1') {
-        const leftPx = resize.size ?? width / 2
-        const rightPx = width - leftPx - HANDLE_SIZE
+                    <div
+                        style={{
+                            width: HANDLE_SIZE,
+                            background: '#3a3a3a',
+                            cursor: 'col-resize',
+                            flexShrink: 0,
+                        }}
+                    />
+
+                    <div
+                        style={{
+                            width: `calc(${secondPercent}% - ${HANDLE_SIZE / 2}px)`,
+                            height: '100%',
+                            minWidth: 0,
+                        }}
+                    >
+                        {renderNode(node.second)}
+                    </div>
+                </div>
+            )
+        }
 
         return (
             <div
-                ref={containerRef}
+                key={node.id}
                 style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     width: '100%',
                     height: '100%',
                     overflow: 'hidden',
                 }}
             >
-                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
-
-                {renderVerticalHandle(resize.startDrag('vertical'))}
-
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
-            </div>
-        )
-    }
-
-    if (layout === '2x2') {
-        const leftPx = vertical.size ?? width / 2
-        const rightPx = width - leftPx - HANDLE_SIZE
-
-        const topPx = horizontal.size ?? height / 2
-        const bottomPx = height - topPx
-
-        return (
-            <div
-                ref={containerRef}
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                    overflow: 'hidden',
-                }}
-            >
-                <div style={{ display: 'flex', height: topPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
-
-                    {renderVerticalHandle(resize.startDrag('vertical'))}
-
-                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
+                <div
+                    style={{
+                        height: `calc(${firstPercent}% - ${HANDLE_SIZE / 2}px)`,
+                        minHeight: 0,
+                    }}
+                >
+                    {renderNode(node.first)}
                 </div>
 
-                {renderHorizontalHandle(horizontal.startDrag('horizontal'), {
-                    top: topPx,
-                })}
+                <div
+                    style={{
+                        height: HANDLE_SIZE,
+                        background: '#3a3a3a',
+                        cursor: 'row-resize',
+                        flexShrink: 0,
+                    }}
+                />
 
-                <div style={{ display: 'flex', height: bottomPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[2], chartId(2))}</div>
-
-                    {renderVerticalHandle(resize.startDrag('vertical'))}
-
-                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[3], chartId(3))}</div>
+                <div
+                    style={{
+                        height: `calc(${secondPercent}% - ${HANDLE_SIZE / 2}px)`,
+                        minHeight: 0,
+                    }}
+                >
+                    {renderNode(node.second)}
                 </div>
             </div>
         )
     }
 
-    if (layout === '3x1') {
-        const leftPx = resize.size ?? width / 2
-        const rightPx = width - leftPx - HANDLE_SIZE
+    const root = createLayout(layout)
 
-        return (
-            <div
-                ref={containerRef}
-                style={{
-                    display: 'flex',
-                    width: '100%',
-                    height: '100%',
-                    overflow: 'hidden',
-                }}
-            >
-                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
-
-                {renderVerticalHandle(resize.startDrag('vertical'))}
-
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
-
-                {renderVerticalHandle(resize.startDrag('vertical'))}
-
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[2], chartId(2))}</div>
-            </div>
-        )
-    }
-
-    return null
+    return (
+        <div
+            ref={containerRef}
+            style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+            }}
+        >
+            {renderNode(root)}
+        </div>
+    )
 }
