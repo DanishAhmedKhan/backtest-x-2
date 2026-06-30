@@ -52,10 +52,42 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         />
     )
 
+    const chartId = (index: number) => `${layout}-${index + 1}`
+
+    const renderVerticalHandle = (onMouseDown: React.MouseEventHandler<HTMLDivElement>) => (
+        <div
+            onMouseDown={onMouseDown}
+            style={{
+                width: HANDLE_SIZE,
+                background: '#3a3a3a',
+                cursor: 'col-resize',
+            }}
+        />
+    )
+
+    const renderHorizontalHandle = (
+        onMouseDown: React.MouseEventHandler<HTMLDivElement>,
+        style?: React.CSSProperties,
+    ) => (
+        <div
+            onMouseDown={onMouseDown}
+            style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                height: HANDLE_SIZE,
+                background: '#3a3a3a',
+                cursor: 'row-resize',
+                zIndex: 10,
+                ...style,
+            }}
+        />
+    )
+
     if (layout === '1x1') {
         return (
             <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-                {renderChart(charts[0], '2x1-1')}
+                {renderChart(charts[0], chartId(0))}
             </div>
         )
     }
@@ -74,18 +106,11 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     overflow: 'hidden',
                 }}
             >
-                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '2x1-1')}</div>
+                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
 
-                <div
-                    onMouseDown={resize.startDrag('vertical')}
-                    style={{
-                        width: HANDLE_SIZE,
-                        background: '#3a3a3a',
-                        cursor: 'col-resize',
-                    }}
-                />
+                {renderVerticalHandle(resize.startDrag('vertical'))}
 
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '2x1-2')}</div>
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
             </div>
         )
     }
@@ -108,47 +133,23 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 }}
             >
                 <div style={{ display: 'flex', height: topPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '2x2-1')}</div>
+                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
 
-                    <div
-                        onMouseDown={vertical.startDrag('vertical')}
-                        style={{
-                            width: HANDLE_SIZE,
-                            background: '#3a3a3a',
-                            cursor: 'col-resize',
-                        }}
-                    />
+                    {renderVerticalHandle(resize.startDrag('vertical'))}
 
-                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '2x2-2')}</div>
+                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
                 </div>
 
-                <div
-                    onMouseDown={horizontal.startDrag('horizontal')}
-                    style={{
-                        position: 'absolute',
-                        top: topPx,
-                        left: 0,
-                        right: 0,
-                        height: HANDLE_SIZE,
-                        background: '#3a3a3a',
-                        cursor: 'row-resize',
-                        zIndex: 10,
-                    }}
-                />
+                {renderHorizontalHandle(horizontal.startDrag('horizontal'), {
+                    top: topPx,
+                })}
 
                 <div style={{ display: 'flex', height: bottomPx }}>
-                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[2], '2x2-3')}</div>
+                    <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[2], chartId(2))}</div>
 
-                    <div
-                        onMouseDown={vertical.startDrag('vertical')}
-                        style={{
-                            width: HANDLE_SIZE,
-                            background: '#3a3a3a',
-                            cursor: 'col-resize',
-                        }}
-                    />
+                    {renderVerticalHandle(resize.startDrag('vertical'))}
 
-                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[3], '2x2-4')}</div>
+                    <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[3], chartId(3))}</div>
                 </div>
             </div>
         )
@@ -168,29 +169,15 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     overflow: 'hidden',
                 }}
             >
-                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], '3x1-1')}</div>
+                <div style={{ width: leftPx, minWidth: 0 }}>{renderChart(charts[0], chartId(0))}</div>
 
-                <div
-                    onMouseDown={resize.startDrag('vertical')}
-                    style={{
-                        width: HANDLE_SIZE,
-                        background: '#3a3a3a',
-                        cursor: 'col-resize',
-                    }}
-                />
+                {renderVerticalHandle(resize.startDrag('vertical'))}
 
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], '3x1-2')}</div>
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[1], chartId(1))}</div>
 
-                <div
-                    onMouseDown={resize.startDrag('vertical')}
-                    style={{
-                        width: HANDLE_SIZE,
-                        background: '#3a3a3a',
-                        cursor: 'col-resize',
-                    }}
-                />
+                {renderVerticalHandle(resize.startDrag('vertical'))}
 
-                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[2], '3x1-2')}</div>
+                <div style={{ width: rightPx, minWidth: 0 }}>{renderChart(charts[2], chartId(2))}</div>
             </div>
         )
     }
