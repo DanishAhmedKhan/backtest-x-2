@@ -2,6 +2,9 @@ import type { ChartNode, LayoutNode, SplitNode } from '../types/Layout'
 
 export const HANDLE_SIZE = 6
 
+const MIN_SPLIT = 0.2
+const MAX_SPLIT = 0.8
+
 export interface Rect {
     left: number
     top: number
@@ -50,13 +53,15 @@ export function computeLayoutRects(
             rect,
         })
 
-        // Use overridden ratio if present
-        const split = splitState[node.id] ?? node.split
-
         if (node.direction === 'vertical') {
             const availableWidth = rect.width - HANDLE_SIZE
 
-            const firstWidth = Math.round(availableWidth * split)
+            let firstWidth = splitState[node.id] ?? Math.round(availableWidth * node.split)
+
+            const minWidth = availableWidth * MIN_SPLIT
+            const maxWidth = availableWidth * MAX_SPLIT
+
+            firstWidth = Math.max(minWidth, Math.min(maxWidth, firstWidth))
 
             const secondWidth = availableWidth - firstWidth
 
@@ -79,7 +84,12 @@ export function computeLayoutRects(
 
         const availableHeight = rect.height - HANDLE_SIZE
 
-        const firstHeight = Math.round(availableHeight * split)
+        let firstHeight = splitState[node.id] ?? Math.round(availableHeight * node.split)
+
+        const minHeight = availableHeight * MIN_SPLIT
+        const maxHeight = availableHeight * MAX_SPLIT
+
+        firstHeight = Math.max(minHeight, Math.min(maxHeight, firstHeight))
 
         const secondHeight = availableHeight - firstHeight
 

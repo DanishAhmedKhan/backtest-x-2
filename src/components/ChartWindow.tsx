@@ -42,13 +42,12 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
 
     const { splits, startDrag } = useLayoutResize()
 
-    const root = useMemo(() => {
-        return createLayout(layout)
-    }, [layout])
+    const root = useMemo(() => createLayout(layout), [layout])
 
-    const rects = useMemo(() => {
-        return computeLayoutRects(root, size.width, size.height, splits)
-    }, [root, size.width, size.height, splits])
+    const rects = useMemo(
+        () => computeLayoutRects(root, size.width, size.height, splits),
+        [root, size.width, size.height, splits],
+    )
 
     return (
         <div
@@ -60,6 +59,8 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 overflow: 'hidden',
             }}
         >
+            {/* Charts */}
+
             {rects.charts.map(({ node, rect }) => {
                 const chart = charts[node.chartIndex]
 
@@ -88,19 +89,21 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 )
             })}
 
-            {rects.splits.map(({ node, rect }) => {
-                const split = splits[node.id] ?? node.split
+            {/* Resize Handles */}
 
+            {rects.splits.map(({ node, rect }) => {
                 if (node.direction === 'vertical') {
-                    const x = rect.left + (rect.width - HANDLE_SIZE) * split
+                    const availableWidth = rect.width - HANDLE_SIZE
+
+                    const firstWidth = splits[node.id] ?? Math.round(availableWidth * node.split)
 
                     return (
                         <div
                             key={node.id}
-                            onMouseDown={startDrag(node.id, 'vertical', rect)}
+                            onMouseDown={startDrag(node.id, 'vertical', rect, firstWidth)}
                             style={{
                                 position: 'absolute',
-                                left: x,
+                                left: rect.left + firstWidth,
                                 top: rect.top,
                                 width: HANDLE_SIZE,
                                 height: rect.height,
@@ -112,16 +115,18 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     )
                 }
 
-                const y = rect.top + (rect.height - HANDLE_SIZE) * split
+                const availableHeight = rect.height - HANDLE_SIZE
+
+                const firstHeight = splits[node.id] ?? Math.round(availableHeight * node.split)
 
                 return (
                     <div
                         key={node.id}
-                        onMouseDown={startDrag(node.id, 'horizontal', rect)}
+                        onMouseDown={startDrag(node.id, 'horizontal', rect, firstHeight)}
                         style={{
                             position: 'absolute',
                             left: rect.left,
-                            top: y,
+                            top: rect.top + firstHeight,
                             width: rect.width,
                             height: HANDLE_SIZE,
                             background: '#3a3a3a',
