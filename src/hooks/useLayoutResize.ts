@@ -10,50 +10,38 @@ type Rect = {
     height: number
 }
 
-const MIN_SPLIT = 0.2
-const MAX_SPLIT = 0.8
-
 export function useLayoutResize() {
     const [splits, setSplits] = useState<Record<string, number>>({})
 
     const startDrag = (id: string, direction: Direction, rect: Rect) => (e: React.MouseEvent) => {
         e.preventDefault()
 
+        const startX = e.clientX
+        const startY = e.clientY
+
+        const available = direction === 'vertical' ? rect.width - HANDLE_SIZE : rect.height - HANDLE_SIZE
+
+        const initialRatio = splits[id] ?? 0.5
+
         const onMove = (ev: MouseEvent) => {
-            let ratio: number
+            const delta = direction === 'vertical' ? ev.clientX - startX : ev.clientY - startY
 
-            if (direction === 'vertical') {
-                const availableWidth = rect.width - HANDLE_SIZE
+            let ratio = initialRatio + delta / available
 
-                ratio = (ev.clientX - rect.left) / availableWidth
-            } else {
-                const availableHeight = rect.height - HANDLE_SIZE
+            ratio = Math.max(0.2, Math.min(0.8, ratio))
 
-                ratio = (ev.clientY - rect.top) / availableHeight
-            }
-
-            ratio = Math.max(MIN_SPLIT, Math.min(MAX_SPLIT, ratio))
-
-            setSplits((prev) => {
-                if (prev[id] === ratio) {
-                    return prev
-                }
-
-                return {
-                    ...prev,
-                    [id]: ratio,
-                }
-            })
+            setSplits((prev) => ({
+                ...prev,
+                [id]: ratio,
+            }))
         }
 
         const onUp = () => {
             window.removeEventListener('mousemove', onMove)
-
             window.removeEventListener('mouseup', onUp)
         }
 
         window.addEventListener('mousemove', onMove)
-
         window.addEventListener('mouseup', onUp)
     }
 
