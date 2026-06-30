@@ -1,8 +1,10 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useLayoutEffect, useMemo } from 'react'
 import ChartFrame from './ChartFrame'
 import type { ChartState } from '../types/ChartState'
-import type { LayoutNode, LayoutType } from '../types/Layout'
+import type { LayoutType } from '../types/Layout'
 import { createLayout } from '../layout/layoutTemplates'
+import { computeLayoutRects, HANDLE_SIZE } from '../layout/layoutEngine'
+import { useLayoutResize } from '../hooks/useLayoutResize'
 
 type Props = {
     charts: ChartState[]
@@ -11,12 +13,13 @@ type Props = {
     layout: LayoutType
 }
 
-const HANDLE_SIZE = 6
-
 export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
-    const [, setSize] = useState({ width: 0, height: 0 })
+    const [size, setSize] = useState({
+        width: 0,
+        height: 0,
+    })
 
     useLayoutEffect(() => {
         const el = containerRef.current
@@ -37,134 +40,97 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
         return () => observer.disconnect()
     }, [])
 
-    const renderChart = (chart: ChartState, frameId: string) => (
-        <ChartFrame
-            id={frameId}
-            chart={chart}
-            isActive={chart.id === activeChartId}
-            onSelect={() => onSelectChart(chart.id)}
-        />
-    )
+    const { splits, startDrag } = useLayoutResize()
 
-    const renderNode = (node: LayoutNode): React.ReactNode => {
-        if (node.type === 'chart') {
-            const chart = charts[node.chartIndex]
+    const root = useMemo(() => {
+        return createLayout(layout)
+    }, [layout])
 
-            return (
-                <div
-                    key={node.id}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        minWidth: 0,
-                        minHeight: 0,
-                    }}
-                >
-                    {renderChart(chart, node.id)}
-                </div>
-            )
-        }
-
-        const firstPercent = node.split * 100
-        const secondPercent = (1 - node.split) * 100
-
-        if (node.direction === 'vertical') {
-            return (
-                <div
-                    key={node.id}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'hidden',
-                    }}
-                >
-                    <div
-                        style={{
-                            width: `calc(${firstPercent}% - ${HANDLE_SIZE / 2}px)`,
-                            height: '100%',
-                            minWidth: 0,
-                        }}
-                    >
-                        {renderNode(node.first)}
-                    </div>
-
-                    <div
-                        style={{
-                            width: HANDLE_SIZE,
-                            background: '#3a3a3a',
-                            cursor: 'col-resize',
-                            flexShrink: 0,
-                        }}
-                    />
-
-                    <div
-                        style={{
-                            width: `calc(${secondPercent}% - ${HANDLE_SIZE / 2}px)`,
-                            height: '100%',
-                            minWidth: 0,
-                        }}
-                    >
-                        {renderNode(node.second)}
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div
-                key={node.id}
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    height: '100%',
-                    overflow: 'hidden',
-                }}
-            >
-                <div
-                    style={{
-                        height: `calc(${firstPercent}% - ${HANDLE_SIZE / 2}px)`,
-                        minHeight: 0,
-                    }}
-                >
-                    {renderNode(node.first)}
-                </div>
-
-                <div
-                    style={{
-                        height: HANDLE_SIZE,
-                        background: '#3a3a3a',
-                        cursor: 'row-resize',
-                        flexShrink: 0,
-                    }}
-                />
-
-                <div
-                    style={{
-                        height: `calc(${secondPercent}% - ${HANDLE_SIZE / 2}px)`,
-                        minHeight: 0,
-                    }}
-                >
-                    {renderNode(node.second)}
-                </div>
-            </div>
-        )
-    }
-
-    const root = createLayout(layout)
+    const rects = useMemo(() => {
+        return computeLayoutRects(root, size.width, size.height, splits)
+    }, [root, size.width, size.height, splits])
 
     return (
         <div
             ref={containerRef}
             style={{
+                position: 'relative',
                 width: '100%',
                 height: '100%',
                 overflow: 'hidden',
             }}
         >
-            {renderNode(root)}
+            {rects.charts.map(({ node, rect }) => {
+                const chart = charts[node.chartIndex]
+
+                if (!chart) return null
+
+                return (
+                    <div
+                        key={node.id}
+                        style={{
+                            position: 'absolute',
+                            left: rect.left,
+                            top: rect.top,
+                            width: rect.width,
+                            height: rect.height,
+                            minWidth: 0,
+                            minHeight: 0,
+                        }}
+                    >
+                        <ChartFrame
+                            id={node.id}
+                            chart={chart}
+                            isActive={chart.id === activeChartId}
+                            onSelect={() => onSelectChart(chart.id)}
+                        />
+                    </div>
+                )
+            })}
+
+            {rects.splits.map(({ node, rect }) => {
+                const split = splits[node.id] ?? node.split
+
+                if (node.direction === 'vertical') {
+                    const x = rect.left + (rect.width - HANDLE_SIZE) * split
+
+                    return (
+                        <div
+                            key={node.id}
+                            onMouseDown={startDrag(node.id, 'vertical', rect)}
+                            style={{
+                                position: 'absolute',
+                                left: x,
+                                top: rect.top,
+                                width: HANDLE_SIZE,
+                                height: rect.height,
+                                background: '#3a3a3a',
+                                cursor: 'col-resize',
+                                zIndex: 100,
+                            }}
+                        />
+                    )
+                }
+
+                const y = rect.top + (rect.height - HANDLE_SIZE) * split
+
+                return (
+                    <div
+                        key={node.id}
+                        onMouseDown={startDrag(node.id, 'horizontal', rect)}
+                        style={{
+                            position: 'absolute',
+                            left: rect.left,
+                            top: y,
+                            width: rect.width,
+                            height: HANDLE_SIZE,
+                            background: '#3a3a3a',
+                            cursor: 'row-resize',
+                            zIndex: 100,
+                        }}
+                    />
+                )
+            })}
         </div>
     )
 }

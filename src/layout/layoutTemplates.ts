@@ -29,7 +29,7 @@ export const createLayout = (type: LayoutType): LayoutNode => {
     const factory: NodeFactory = {
         chart(index) {
             return {
-                id: `node-${nextId++}`,
+                id: `${type}-node-${nextId++}`,
                 type: 'chart',
                 chartIndex: index,
             }
@@ -37,7 +37,7 @@ export const createLayout = (type: LayoutType): LayoutNode => {
 
         split(direction, split, first, second) {
             return {
-                id: `node-${nextId++}`,
+                id: `${type}-node-${nextId++}`,
                 type: 'split',
                 direction,
                 split,
