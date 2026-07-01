@@ -32,9 +32,7 @@ export function useLayoutResize() {
             const mouse = direction === 'vertical' ? ev.clientX : ev.clientY
 
             const delta = mouse - startMouse
-
             let newSize = startSize + delta
-
             newSize = Math.max(minSize, Math.min(maxSize, newSize))
 
             setSplits((prev) => ({

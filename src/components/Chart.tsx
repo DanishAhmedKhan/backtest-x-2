@@ -128,10 +128,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         if (!chart || !el) return
 
         const resize = () => {
-            chart.applyOptions({
-                width: el.clientWidth,
-                height: el.clientHeight,
-            })
+            chart.resize(el.clientWidth, el.clientHeight, true)
         }
 
         const observer = new ResizeObserver(resize)

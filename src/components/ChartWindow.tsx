@@ -59,8 +59,6 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 overflow: 'hidden',
             }}
         >
-            {/* Charts */}
-
             {rects.charts.map(({ node, rect }) => {
                 const chart = charts[node.chartIndex]
 
@@ -88,8 +86,6 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                     </div>
                 )
             })}
-
-            {/* Resize Handles */}
 
             {rects.splits.map(({ node, rect }) => {
                 if (node.direction === 'vertical') {
