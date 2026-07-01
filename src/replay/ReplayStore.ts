@@ -12,6 +12,8 @@ class ReplayStore {
     public chartTimeframeSeconds = 60
     public updateIntervalSeconds = 60
 
+    public pendingStepSeconds: number | null = null
+
     public start(selectedTime: number, chartTimeframeSeconds: number) {
         this.enabled = true
 
@@ -30,6 +32,12 @@ class ReplayStore {
 
     public step() {
         if (this.marketTime === null) {
+            return
+        }
+
+        if (this.pendingStepSeconds !== null) {
+            this.marketTime += this.pendingStepSeconds
+            this.pendingStepSeconds = null
             return
         }
 
@@ -68,6 +76,12 @@ class ReplayStore {
     }
 
     public setUpdateIntervalSeconds(seconds: number) {
+        if (this.marketTime !== null && this.updateIntervalSeconds !== seconds) {
+            const bucketEnd = Math.floor(this.marketTime / seconds) * seconds + seconds - 60
+
+            this.pendingStepSeconds = bucketEnd - this.marketTime
+        }
+
         this.updateIntervalSeconds = seconds
     }
 }

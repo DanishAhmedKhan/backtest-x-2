@@ -78,9 +78,15 @@ export default function ReplayToolbar() {
     const handleUpdateInterval = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const seconds = Number(e.target.value)
 
-        setUpdateInterval(seconds)
-
         replayStore.setUpdateIntervalSeconds(seconds)
+
+        eventBus.emit('replayUpdateIntervalChanged', {
+            seconds,
+        })
+
+        eventBus.emit('replayTimeChanged', {
+            time: replayStore.marketTime!,
+        })
     }
 
     const handleExit = () => {
@@ -110,6 +116,14 @@ export default function ReplayToolbar() {
 
         return () => clearInterval(interval)
     }, [isPlaying, speed])
+
+    useEffect(() => {
+        const unsubscribe = eventBus.on('replayUpdateIntervalChanged', ({ seconds }) => {
+            setUpdateInterval(seconds)
+        })
+
+        return unsubscribe
+    }, [])
 
     return (
         <div

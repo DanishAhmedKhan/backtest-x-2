@@ -180,7 +180,14 @@ function Chart({ id, ticker, timeframe }: Props) {
             return
         }
 
-        replayStore.setChartTimeframeSeconds(timeframe.toSeconds())
+        const seconds = timeframe.toSeconds()
+
+        replayStore.setChartTimeframeSeconds(seconds)
+        replayStore.setUpdateIntervalSeconds(seconds)
+
+        eventBus.emit('replayUpdateIntervalChanged', {
+            seconds,
+        })
     }, [timeframe])
 
     const handleReplaySelection = () => {

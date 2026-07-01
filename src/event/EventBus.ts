@@ -19,6 +19,10 @@ type EventMap = {
     replayTimeChanged: {
         time: number
     }
+
+    replayUpdateIntervalChanged: {
+        seconds: number
+    }
 }
 
 type EventKey = keyof EventMap
