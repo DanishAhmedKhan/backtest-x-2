@@ -66,7 +66,7 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, raw1
                 return
             }
 
-            const tfSeconds = timeframe.toSeconds()
+            const tfSeconds = replayStore.chartTimeframeSeconds
 
             if (tfSeconds === 60) {
                 const visible = candlesRef.current.filter((c) => Number(c.time) <= replayTime)

@@ -175,6 +175,14 @@ function Chart({ id, ticker, timeframe }: Props) {
         raw1mCandlesRef,
     })
 
+    useEffect(() => {
+        if (!replayStore.enabled) {
+            return
+        }
+
+        replayStore.setChartTimeframeSeconds(timeframe.toSeconds())
+    }, [timeframe])
+
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return

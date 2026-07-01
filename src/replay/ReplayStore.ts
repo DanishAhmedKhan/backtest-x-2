@@ -9,16 +9,19 @@ class ReplayStore {
 
     public isSelecting = true
 
-    public stepSeconds = 60
+    public chartTimeframeSeconds = 60
+    public updateIntervalSeconds = 60
 
-    public start(selectedTime: number, sourceTimeframeSeconds: number) {
+    public start(selectedTime: number, chartTimeframeSeconds: number) {
         this.enabled = true
 
         this.startTime = selectedTime
 
-        this.stepSeconds = sourceTimeframeSeconds
+        this.chartTimeframeSeconds = chartTimeframeSeconds
 
-        this.marketTime = selectedTime + sourceTimeframeSeconds - 60
+        this.updateIntervalSeconds = chartTimeframeSeconds
+
+        this.marketTime = selectedTime + chartTimeframeSeconds - 60
 
         this.isSelecting = false
         this.previewTime = null
@@ -30,7 +33,7 @@ class ReplayStore {
             return
         }
 
-        this.marketTime += this.stepSeconds
+        this.marketTime += this.updateIntervalSeconds
     }
 
     public rewind() {
@@ -38,19 +41,15 @@ class ReplayStore {
             return
         }
 
-        this.marketTime -= this.stepSeconds
+        this.marketTime -= this.updateIntervalSeconds
     }
 
     public stop() {
         this.enabled = false
-
         this.startTime = null
         this.marketTime = null
-
         this.previewTime = null
-
-        this.stepSeconds = 60
-
+        this.updateIntervalSeconds = 60
         this.isSelecting = true
     }
 
@@ -62,6 +61,14 @@ class ReplayStore {
     public closeToolbar() {
         this.showToolbar = false
         this.previewTime = null
+    }
+
+    public setChartTimeframeSeconds(seconds: number) {
+        this.chartTimeframeSeconds = seconds
+    }
+
+    public setUpdateIntervalSeconds(seconds: number) {
+        this.updateIntervalSeconds = seconds
     }
 }
 

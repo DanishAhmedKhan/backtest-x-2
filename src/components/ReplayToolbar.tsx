@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
+import { DEFAULT_REPLAY_SPEED, REPLAY_SPEEDS, REPLAY_UPDATE_INTERVALS } from '../config/default/ReplayConfig'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -15,7 +16,8 @@ export default function ReplayToolbar() {
     })
 
     const [isPlaying, setIsPlaying] = useState(false)
-    const [speed, setSpeed] = useState(1)
+    const [speed, setSpeed] = useState(DEFAULT_REPLAY_SPEED)
+    const [updateInterval, setUpdateInterval] = useState(replayStore.updateIntervalSeconds)
 
     const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         draggingRef.current = true
@@ -71,6 +73,14 @@ export default function ReplayToolbar() {
         eventBus.emit('replayTimeChanged', {
             time: replayStore.marketTime,
         })
+    }
+
+    const handleUpdateInterval = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const seconds = Number(e.target.value)
+
+        setUpdateInterval(seconds)
+
+        replayStore.setUpdateIntervalSeconds(seconds)
     }
 
     const handleExit = () => {
@@ -137,15 +147,20 @@ export default function ReplayToolbar() {
 
             <button onClick={handleForward}>▶▶</button>
 
-            <button>Step</button>
+            <select value={updateInterval} onChange={handleUpdateInterval}>
+                {REPLAY_UPDATE_INTERVALS.map((tf) => (
+                    <option key={tf.toKey()} value={tf.toSeconds()}>
+                        {tf.label}
+                    </option>
+                ))}
+            </select>
 
             <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
-                <option value={1}>1x</option>
-                <option value={2}>2x</option>
-                <option value={5}>5x</option>
-                <option value={10}>10x</option>
-                <option value={30}>30x</option>
-                <option value={60}>60x</option>
+                {REPLAY_SPEEDS.map((value) => (
+                    <option key={value} value={value}>
+                        {value}x
+                    </option>
+                ))}
             </select>
 
             <button onClick={handleExit}>Exit</button>

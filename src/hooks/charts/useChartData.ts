@@ -5,6 +5,8 @@ import type { Candle } from '../../core/Candle'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
+import { replayStore } from '../../replay/ReplayStore'
+import { eventBus } from '../../event/EventBus'
 
 type Params = {
     ticker: Ticker
@@ -87,6 +89,12 @@ export function useChartData({
             })
 
             setIsChangingTimeframe(false)
+
+            if (replayStore.enabled && replayStore.marketTime !== null) {
+                eventBus.emit('replayTimeChanged', {
+                    time: replayStore.marketTime,
+                })
+            }
         }
 
         load()
