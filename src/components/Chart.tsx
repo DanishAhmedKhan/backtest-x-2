@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState, memo } from 'react'
-import {
-    createChart,
-    CandlestickSeries,
-    type CandlestickData,
-    type Time,
-    type IChartApi,
-    type ISeriesApi,
-} from 'lightweight-charts'
+import { type CandlestickData, type Time } from 'lightweight-charts'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -18,12 +11,12 @@ import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
 
-import { DEFAULT_CHART_CONFIG } from '../config/default/ChartConfig'
-import { TIME_SERIES_CONFIG } from '../config/default/TimeSeriesConfig'
-
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import ReplayOverlay from './ReplayOverlay'
+import { useChart } from '../hooks/charts/useChart'
+import { useReplayPreview } from '../hooks/charts/useReplayPreview'
+import { useChartResize } from '../hooks/charts/useChartResize'
 
 type Props = {
     id: string
@@ -33,8 +26,6 @@ type Props = {
 
 function Chart({ id, ticker, timeframe }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
-    const chartRef = useRef<IChartApi | null>(null)
-    const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
     const raw1mCandlesRef = useRef<Candle[]>([])
@@ -46,14 +37,16 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
-    const [chartReady, setChartReady] = useState<boolean>(false)
 
     const oldestLoadedFileRef = useRef(0)
     const totalFilesRef = useRef(0)
     const isLoadingOlderRef = useRef(false)
 
-    const [previewTime, setPreviewTime] = useState<number | null>(null)
-    const [previewX, setPreviewX] = useState<number | null>(null)
+    const { chartRef, seriesRef, chartReady } = useChart(containerRef)
+
+    const { previewTime, previewX, clearPreview } = useReplayPreview({
+        chartRef,
+    })
 
     useViewportSync({
         chartRef,
@@ -79,74 +72,18 @@ function Chart({ id, ticker, timeframe }: Props) {
         isLoadingOlderRef,
     })
 
-    useEffect(() => {
-        const unsubscribe = eventBus.on('replayPreviewMove', ({ time }) => {
-            setPreviewTime(time)
-        })
+    useChartResize({
+        containerRef,
+        chartRef,
+    })
 
-        return unsubscribe
-    }, [])
-
-    useEffect(() => {
-        const chart = chartRef.current
-
-        if (!chart || previewTime === null) {
-            setPreviewX(null)
-            return
-        }
-
-        const x = chart.timeScale().timeToCoordinate(previewTime as Time)
-
-        if (x === null) {
-            setPreviewX(null)
-            return
-        }
-
-        setPreviewX(x)
-    }, [previewTime])
-
-    useEffect(() => {
-        if (!containerRef.current) return
-
-        const chart = createChart(containerRef.current, DEFAULT_CHART_CONFIG)
-        const timeSeriesConfig = TIME_SERIES_CONFIG
-        const series = chart.addSeries(CandlestickSeries, timeSeriesConfig)
-
-        chartRef.current = chart
-        seriesRef.current = series
-        setChartReady(true)
-
-        return () => {
-            chart.remove()
-            setChartReady(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        const chart = chartRef.current
-        const el = containerRef.current
-        if (!chart || !el) return
-
-        const resize = () => {
-            chart.resize(el.clientWidth, el.clientHeight, true)
-        }
-
-        const observer = new ResizeObserver(resize)
-        observer.observe(el)
-        resize()
-
-        return () => observer.disconnect()
-    }, [])
-
-    useEffect(() => {
-        chartRef.current?.applyOptions({
-            crosshair: {
-                horzLine: { visible: isHovered },
-            },
-        })
-    }, [isHovered])
-
-    useCrosshairSync(id, chartRef, seriesRef, candleMapRef, timesRef)
+    useCrosshairSync({
+        id,
+        chartRef,
+        seriesRef,
+        candleMapRef,
+        timesRef,
+    })
 
     useChartData({
         ticker,
@@ -176,6 +113,14 @@ function Chart({ id, ticker, timeframe }: Props) {
     })
 
     useEffect(() => {
+        chartRef.current?.applyOptions({
+            crosshair: {
+                horzLine: { visible: isHovered },
+            },
+        })
+    }, [chartRef, isHovered])
+
+    useEffect(() => {
         if (!replayStore.enabled) {
             return
         }
@@ -197,8 +142,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         replayStore.start(previewTime, timeframe.toSeconds())
 
-        setPreviewTime(null)
-        setPreviewX(null)
+        clearPreview()
 
         eventBus.emit('replayStart', {
             time: previewTime,

@@ -4,13 +4,15 @@ import { eventBus } from '../../event/EventBus'
 import { findNearestTime } from './useNearestTime'
 import { replayStore } from '../../replay/ReplayStore'
 
-export function useCrosshairSync(
-    id: string,
-    chartRef: React.RefObject<IChartApi | null>,
-    seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>,
-    candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>,
-    timesRef: React.RefObject<number[]>,
-) {
+type Props = {
+    id: string
+    chartRef: React.RefObject<IChartApi | null>
+    seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
+    candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
+    timesRef: React.RefObject<number[]>
+}
+
+export function useCrosshairSync({ id, chartRef, seriesRef, candleMapRef, timesRef }: Props) {
     useEffect(() => {
         const chart = chartRef.current
         if (!chart) return
