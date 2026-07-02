@@ -79,7 +79,13 @@ class ReplayStore {
         if (this.marketTime !== null && this.updateIntervalSeconds !== seconds) {
             const bucketEnd = Math.floor(this.marketTime / seconds) * seconds + seconds - 60
 
-            this.pendingStepSeconds = bucketEnd - this.marketTime
+            const remaining = bucketEnd - this.marketTime
+
+            if (remaining > 0) {
+                this.pendingStepSeconds = remaining
+            } else {
+                this.pendingStepSeconds = null
+            }
         }
 
         this.updateIntervalSeconds = seconds
