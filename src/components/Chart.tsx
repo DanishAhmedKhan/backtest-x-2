@@ -17,6 +17,7 @@ import ReplayOverlay from './ReplayOverlay'
 import { useChart } from '../hooks/charts/useChart'
 import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useChartResize } from '../hooks/charts/useChartResize'
+import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
 type Props = {
     id: string
@@ -32,8 +33,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
-    const candleCountRef = useRef<number>(100)
-    const spaceCountRef = useRef<number>(30)
+    const candleCountRef = useRef<number>(DEFAULT_VISIBLE_CANDLE)
+    const spaceCountRef = useRef<number>(DEFAULT_BLANK_CANDLE)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)

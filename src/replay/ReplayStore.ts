@@ -16,15 +16,10 @@ class ReplayStore {
 
     public start(selectedTime: number, chartTimeframeSeconds: number) {
         this.enabled = true
-
         this.startTime = selectedTime
-
         this.chartTimeframeSeconds = chartTimeframeSeconds
-
         this.updateIntervalSeconds = chartTimeframeSeconds
-
         this.marketTime = selectedTime + chartTimeframeSeconds - 60
-
         this.isSelecting = false
         this.previewTime = null
         this.showToolbar = false

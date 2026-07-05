@@ -90,7 +90,6 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
             {rects.splits.map(({ node, rect }) => {
                 if (node.direction === 'vertical') {
                     const availableWidth = rect.width - HANDLE_SIZE
-
                     const firstWidth = splits[node.id] ?? Math.round(availableWidth * node.split)
 
                     return (
@@ -112,7 +111,6 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                 }
 
                 const availableHeight = rect.height - HANDLE_SIZE
-
                 const firstHeight = splits[node.id] ?? Math.round(availableHeight * node.split)
 
                 return (

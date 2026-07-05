@@ -13,22 +13,15 @@ export type LayoutNode = ChartNode | SplitNode
 
 export interface ChartNode {
     id: string
-
     type: 'chart'
-
     chartIndex: number
 }
 
 export interface SplitNode {
     id: string
-
     type: 'split'
-
     direction: 'horizontal' | 'vertical'
-
     split: number
-
     first: LayoutNode
-
     second: LayoutNode
 }

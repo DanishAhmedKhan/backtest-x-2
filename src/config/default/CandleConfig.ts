@@ -1,0 +1,2 @@
+export const DEFAULT_VISIBLE_CANDLE = 100
+export const DEFAULT_BLANK_CANDLE = 30
