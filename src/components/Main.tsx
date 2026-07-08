@@ -13,6 +13,7 @@ import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
+import JumpToDialog from './JumpToDialog'
 
 const storage = new LocalStorageProvider()
 
@@ -55,6 +56,7 @@ export default function Main() {
     const [charts, setCharts] = useState<ChartState[]>(createCharts(config.charts))
     const [activeChartId, setActiveChartId] = useState('chart-1')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
+    const [jumpOpen, setJumpOpen] = useState(false)
 
     const activeChart = charts.find((c) => c.id === activeChartId) ?? charts[0]
 
@@ -117,6 +119,16 @@ export default function Main() {
                         replayStore.isSelecting = true
                         replayStore.openToolbar()
                         setShowReplayToolbar(true)
+                    }}
+                    onJumpToClick={() => {}}
+                />
+
+                <JumpToDialog
+                    open={jumpOpen}
+                    onClose={() => setJumpOpen(false)}
+                    onGo={(date) => {
+                        console.log(date)
+                        // jumpTo(date)
                     }}
                 />
             </div>

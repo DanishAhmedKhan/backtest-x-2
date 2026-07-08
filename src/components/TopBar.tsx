@@ -12,6 +12,7 @@ type Props = {
     onTimeframeChange: (t: Timeframe) => void
     onLayoutChange: (l: LayoutType) => void
     onReplayClick: () => void
+    onJumpToClick: () => void
 }
 
 export default function TopBar({
@@ -22,6 +23,7 @@ export default function TopBar({
     onTimeframeChange,
     onLayoutChange,
     onReplayClick,
+    onJumpToClick,
 }: Props) {
     return (
         <div
@@ -31,6 +33,7 @@ export default function TopBar({
                 padding: 10,
                 backgroundColor: '#fff',
                 height: '100%',
+                alignItems: 'center',
             }}
         >
             <select
@@ -66,6 +69,16 @@ export default function TopBar({
                     </option>
                 ))}
             </select>
+
+            <button
+                onClick={onJumpToClick}
+                style={{
+                    padding: '0px 10px',
+                    cursor: 'pointer',
+                }}
+            >
+                📅 Jump To
+            </button>
 
             <button
                 onClick={onReplayClick}
