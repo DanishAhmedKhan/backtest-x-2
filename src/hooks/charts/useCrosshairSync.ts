@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { IChartApi, ISeriesApi, Time, MouseEventParams, CandlestickData } from 'lightweight-charts'
 import { eventBus } from '../../event/EventBus'
-import { findNearestTime } from './useNearestTime'
+import { findNearestTime } from '../utilities/findNearestTime'
 import { replayStore } from '../../replay/ReplayStore'
 
 type Props = {

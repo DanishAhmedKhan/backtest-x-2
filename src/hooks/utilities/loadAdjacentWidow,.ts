@@ -12,18 +12,13 @@ export type LoadAdjacentWindowResult = {
 
 type Params = {
     series: ISeriesApi<'Candlestick'>
-
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
-
     ticker: Ticker
     timeframe: Timeframe
-
     loadedWindowRef: React.RefObject<LoadedWindow>
-
     totalFilesRef: React.RefObject<number>
-
     direction: 'older' | 'newer'
 }
 
