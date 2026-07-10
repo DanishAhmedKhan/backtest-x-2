@@ -3,17 +3,19 @@ import TopBar from './TopBar'
 import ChartWindow from './ChartWindow'
 import ToolBar from './ToolBar'
 import ReplayToolbar from './ReplayToolbar'
+import JumpToDialog from './JumpToDialog'
+
+import { Ticker } from '../core/Ticker'
+import { Timeframe } from '../core/Timeframe'
+import { TickerRegistry } from '../core/TickerRegstry'
+import { TimeframeRegistry } from '../core/TimeframeRegistry'
+
 import type { ChartState } from '../types/ChartState'
 import { LAYOUTS, type LayoutType } from '../types/Layout'
 import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
 import type { AppConfig, ChartConfig } from '../types/AppConfig'
-import { Ticker } from '../core/Ticker'
-import { Timeframe } from '../core/Timeframe'
-import { TickerRegistry } from '../core/TickerRegstry'
-import { TimeframeRegistry } from '../core/TimeframeRegistry'
-import JumpToDialog from './JumpToDialog'
 
 const storage = new LocalStorageProvider()
 
@@ -120,14 +122,14 @@ export default function Main() {
                         replayStore.openToolbar()
                         setShowReplayToolbar(true)
                     }}
-                    onJumpToClick={() => {}}
+                    onJumpToClick={() => setJumpOpen(true)}
                 />
 
                 <JumpToDialog
                     open={jumpOpen}
                     onClose={() => setJumpOpen(false)}
-                    onGo={(date) => {
-                        console.log(date)
+                    onGo={(timestamp: number) => {
+                        console.log(timestamp)
                         // jumpTo(date)
                     }}
                 />

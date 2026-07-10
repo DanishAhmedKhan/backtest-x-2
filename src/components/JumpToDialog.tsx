@@ -4,7 +4,7 @@ type Props = {
     open: boolean
     initialDate?: Date
     onClose: () => void
-    onGo: (date: Date) => void
+    onGo: (date: number) => void
 }
 
 function toDateInputValue(date: Date) {
@@ -26,7 +26,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
 
         if (isNaN(selected.getTime())) return
 
-        onGo(selected)
+        onGo(selected.getTime())
         onClose()
     }
 
