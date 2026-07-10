@@ -19,19 +19,7 @@ export class CsvCandleLoader {
     public static async load(ticker: string, intervalFolder: FolderName, fileCount: number = 2): Promise<Candle[]> {
         const files = await this.getSortedFiles(ticker)
 
-        const selectedFiles = files.slice(-fileCount)
-
-        const candles: Candle[] = []
-
-        for (const file of selectedFiles) {
-            const url = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/${intervalFolder}/${file}`
-            const text = await fetch(url).then((res) => res.text())
-            candles.push(...this.parseCsv(text))
-        }
-
-        candles.sort((a, b) => a.time - b.time)
-
-        return candles
+        return this.loadWindow(ticker, intervalFolder, Math.max(0, files.length - fileCount), fileCount)
     }
 
     public static async loadChunk(
@@ -63,6 +51,62 @@ export class CsvCandleLoader {
 
         return candles
     }
+
+    public static async loadWindow(
+        ticker: string,
+        intervalFolder: FolderName,
+        startIndex: number,
+        fileCount: number,
+    ): Promise<Candle[]> {
+        const files = await this.getSortedFiles(ticker)
+
+        const safeStart = Math.max(0, startIndex)
+
+        const selectedFiles = files.slice(safeStart, safeStart + fileCount)
+
+        if (selectedFiles.length === 0) {
+            return []
+        }
+
+        const candles: Candle[] = []
+
+        for (const file of selectedFiles) {
+            const url = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/${intervalFolder}/${file}`
+            const text = await fetch(url).then((res) => res.text())
+            candles.push(...this.parseCsv(text))
+        }
+
+        candles.sort((a, b) => a.time - b.time)
+
+        return candles
+    }
+
+    public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
+        const files = await this.getSortedFiles(ticker)
+
+        const date = new Date(timestamp * 1000)
+        const { year, week } = this.getIsoWeek(date)
+
+        const fileName = `${year}-${week}.csv`
+
+        return files.indexOf(fileName)
+    }
+
+    private static getIsoWeek(date: Date) {
+        const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+
+        const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+
+        return {
+            year: d.getUTCFullYear(),
+            week,
+        }
+    }
+
     public static async getFileCount(ticker: string): Promise<number> {
         const files = await this.getSortedFiles(ticker)
         return files.length

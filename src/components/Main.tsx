@@ -16,6 +16,7 @@ import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
 import type { AppConfig, ChartConfig } from '../types/AppConfig'
+import { eventBus } from '../event/EventBus'
 
 const storage = new LocalStorageProvider()
 
@@ -128,9 +129,12 @@ export default function Main() {
                 <JumpToDialog
                     open={jumpOpen}
                     onClose={() => setJumpOpen(false)}
-                    onGo={(timestamp: number) => {
-                        console.log(timestamp)
-                        // jumpTo(date)
+                    onGo={(timestamp) => {
+                        eventBus.emit('jumpTo', {
+                            timestamp,
+                        })
+
+                        setJumpOpen(false)
                     }}
                 />
             </div>

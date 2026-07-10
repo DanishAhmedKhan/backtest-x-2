@@ -18,6 +18,12 @@ import { useChart } from '../hooks/charts/useChart'
 import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useChartResize } from '../hooks/charts/useChartResize'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { useJumpTo } from '../hooks/charts/useJumpTo'
+
+export type LoadedWindow = {
+    oldestFile: number
+    latestFile: number
+}
 
 type Props = {
     id: string
@@ -39,7 +45,11 @@ function Chart({ id, ticker, timeframe }: Props) {
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
 
-    const oldestLoadedFileRef = useRef(0)
+    const loadedWindowRef = useRef({
+        oldestFile: 0,
+        latestFile: 0,
+    })
+
     const totalFilesRef = useRef(0)
     const isLoadingOlderRef = useRef(false)
 
@@ -68,7 +78,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         ticker,
         timeframe,
         chartReady,
-        oldestLoadedFileRef,
+        loadedWindowRef,
         totalFilesRef,
         isLoadingOlderRef,
     })
@@ -96,7 +106,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         raw1mCandlesRef,
         candleMapRef,
         timesRef,
-        oldestLoadedFileRef,
+        loadedWindowRef,
         totalFilesRef,
         candleCountRef,
         spaceCountRef,
@@ -111,6 +121,20 @@ function Chart({ id, ticker, timeframe }: Props) {
         seriesRef,
         candlesRef,
         raw1mCandlesRef,
+    })
+
+    useJumpTo({
+        ticker,
+        timeframe,
+        chartRef,
+        seriesRef,
+        candlesRef,
+        raw1mCandlesRef,
+        candleMapRef,
+        timesRef,
+        loadedWindowRef,
+        candleCountRef,
+        spaceCountRef,
     })
 
     useEffect(() => {

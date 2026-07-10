@@ -7,6 +7,8 @@ import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
+import type { LoadedWindow } from '../../components/Chart'
+import { applyChartData } from '../utilities/applyChartData'
 
 type Params = {
     ticker: Ticker
@@ -18,7 +20,7 @@ type Params = {
     raw1mCandlesRef: React.RefObject<Candle[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
-    oldestLoadedFileRef: React.RefObject<number>
+    loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     candleCountRef: React.RefObject<number | null>
     spaceCountRef: React.RefObject<number | null>
@@ -35,7 +37,7 @@ export function useChartData({
     raw1mCandlesRef,
     candleMapRef,
     timesRef,
-    oldestLoadedFileRef,
+    loadedWindowRef,
     totalFilesRef,
     candleCountRef,
     spaceCountRef,
@@ -52,40 +54,37 @@ export function useChartData({
 
             setIsChangingTimeframe(true)
 
-            const candles = await CandleService.getCandles(ticker, timeframe)
-            raw1mCandlesRef.current = await CandleService.getCandles(ticker, new Timeframe(1, TimeframeUnit.Minute))
-
             const totalFiles = await CandleService.getTotalFiles(ticker)
 
             totalFilesRef.current = totalFiles
-            oldestLoadedFileRef.current = Math.max(0, totalFiles - 2)
 
-            const formatted: CandlestickData<Time>[] = candles.map((c) => ({
-                time: c.time as Time,
-                open: c.open,
-                high: c.high,
-                low: c.low,
-                close: c.close,
-            }))
+            const candles = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
 
-            candlesRef.current = formatted
+            raw1mCandlesRef.current = await CandleService.getInitialWindow(
+                ticker,
+                new Timeframe(1, TimeframeUnit.Minute),
+                totalFiles,
+            )
 
-            candleMapRef.current.clear()
+            loadedWindowRef.current = {
+                oldestFile: Math.max(0, totalFiles - 2),
+                latestFile: totalFiles - 1,
+            }
 
-            formatted.forEach((c) => {
-                candleMapRef.current.set(Number(c.time), c)
+            const barCount = applyChartData({
+                candles,
+                series,
+                candlesRef,
+                candleMapRef,
+                timesRef,
             })
-
-            timesRef.current = formatted.map((c) => Number(c.time))
-
-            series.setData(formatted)
 
             const visible = candleCountRef.current ?? 0
             const whitespace = spaceCountRef.current ?? 0
 
             timeScale.setVisibleLogicalRange({
-                from: formatted.length - visible,
-                to: formatted.length + whitespace,
+                from: barCount - visible,
+                to: barCount + whitespace,
             })
 
             setIsChangingTimeframe(false)

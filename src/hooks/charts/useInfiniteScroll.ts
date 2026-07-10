@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-charts'
 
-import { CandleService } from '../../core/CandleService'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { replayStore } from '../../replay/ReplayStore'
+import type { LoadedWindow } from '../../components/Chart'
+import { loadAdjacentWindow } from '../utilities/loadAdjacentWidow,'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -15,7 +16,7 @@ type Params = {
     ticker: Ticker
     timeframe: Timeframe
     chartReady: boolean
-    oldestLoadedFileRef: React.RefObject<number>
+    loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     isLoadingOlderRef: React.RefObject<boolean>
 }
@@ -29,7 +30,7 @@ export function useInfiniteScroll({
     ticker,
     timeframe,
     chartReady,
-    oldestLoadedFileRef,
+    loadedWindowRef,
     totalFilesRef,
     isLoadingOlderRef,
 }: Params) {
@@ -44,68 +45,59 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
-            if (replayStore.enabled) {
-                return
-            }
+            if (replayStore.enabled) return
 
-            if (isLoadingOlderRef.current) {
-                return
-            }
+            if (isLoadingOlderRef.current) return
 
             const range = timeScale.getVisibleLogicalRange()
 
-            if (!range || range.from > 20) return
-            if (oldestLoadedFileRef.current <= 0) return
+            if (!range) return
 
             isLoadingOlderRef.current = true
 
             try {
-                const loadIndex = oldestLoadedFileRef.current - 1
+                if (range.from < 20) {
+                    const currentRange = range
 
-                const olderCandles = await CandleService.getOlderCandles(ticker, timeframe, loadIndex, 1)
+                    const result = await loadAdjacentWindow({
+                        series,
+                        candlesRef,
+                        candleMapRef,
+                        timesRef,
+                        ticker,
+                        timeframe,
+                        loadedWindowRef,
+                        totalFilesRef,
+                        direction: 'older',
+                    })
 
-                if (!olderCandles.length) {
-                    return
+                    if (result.loaded) {
+                        requestAnimationFrame(() => {
+                            timeScale.setVisibleLogicalRange({
+                                from: currentRange.from + result.addedBars,
+                                to: currentRange.to + result.addedBars,
+                            })
+                        })
+
+                        return
+                    }
                 }
 
-                const formatted: CandlestickData<Time>[] = olderCandles.map((c) => ({
-                    time: c.time as Time,
-                    open: c.open,
-                    high: c.high,
-                    low: c.low,
-                    close: c.close,
-                }))
-
-                const currentRange = timeScale.getVisibleLogicalRange()
-
-                const oldLength = candlesRef.current.length
-
-                const merged = [...formatted, ...candlesRef.current]
-
-                candlesRef.current = merged
-
-                formatted.forEach((c) => {
-                    candleMapRef.current.set(Number(c.time), c)
-                })
-
-                timesRef.current = merged.map((c) => Number(c.time))
-
-                series.setData(merged)
-
-                oldestLoadedFileRef.current = loadIndex
-
-                if (currentRange) {
-                    const addedBars = merged.length - oldLength
-
-                    requestAnimationFrame(() => {
-                        timeScale.setVisibleLogicalRange({
-                            from: currentRange.from + addedBars,
-                            to: currentRange.to + addedBars,
-                        })
+                if (range.to > candlesRef.current.length - 20) {
+                    await loadAdjacentWindow({
+                        series,
+                        candlesRef,
+                        candleMapRef,
+                        timesRef,
+                        ticker,
+                        timeframe,
+                        loadedWindowRef,
+                        totalFilesRef,
+                        direction: 'newer',
                     })
                 }
             } catch (err) {
-                console.error('Failed loading older candles', err)
+                console.error(err)
             } finally {
                 isLoadingOlderRef.current = false
             }
@@ -125,8 +117,8 @@ export function useInfiniteScroll({
         candlesRef,
         candleMapRef,
         timesRef,
-        oldestLoadedFileRef,
         totalFilesRef,
         isLoadingOlderRef,
+        loadedWindowRef,
     ])
 }
