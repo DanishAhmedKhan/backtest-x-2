@@ -1,6 +1,5 @@
 import type { Ticker } from './Ticker'
 import type { Timeframe } from './Timeframe'
-import type { Candle } from './Candle'
 import { CandleAggregator } from '../data/CandleAggregator'
 import { candleCache } from '../data/CandleCache'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
@@ -25,24 +24,6 @@ export class CandleService {
         const startIndex = Math.max(0, fileCount - 2)
 
         return this.getCandlesWindow(ticker, timeframe, startIndex, 2)
-    }
-
-    static async getBaseCandles(ticker: Ticker): Promise<Candle[]> {
-        return CsvCandleLoader.load(ticker.value, 'M', 2)
-    }
-
-    static async getOlderCandles(ticker: Ticker, timeframe: Timeframe, startIndex: number, count: number) {
-        const tfSeconds = timeframe.toSeconds()
-
-        const intervalFolder = tfSeconds < 3600 ? 'M' : 'H'
-
-        const raw = await CsvCandleLoader.loadChunk(ticker.value, intervalFolder, startIndex, count)
-
-        if (tfSeconds === 60 || tfSeconds === 3600) {
-            return raw
-        }
-
-        return CandleAggregator.aggregate(raw, tfSeconds / 60)
     }
 
     static async getCandlesWindow(ticker: Ticker, timeframe: Timeframe, startIndex: number, fileCount: number) {

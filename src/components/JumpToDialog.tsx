@@ -26,7 +26,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
 
         if (isNaN(selected.getTime())) return
 
-        onGo(selected.getTime())
+        onGo(selected.getTime() / 1000)
         onClose()
     }
 

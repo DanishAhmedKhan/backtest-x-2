@@ -16,42 +16,6 @@ export class CsvCandleLoader {
         })
     }
 
-    public static async load(ticker: string, intervalFolder: FolderName, fileCount: number = 2): Promise<Candle[]> {
-        const files = await this.getSortedFiles(ticker)
-
-        return this.loadWindow(ticker, intervalFolder, Math.max(0, files.length - fileCount), fileCount)
-    }
-
-    public static async loadChunk(
-        ticker: string,
-        intervalFolder: FolderName,
-        startIndex: number,
-        count: number,
-    ): Promise<Candle[]> {
-        const files = await this.getSortedFiles(ticker)
-
-        const safeStart = Math.max(0, startIndex)
-
-        const selectedFiles = files.slice(safeStart, safeStart + count)
-
-        if (selectedFiles.length === 0) {
-            console.warn('No files selected (index out of range)')
-            return []
-        }
-
-        const candles: Candle[] = []
-
-        for (const file of selectedFiles) {
-            const url = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/${intervalFolder}/${file}`
-            const text = await fetch(url).then((res) => res.text())
-            candles.push(...this.parseCsv(text))
-        }
-
-        candles.sort((a, b) => a.time - b.time)
-
-        return candles
-    }
-
     public static async loadWindow(
         ticker: string,
         intervalFolder: FolderName,
@@ -98,7 +62,6 @@ export class CsvCandleLoader {
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
 
         const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-
         const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
 
         return {

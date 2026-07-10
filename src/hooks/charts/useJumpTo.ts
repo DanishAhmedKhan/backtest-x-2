@@ -77,9 +77,17 @@ export function useJumpTo({
             const visible = candleCountRef.current ?? 200
             const whitespace = spaceCountRef.current ?? 10
 
-            chart.timeScale().setVisibleLogicalRange({
-                from: index - visible / 2,
-                to: index + visible / 2 + whitespace,
+            requestAnimationFrame(() => {
+                chart.timeScale().setVisibleLogicalRange({
+                    from: index - visible / 2,
+                    to: index + visible / 2 + whitespace,
+                })
+
+                series.applyOptions({
+                    autoscaleInfoProvider: () => null,
+                })
+
+                chart.timeScale().fitContent()
             })
         })
 
@@ -87,17 +95,13 @@ export function useJumpTo({
     }, [
         ticker,
         timeframe,
-
         chartRef,
         seriesRef,
-
         candlesRef,
         raw1mCandlesRef,
         candleMapRef,
         timesRef,
-
         loadedWindowRef,
-
         candleCountRef,
         spaceCountRef,
     ])
