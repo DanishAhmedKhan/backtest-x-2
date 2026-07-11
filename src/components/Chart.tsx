@@ -19,11 +19,7 @@ import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useChartResize } from '../hooks/charts/useChartResize'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import { useJumpTo } from '../hooks/charts/useJumpTo'
-
-export type LoadedWindow = {
-    oldestFile: number
-    latestFile: number
-}
+import type { ViewportState } from '../types/Viewport'
 
 type Props = {
     id: string
@@ -39,8 +35,10 @@ function Chart({ id, ticker, timeframe }: Props) {
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
-    const candleCountRef = useRef<number>(DEFAULT_VISIBLE_CANDLE)
-    const spaceCountRef = useRef<number>(DEFAULT_BLANK_CANDLE)
+    const viewportRef = useRef<ViewportState>({
+        visibleBars: DEFAULT_VISIBLE_CANDLE,
+        rightOffset: DEFAULT_BLANK_CANDLE,
+    })
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
@@ -65,8 +63,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         candlesRef,
         isChangingTimeframeRef,
         chartReady,
-        candleCountRef,
-        spaceCountRef,
+        viewportRef,
     })
 
     useInfiniteScroll({
@@ -108,8 +105,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         timesRef,
         loadedWindowRef,
         totalFilesRef,
-        candleCountRef,
-        spaceCountRef,
+        viewportRef,
         setIsChangingTimeframe: (value) => {
             isChangingTimeframeRef.current = value
         },
@@ -133,8 +129,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         candleMapRef,
         timesRef,
         loadedWindowRef,
-        candleCountRef,
-        spaceCountRef,
+        viewportRef,
     })
 
     useEffect(() => {

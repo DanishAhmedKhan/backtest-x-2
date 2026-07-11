@@ -7,8 +7,9 @@ import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
-import type { LoadedWindow } from '../../components/Chart'
 import { applyChartData } from '../utilities/applyChartData'
+import type { LoadedWindow } from '../../types/LoadedWindow'
+import type { ViewportState } from '../../types/Viewport'
 
 type Params = {
     ticker: Ticker
@@ -22,8 +23,7 @@ type Params = {
     timesRef: React.RefObject<number[]>
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
-    candleCountRef: React.RefObject<number | null>
-    spaceCountRef: React.RefObject<number | null>
+    viewportRef: React.RefObject<ViewportState>
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -39,8 +39,7 @@ export function useChartData({
     timesRef,
     loadedWindowRef,
     totalFilesRef,
-    candleCountRef,
-    spaceCountRef,
+    viewportRef,
     setIsChangingTimeframe,
 }: Params) {
     useEffect(() => {
@@ -79,13 +78,13 @@ export function useChartData({
                 timesRef,
             })
 
-            const visible = candleCountRef.current ?? 0
-            const whitespace = spaceCountRef.current ?? 0
+            const lastIndex = barCount - 1
+            const { visibleBars, rightOffset } = viewportRef.current
 
-            timeScale.setVisibleLogicalRange({
-                from: barCount - visible,
-                to: barCount + whitespace,
-            })
+            const to = lastIndex + rightOffset
+            const from = to - visibleBars + 1
+
+            timeScale.setVisibleLogicalRange({ from, to })
 
             setIsChangingTimeframe(false)
 

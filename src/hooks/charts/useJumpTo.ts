@@ -1,16 +1,17 @@
 import { useEffect } from 'react'
 import type { CandlestickData, IChartApi, ISeriesApi, Time } from 'lightweight-charts'
 
-import { CandleService } from '../../core/CandleService'
-import type { Candle } from '../../core/Candle'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
+import { TimeframeUnit } from '../../core/TimeframeUnit'
+import { CandleService } from '../../core/CandleService'
+import type { Candle } from '../../core/Candle'
 
 import { eventBus } from '../../event/EventBus'
 import { applyChartData } from '../utilities/applyChartData'
 
-import type { LoadedWindow } from '../../components/Chart'
-import { TimeframeUnit } from '../../core/TimeframeUnit'
+import type { ViewportState } from '../../types/Viewport'
+import type { LoadedWindow } from '../../types/LoadedWindow'
 
 type Params = {
     ticker: Ticker
@@ -22,8 +23,7 @@ type Params = {
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     loadedWindowRef: React.RefObject<LoadedWindow>
-    candleCountRef: React.RefObject<number | null>
-    spaceCountRef: React.RefObject<number | null>
+    viewportRef: React.RefObject<ViewportState>
 }
 
 export function useJumpTo({
@@ -36,8 +36,7 @@ export function useJumpTo({
     candleMapRef,
     timesRef,
     loadedWindowRef,
-    candleCountRef,
-    spaceCountRef,
+    viewportRef,
 }: Params) {
     useEffect(() => {
         const unsubscribe = eventBus.on('jumpTo', async ({ timestamp }) => {
@@ -74,13 +73,12 @@ export function useJumpTo({
                 index = barCount - 1
             }
 
-            const visible = candleCountRef.current ?? 200
-            const whitespace = spaceCountRef.current ?? 10
+            const { visibleBars, rightOffset } = viewportRef.current
 
             requestAnimationFrame(() => {
                 chart.timeScale().setVisibleLogicalRange({
-                    from: index - visible / 2,
-                    to: index + visible / 2 + whitespace,
+                    from: index - visibleBars / 2,
+                    to: index + visibleBars / 2 + rightOffset,
                 })
 
                 series.applyOptions({
@@ -102,7 +100,6 @@ export function useJumpTo({
         candleMapRef,
         timesRef,
         loadedWindowRef,
-        candleCountRef,
-        spaceCountRef,
+        viewportRef,
     ])
 }

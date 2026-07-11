@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { IChartApi, Time, CandlestickData, ISeriesApi } from 'lightweight-charts'
+import type { ViewportState } from '../../types/Viewport'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -7,8 +8,7 @@ type Params = {
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     isChangingTimeframeRef: React.RefObject<boolean>
     chartReady: boolean
-    candleCountRef: React.RefObject<number | null>
-    spaceCountRef: React.RefObject<number | null>
+    viewportRef: React.RefObject<ViewportState>
 }
 
 export function useViewportSync({
@@ -17,8 +17,7 @@ export function useViewportSync({
     candlesRef,
     isChangingTimeframeRef,
     chartReady,
-    candleCountRef,
-    spaceCountRef,
+    viewportRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -44,12 +43,13 @@ export function useViewportSync({
             const visibleStart = Math.max(from, 0)
             const visibleEnd = Math.min(to, lastIndex)
 
-            const visibleCandles = Math.max(0, visibleEnd - visibleStart + 1)
+            const visibleBars = Math.max(0, visibleEnd - visibleStart + 1)
+            const rightOffset = Math.max(0, to - lastIndex)
 
-            const whitespace = Math.max(0, to - lastIndex)
-
-            candleCountRef.current = visibleCandles
-            spaceCountRef.current = whitespace
+            viewportRef.current = {
+                visibleBars,
+                rightOffset,
+            }
         }
 
         timeScale.subscribeVisibleLogicalRangeChange(handler)
@@ -57,5 +57,5 @@ export function useViewportSync({
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [chartRef, candlesRef, isChangingTimeframeRef, chartReady, seriesRef, candleCountRef, spaceCountRef])
+    }, [chartRef, candlesRef, isChangingTimeframeRef, chartReady, seriesRef, viewportRef])
 }
