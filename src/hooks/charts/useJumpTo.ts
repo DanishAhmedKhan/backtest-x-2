@@ -75,7 +75,17 @@ export function useJumpTo({
 
             const { visibleBars, rightOffset } = viewportRef.current
 
+            // const to = index + rightOffset
+            // const from = to - visibleBars + 1
+
             requestAnimationFrame(() => {
+                // this preserves that position
+                // chart.timeScale().setVisibleLogicalRange({
+                //     from,
+                //     to,
+                // })
+
+                // This centers the candle in the chart
                 chart.timeScale().setVisibleLogicalRange({
                     from: index - visibleBars / 2,
                     to: index + visibleBars / 2 + rightOffset,

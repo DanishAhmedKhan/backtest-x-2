@@ -1,13 +1,17 @@
 import { useEffect } from 'react'
 import type { CandlestickData, Time, IChartApi, ISeriesApi } from 'lightweight-charts'
-import { CandleService } from '../../core/CandleService'
-import type { Candle } from '../../core/Candle'
+
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
-import { replayStore } from '../../replay/ReplayStore'
+import { CandleService } from '../../core/CandleService'
+import type { Candle } from '../../core/Candle'
+
 import { eventBus } from '../../event/EventBus'
+import { replayStore } from '../../replay/ReplayStore'
 import { applyChartData } from '../utilities/applyChartData'
+import { restoreViewport } from '../utilities/viewport'
+
 import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
 
@@ -49,8 +53,6 @@ export function useChartData({
 
             if (!chart || !series || !chartReady) return
 
-            const timeScale = chart.timeScale()
-
             setIsChangingTimeframe(true)
 
             const totalFiles = await CandleService.getTotalFiles(ticker)
@@ -78,13 +80,11 @@ export function useChartData({
                 timesRef,
             })
 
-            const lastIndex = barCount - 1
-            const { visibleBars, rightOffset } = viewportRef.current
-
-            const to = lastIndex + rightOffset
-            const from = to - visibleBars + 1
-
-            timeScale.setVisibleLogicalRange({ from, to })
+            restoreViewport({
+                chart,
+                viewport: viewportRef,
+                barCount,
+            })
 
             setIsChangingTimeframe(false)
 

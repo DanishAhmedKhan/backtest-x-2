@@ -3,9 +3,11 @@ import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-c
 
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
+
 import { replayStore } from '../../replay/ReplayStore'
-import type { LoadedWindow } from '../../components/Chart'
 import { loadAdjacentWindow } from '../utilities/loadAdjacentWidow,'
+
+import type { LoadedWindow } from '../../types/LoadedWindow'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
