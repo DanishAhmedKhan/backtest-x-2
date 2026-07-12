@@ -28,7 +28,5 @@ export function useChartResize({ containerRef, chartRef }: Props) {
         return () => {
             observer.disconnect()
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [chartRef, containerRef])
 }

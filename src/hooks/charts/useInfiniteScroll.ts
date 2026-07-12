@@ -49,16 +49,11 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
-            if (isChangingTimeframeRef.current) {
+            if (isChangingTimeframeRef.current || replayStore.enabled || isLoadingOlderRef.current) {
                 return
             }
 
-            if (replayStore.enabled) return
-
-            if (isLoadingOlderRef.current) return
-
             const range = timeScale.getVisibleLogicalRange()
-
             if (!range) return
 
             isLoadingOlderRef.current = true

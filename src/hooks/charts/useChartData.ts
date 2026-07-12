@@ -56,20 +56,21 @@ export function useChartData({
             setIsChangingTimeframe(true)
 
             const totalFiles = await CandleService.getTotalFiles(ticker)
-
             totalFilesRef.current = totalFiles
 
-            const candles = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
+            const chartResult = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
+            const candles = chartResult.candles
 
-            raw1mCandlesRef.current = await CandleService.getInitialWindow(
+            const rawResult = await CandleService.getInitialWindow(
                 ticker,
                 new Timeframe(1, TimeframeUnit.Minute),
                 totalFiles,
             )
+            raw1mCandlesRef.current = rawResult.candles
 
             loadedWindowRef.current = {
-                oldestFile: Math.max(0, totalFiles - 2),
-                latestFile: totalFiles - 1,
+                oldestFile: chartResult.oldestFile,
+                latestFile: chartResult.latestFile,
             }
 
             applyChartData({

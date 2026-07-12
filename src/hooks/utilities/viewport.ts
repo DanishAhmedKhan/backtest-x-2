@@ -59,15 +59,21 @@ export function restoreViewport({
         to = lastIndex - viewport.current.barsAfterViewport
     }
 
-    const maxTo = lastIndex + viewport.current.rightWhitespace
-    const minTo = viewport.current.visibleBars - 1
+    const desiredFrom = to - viewport.current.visibleBars + 1
 
-    to = Math.max(minTo, Math.min(to, maxTo))
+    if (desiredFrom < 0) {
+        const leftPadding = -desiredFrom
 
-    const from = to - viewport.current.visibleBars + 1
+        chart.timeScale().setVisibleLogicalRange({
+            from: -leftPadding,
+            to: viewport.current.visibleBars - leftPadding - 1,
+        })
+
+        return
+    }
 
     chart.timeScale().setVisibleLogicalRange({
-        from,
+        from: desiredFrom,
         to,
     })
 }

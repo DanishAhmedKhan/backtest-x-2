@@ -1,29 +1,66 @@
 import type { Ticker } from './Ticker'
 import type { Timeframe } from './Timeframe'
 import { CandleAggregator } from '../data/CandleAggregator'
-import { candleCache } from '../data/CandleCache'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
+import type { Candle } from './Candle'
+import { TimeframeUnit } from './TimeframeUnit'
 
 export class CandleService {
-    static async getCandles(ticker: Ticker, timeframe: Timeframe) {
-        const key = `${ticker.value}_${timeframe.toKey()}`
+    static async getInitialWindow(
+        ticker: Ticker,
+        timeframe: Timeframe,
+        totalFiles?: number,
+    ): Promise<{
+        candles: Candle[]
+        oldestFile: number
+        latestFile: number
+    }> {
+        const tfSeconds = timeframe.toSeconds()
 
-        if (candleCache.has(key)) {
-            return candleCache.get(key)!
+        const intervalFolder = tfSeconds < 3600 ? 'M' : 'H'
+
+        const fileCount = this.getInitialFileCount(timeframe)
+
+        if (totalFiles === undefined) {
+            totalFiles = await this.getTotalFiles(ticker)
         }
 
-        const result = await this.getInitialWindow(ticker, timeframe)
+        const startIndex = Math.max(0, totalFiles - fileCount)
 
-        candleCache.set(key, result)
+        const raw = await CsvCandleLoader.loadWindow(ticker.value, intervalFolder, startIndex, fileCount)
 
-        return result
+        let result: Candle[]
+
+        if (tfSeconds === 60 || tfSeconds === 3600) {
+            result = raw
+        } else {
+            result = CandleAggregator.aggregate(raw, tfSeconds / 60)
+        }
+
+        return {
+            candles: result,
+            oldestFile: startIndex,
+            latestFile: totalFiles - 1,
+        }
     }
 
-    static async getInitialWindow(ticker: Ticker, timeframe: Timeframe, totalFiles?: number) {
-        const fileCount = totalFiles ?? (await this.getTotalFiles(ticker))
-        const startIndex = Math.max(0, fileCount - 2)
+    private static getInitialFileCount(timeframe: Timeframe): number {
+        switch (timeframe.unit) {
+            case TimeframeUnit.Minute:
+                return 5
 
-        return this.getCandlesWindow(ticker, timeframe, startIndex, 2)
+            case TimeframeUnit.Hour:
+                return 20
+
+            case TimeframeUnit.Day:
+            case TimeframeUnit.Week:
+            case TimeframeUnit.Month:
+            case TimeframeUnit.Year:
+                return 20
+
+            default:
+                return 5
+        }
     }
 
     static async getCandlesWindow(ticker: Ticker, timeframe: Timeframe, startIndex: number, fileCount: number) {
