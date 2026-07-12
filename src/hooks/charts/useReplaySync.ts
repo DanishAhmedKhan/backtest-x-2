@@ -7,6 +7,8 @@ import type { Candle } from '../../core/Candle'
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import { CandleAggregator } from '../../data/CandleAggregator'
+import { restoreViewport, shiftViewport } from '../utilities/viewport'
+import type { ViewportState } from '../../types/Viewport'
 
 type Props = {
     timeframe: Timeframe
@@ -14,48 +16,31 @@ type Props = {
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     raw1mCandlesRef: React.RefObject<Candle[]>
+    candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
+    timesRef: React.RefObject<number[]>
+    viewportRef: React.RefObject<ViewportState>
 }
 
-export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef }: Props) {
-    const previousCountRef = useRef<number>(0)
+export function useReplaySync({
+    timeframe,
+    chartRef,
+    seriesRef,
+    candlesRef,
+    raw1mCandlesRef,
+    candleMapRef,
+    timesRef,
+    viewportRef,
+}: Props) {
+    const previousCountRef = useRef(0)
 
     useEffect(() => {
-        const preserveViewport = (currentCount: number) => {
+        const rebuildReplay = (restore = false) => {
+            console.log('Replay rebuild')
+
             const chart = chartRef.current
-
-            if (!chart) {
-                return
-            }
-
-            if (previousCountRef.current === 0) {
-                previousCountRef.current = currentCount
-                return
-            }
-
-            const addedBars = currentCount - previousCountRef.current
-
-            previousCountRef.current = currentCount
-
-            if (addedBars <= 0) {
-                return
-            }
-
-            const range = chart.timeScale().getVisibleLogicalRange()
-
-            if (!range) {
-                return
-            }
-
-            chart.timeScale().setVisibleLogicalRange({
-                from: range.from + addedBars,
-                to: range.to + addedBars,
-            })
-        }
-
-        const rebuildReplay = () => {
             const series = seriesRef.current
 
-            if (!series) {
+            if (!chart || !series) {
                 return
             }
 
@@ -68,22 +53,41 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, raw1
 
             const tfSeconds = replayStore.chartTimeframeSeconds
 
+            let replayCandles
+
             if (tfSeconds === 60) {
-                const visible = candlesRef.current.filter((c) => Number(c.time) <= replayTime)
+                replayCandles = candlesRef.current
+                    .filter((c) => Number(c.time) <= replayTime)
+                    .map((c) => ({
+                        time: Number(c.time),
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close,
+                    }))
+            } else {
+                const replayBucket = Math.floor(replayStart / tfSeconds) * tfSeconds
 
-                series.setData(visible)
+                const historical = candlesRef.current
+                    .filter((c) => Number(c.time) < replayBucket)
+                    .map((c) => ({
+                        time: Number(c.time),
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close,
+                    }))
 
-                preserveViewport(visible.length)
+                const replay1m = raw1mCandlesRef.current.filter((c) => c.time >= replayBucket && c.time <= replayTime)
 
-                return
+                const rebuilt = CandleAggregator.aggregate(replay1m, tfSeconds / 60)
+
+                replayCandles = [...historical, ...rebuilt]
             }
 
-            const replayBucket = Math.floor(replayStart / tfSeconds) * tfSeconds
-            const historical = candlesRef.current.filter((c) => Number(c.time) < replayBucket)
-            const replay1m = raw1mCandlesRef.current.filter((c) => c.time >= replayBucket && c.time <= replayTime)
-            const rebuilt = CandleAggregator.aggregate(replay1m, tfSeconds / 60)
+            const previousCount = previousCountRef.current
 
-            const finalData = [...historical, ...rebuilt].map((c) => ({
+            const formatted: CandlestickData<Time>[] = replayCandles.map((c) => ({
                 time: c.time as Time,
                 open: c.open,
                 high: c.high,
@@ -91,25 +95,42 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, raw1
                 close: c.close,
             }))
 
-            series.setData(finalData)
+            series.setData(formatted)
 
-            preserveViewport(finalData.length)
+            const currentCount = formatted.length
+
+            if (restore) {
+                requestAnimationFrame(() => {
+                    restoreViewport({
+                        chart,
+                        candles: candlesRef.current,
+                        viewport: viewportRef,
+                    })
+                })
+            } else {
+                shiftViewport({
+                    chart,
+                    bars: currentCount - previousCount,
+                })
+            }
+
+            previousCountRef.current = currentCount
         }
-
         const unsubStart = eventBus.on('replayStart', () => {
             previousCountRef.current = 0
-            rebuildReplay()
+
+            rebuildReplay(true)
         })
 
         const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => {
             replayStore.marketTime = time
 
-            rebuildReplay()
+            rebuildReplay(false)
         })
 
         return () => {
             unsubStart()
             unsubChange()
         }
-    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef])
+    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, candleMapRef, timesRef, viewportRef])
 }

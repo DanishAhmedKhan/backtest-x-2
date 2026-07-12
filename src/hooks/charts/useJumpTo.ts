@@ -12,6 +12,7 @@ import { applyChartData } from '../utilities/applyChartData'
 
 import type { ViewportState } from '../../types/Viewport'
 import type { LoadedWindow } from '../../types/LoadedWindow'
+import { scrollViewportToBar } from '../utilities/viewport'
 
 type Params = {
     ticker: Ticker
@@ -73,29 +74,43 @@ export function useJumpTo({
                 index = barCount - 1
             }
 
-            const { visibleBars, rightOffset } = viewportRef.current
+            // const { visibleBars, rightOffset } = viewportRef.current
 
             // const to = index + rightOffset
             // const from = to - visibleBars + 1
 
-            requestAnimationFrame(() => {
-                // this preserves that position
-                // chart.timeScale().setVisibleLogicalRange({
-                //     from,
-                //     to,
-                // })
+            // requestAnimationFrame(() => {
+            //     // this preserves that position
+            //     // chart.timeScale().setVisibleLogicalRange({
+            //     //     from,
+            //     //     to,
+            //     // })
 
-                // This centers the candle in the chart
-                chart.timeScale().setVisibleLogicalRange({
-                    from: index - visibleBars / 2,
-                    to: index + visibleBars / 2 + rightOffset,
+            //     // This centers the candle in the chart
+            //     chart.timeScale().setVisibleLogicalRange({
+            //         from: index - visibleBars / 2,
+            //         to: index + visibleBars / 2 + rightOffset,
+            //     })
+
+            //     series.applyOptions({
+            //         autoscaleInfoProvider: () => null,
+            //     })
+
+            //     // chart.timeScale().fitContent()
+            // })
+
+            requestAnimationFrame(() => {
+                scrollViewportToBar({
+                    chart,
+                    candles: candlesRef.current,
+                    viewport: viewportRef,
+                    barIndex: index,
+                    align: 'center',
                 })
 
                 series.applyOptions({
                     autoscaleInfoProvider: () => null,
                 })
-
-                // chart.timeScale().fitContent()
             })
         })
 

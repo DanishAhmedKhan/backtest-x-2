@@ -120,6 +120,9 @@ function Chart({ id, ticker, timeframe }: Props) {
         seriesRef,
         candlesRef,
         raw1mCandlesRef,
+        candleMapRef,
+        timesRef,
+        viewportRef,
     })
 
     useJumpTo({

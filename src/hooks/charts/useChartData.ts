@@ -92,6 +92,7 @@ export function useChartData({
             })
 
             if (replayStore.enabled && replayStore.marketTime !== null) {
+                console.log('ChartData finished')
                 eventBus.emit('replayTimeChanged', {
                     time: replayStore.marketTime,
                 })

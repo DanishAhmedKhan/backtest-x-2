@@ -78,21 +78,74 @@ export function restoreViewport({
     })
 }
 
+// export function scrollViewportToBar({
+//     chart,
+//     viewport,
+//     barIndex,
+// }: {
+//     chart: IChartApi
+//     viewport: React.RefObject<ViewportState>
+//     barIndex: number
+// }) {
+//     const to = viewport.current.rightWhitespace > 0 ? barIndex + viewport.current.rightWhitespace : barIndex
+
+//     const from = to - viewport.current.visibleBars + 1
+
+//     chart.timeScale().setVisibleLogicalRange({
+//         from,
+//         to,
+//     })
+// }
+
 export function scrollViewportToBar({
     chart,
+    candles,
     viewport,
     barIndex,
+    align = 'center',
 }: {
     chart: IChartApi
+    candles: CandlestickData<Time>[]
     viewport: React.RefObject<ViewportState>
     barIndex: number
+    align?: 'center' | 'right'
 }) {
-    const to = viewport.current.rightWhitespace > 0 ? barIndex + viewport.current.rightWhitespace : barIndex
+    if (!candles.length) {
+        return
+    }
 
-    const from = to - viewport.current.visibleBars + 1
+    const { visibleBars, rightWhitespace } = viewport.current
+
+    let from: number
+    let to: number
+
+    if (align === 'center') {
+        from = barIndex - visibleBars / 2
+        to = from + visibleBars - 1 + rightWhitespace
+    } else {
+        to = barIndex + rightWhitespace
+        from = to - visibleBars + 1
+    }
 
     chart.timeScale().setVisibleLogicalRange({
         from,
         to,
+    })
+}
+
+export function shiftViewport({ chart, bars }: { chart: IChartApi; bars: number }) {
+    if (bars <= 0) {
+        return
+    }
+
+    const range = chart.timeScale().getVisibleLogicalRange()
+
+    if (!range) {
+        return
+    }
+
+    chart.timeScale().setVisibleLogicalRange({
+        from: range.from + bars,
+        to: range.to + bars,
     })
 }
