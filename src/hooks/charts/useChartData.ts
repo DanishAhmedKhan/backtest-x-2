@@ -72,7 +72,7 @@ export function useChartData({
                 latestFile: totalFiles - 1,
             }
 
-            const barCount = applyChartData({
+            applyChartData({
                 candles,
                 series,
                 candlesRef,
@@ -82,11 +82,13 @@ export function useChartData({
 
             restoreViewport({
                 chart,
+                candles: candlesRef.current,
                 viewport: viewportRef,
-                barCount,
             })
 
-            setIsChangingTimeframe(false)
+            requestAnimationFrame(() => {
+                setIsChangingTimeframe(false)
+            })
 
             if (replayStore.enabled && replayStore.marketTime !== null) {
                 eventBus.emit('replayTimeChanged', {

@@ -3,7 +3,8 @@ import type { CandlestickData, ISeriesApi, Time } from 'lightweight-charts'
 import { CandleService } from '../../core/CandleService'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
-import type { LoadedWindow } from '../../components/Chart'
+
+import type { LoadedWindow } from '../../types/LoadedWindow'
 
 export type LoadAdjacentWindowResult = {
     loaded: boolean

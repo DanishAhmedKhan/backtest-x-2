@@ -1,42 +1,69 @@
-import type { IChartApi, ISeriesApi } from 'lightweight-charts'
-import type { ViewportState } from '../../types/Viewport'
 import type React from 'react'
+import type { CandlestickData, IChartApi, Time } from 'lightweight-charts'
+import type { ViewportState } from '../../types/Viewport'
 
 export function captureViewport({
     chart,
-    series,
+    candles,
     viewport,
 }: {
     chart: IChartApi
-    series: ISeriesApi<'Candlestick'>
+    candles: CandlestickData<Time>[]
     viewport: React.RefObject<ViewportState>
 }) {
     const range = chart.timeScale().getVisibleLogicalRange()
 
-    if (!range) {
+    if (!range || candles.length === 0) {
         return
     }
 
-    const lastBarIndex = series.data().length - 1
+    const lastIndex = candles.length - 1
 
-    viewport.current = {
-        visibleBars: range.to - range.from + 1,
-        rightOffset: range.to - lastBarIndex,
+    const visibleBars = Math.max(1, range.to - range.from + 1)
+
+    if (range.to > lastIndex) {
+        viewport.current = {
+            visibleBars,
+            rightWhitespace: range.to - lastIndex,
+            barsAfterViewport: 0,
+        }
+    } else {
+        viewport.current = {
+            visibleBars,
+            rightWhitespace: 0,
+            barsAfterViewport: lastIndex - range.to,
+        }
     }
 }
 
 export function restoreViewport({
     chart,
+    candles,
     viewport,
-    barCount,
 }: {
     chart: IChartApi
+    candles: CandlestickData<Time>[]
     viewport: React.RefObject<ViewportState>
-    barCount: number
 }) {
-    const lastIndex = barCount - 1
+    if (candles.length === 0) {
+        return
+    }
 
-    const to = lastIndex + viewport.current.rightOffset
+    const lastIndex = candles.length - 1
+
+    let to: number
+
+    if (viewport.current.rightWhitespace > 0) {
+        to = lastIndex + viewport.current.rightWhitespace
+    } else {
+        to = lastIndex - viewport.current.barsAfterViewport
+    }
+
+    const maxTo = lastIndex + viewport.current.rightWhitespace
+    const minTo = viewport.current.visibleBars - 1
+
+    to = Math.max(minTo, Math.min(to, maxTo))
+
     const from = to - viewport.current.visibleBars + 1
 
     chart.timeScale().setVisibleLogicalRange({
@@ -54,7 +81,7 @@ export function scrollViewportToBar({
     viewport: React.RefObject<ViewportState>
     barIndex: number
 }) {
-    const to = barIndex + viewport.current.rightOffset
+    const to = viewport.current.rightWhitespace > 0 ? barIndex + viewport.current.rightWhitespace : barIndex
 
     const from = to - viewport.current.visibleBars + 1
 

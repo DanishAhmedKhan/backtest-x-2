@@ -1,4 +1,5 @@
 export type ViewportState = {
     visibleBars: number
-    rightOffset: number
+    rightWhitespace: number
+    barsAfterViewport: number
 }

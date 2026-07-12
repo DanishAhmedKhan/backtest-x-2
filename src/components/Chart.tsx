@@ -1,25 +1,26 @@
 import { useEffect, useRef, useState, memo } from 'react'
-import { type CandlestickData, type Time } from 'lightweight-charts'
+import type { CandlestickData, Time } from 'lightweight-charts'
+
+import ReplayOverlay from './ReplayOverlay'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import type { Candle } from '../core/Candle'
 
+import { useChart } from '../hooks/charts/useChart'
 import { useChartData } from '../hooks/charts/useChartData'
+import { useChartResize } from '../hooks/charts/useChartResize'
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
+import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
+import { useJumpTo } from '../hooks/charts/useJumpTo'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
-import ReplayOverlay from './ReplayOverlay'
-import { useChart } from '../hooks/charts/useChart'
-import { useReplayPreview } from '../hooks/charts/useReplayPreview'
-import { useChartResize } from '../hooks/charts/useChartResize'
-import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import { useJumpTo } from '../hooks/charts/useJumpTo'
 import type { ViewportState } from '../types/Viewport'
+import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
 type Props = {
     id: string
@@ -37,7 +38,8 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const viewportRef = useRef<ViewportState>({
         visibleBars: DEFAULT_VISIBLE_CANDLE,
-        rightOffset: DEFAULT_BLANK_CANDLE,
+        rightWhitespace: DEFAULT_BLANK_CANDLE,
+        barsAfterViewport: 0,
     })
 
     const isChangingTimeframeRef = useRef<boolean>(false)
@@ -78,6 +80,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         loadedWindowRef,
         totalFilesRef,
         isLoadingOlderRef,
+        isChangingTimeframeRef,
     })
 
     useChartResize({

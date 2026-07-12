@@ -95,7 +95,7 @@ export function useJumpTo({
                     autoscaleInfoProvider: () => null,
                 })
 
-                chart.timeScale().fitContent()
+                // chart.timeScale().fitContent()
             })
         })
 

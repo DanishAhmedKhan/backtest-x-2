@@ -21,6 +21,7 @@ type Params = {
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     isLoadingOlderRef: React.RefObject<boolean>
+    isChangingTimeframeRef: React.RefObject<boolean>
 }
 
 export function useInfiniteScroll({
@@ -35,6 +36,7 @@ export function useInfiniteScroll({
     loadedWindowRef,
     totalFilesRef,
     isLoadingOlderRef,
+    isChangingTimeframeRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -47,6 +49,10 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
+            if (isChangingTimeframeRef.current) {
+                return
+            }
+
             if (replayStore.enabled) return
 
             if (isLoadingOlderRef.current) return
@@ -122,5 +128,6 @@ export function useInfiniteScroll({
         totalFilesRef,
         isLoadingOlderRef,
         loadedWindowRef,
+        isChangingTimeframeRef,
     ])
 }
