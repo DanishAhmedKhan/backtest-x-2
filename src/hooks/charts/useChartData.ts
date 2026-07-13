@@ -9,11 +9,11 @@ import type { Candle } from '../../core/Candle'
 
 import { eventBus } from '../../event/EventBus'
 import { replayStore } from '../../replay/ReplayStore'
-import { applyChartData } from '../utilities/applyChartData'
-import { restoreViewport } from '../utilities/viewport'
 
 import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
+import { applyChartData } from '../utilities/applyChartData'
+import { restoreViewport } from '../utilities/viewport'
 
 type Params = {
     ticker: Ticker
@@ -83,7 +83,7 @@ export function useChartData({
 
             restoreViewport({
                 chart,
-                candles: candlesRef.current,
+                series,
                 viewport: viewportRef,
             })
 

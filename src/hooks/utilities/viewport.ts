@@ -1,23 +1,29 @@
 import type React from 'react'
-import type { CandlestickData, IChartApi, Time } from 'lightweight-charts'
+import type { IChartApi, ISeriesApi } from 'lightweight-charts'
 import type { ViewportState } from '../../types/Viewport'
 
 export function captureViewport({
     chart,
-    candles,
+    series,
     viewport,
 }: {
     chart: IChartApi
-    candles: CandlestickData<Time>[]
+    series: ISeriesApi<'Candlestick'>
     viewport: React.RefObject<ViewportState>
 }) {
     const range = chart.timeScale().getVisibleLogicalRange()
 
-    if (!range || candles.length === 0) {
+    if (!range) {
         return
     }
 
-    const lastIndex = candles.length - 1
+    const renderedBars = series.data()
+
+    if (renderedBars.length === 0) {
+        return
+    }
+
+    const lastIndex = renderedBars.length - 1
 
     const visibleBars = Math.max(1, range.to - range.from + 1)
 
@@ -38,18 +44,20 @@ export function captureViewport({
 
 export function restoreViewport({
     chart,
-    candles,
+    series,
     viewport,
 }: {
     chart: IChartApi
-    candles: CandlestickData<Time>[]
+    series: ISeriesApi<'Candlestick'>
     viewport: React.RefObject<ViewportState>
 }) {
-    if (candles.length === 0) {
+    const renderedBars = series.data()
+
+    if (renderedBars.length === 0) {
         return
     }
 
-    const lastIndex = candles.length - 1
+    const lastIndex = renderedBars.length - 1
 
     let to: number
 
@@ -78,39 +86,20 @@ export function restoreViewport({
     })
 }
 
-// export function scrollViewportToBar({
-//     chart,
-//     viewport,
-//     barIndex,
-// }: {
-//     chart: IChartApi
-//     viewport: React.RefObject<ViewportState>
-//     barIndex: number
-// }) {
-//     const to = viewport.current.rightWhitespace > 0 ? barIndex + viewport.current.rightWhitespace : barIndex
-
-//     const from = to - viewport.current.visibleBars + 1
-
-//     chart.timeScale().setVisibleLogicalRange({
-//         from,
-//         to,
-//     })
-// }
-
 export function scrollViewportToBar({
     chart,
-    candles,
+    series,
     viewport,
     barIndex,
     align = 'center',
 }: {
     chart: IChartApi
-    candles: CandlestickData<Time>[]
+    series: ISeriesApi<'Candlestick'>
     viewport: React.RefObject<ViewportState>
     barIndex: number
     align?: 'center' | 'right'
 }) {
-    if (!candles.length) {
+    if (series.data().length === 0) {
         return
     }
 

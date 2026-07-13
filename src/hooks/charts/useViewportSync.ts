@@ -43,7 +43,7 @@ export function useViewportSync({
 
             captureViewport({
                 chart,
-                candles: candlesRef.current,
+                series,
                 viewport: viewportRef,
             })
         }

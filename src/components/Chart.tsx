@@ -32,6 +32,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
+    const fullCandlesRef = useRef<CandlestickData<Time>[]>([])
     const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])

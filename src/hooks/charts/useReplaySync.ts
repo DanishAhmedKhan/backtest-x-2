@@ -35,8 +35,6 @@ export function useReplaySync({
 
     useEffect(() => {
         const rebuildReplay = (restore = false) => {
-            console.log('Replay rebuild')
-
             const chart = chartRef.current
             const series = seriesRef.current
 
@@ -103,14 +101,17 @@ export function useReplaySync({
                 requestAnimationFrame(() => {
                     restoreViewport({
                         chart,
-                        candles: candlesRef.current,
+                        series,
                         viewport: viewportRef,
                     })
                 })
             } else {
-                shiftViewport({
-                    chart,
-                    bars: currentCount - previousCount,
+                requestAnimationFrame(() => {
+                    restoreViewport({
+                        chart,
+                        series,
+                        viewport: viewportRef,
+                    })
                 })
             }
 
