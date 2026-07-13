@@ -4,9 +4,10 @@ import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-c
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 
-import { replayStore } from '../../replay/ReplayStore'
 import { loadAdjacentWindow } from '../utilities/loadAdjacentWidow,'
 
+import { replayStore } from '../../replay/ReplayStore'
+import { eventBus } from '../../event/EventBus'
 import type { LoadedWindow } from '../../types/LoadedWindow'
 
 type Params = {
@@ -20,8 +21,9 @@ type Params = {
     chartReady: boolean
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
-    isLoadingOlderRef: React.RefObject<boolean>
+    isLoadingDataRef: React.RefObject<boolean>
     isChangingTimeframeRef: React.RefObject<boolean>
+    isDraggingRef: React.RefObject<boolean>
 }
 
 export function useInfiniteScroll({
@@ -35,8 +37,9 @@ export function useInfiniteScroll({
     chartReady,
     loadedWindowRef,
     totalFilesRef,
-    isLoadingOlderRef,
+    isLoadingDataRef,
     isChangingTimeframeRef,
+    isDraggingRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -49,20 +52,26 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
-            if (isChangingTimeframeRef.current || replayStore.enabled || isLoadingOlderRef.current) {
+            if (
+                isChangingTimeframeRef.current ||
+                replayStore.enabled ||
+                isLoadingDataRef.current ||
+                isDraggingRef.current
+            ) {
                 return
             }
 
             const range = timeScale.getVisibleLogicalRange()
             if (!range) return
 
-            isLoadingOlderRef.current = true
+            isLoadingDataRef.current = true
 
             try {
                 if (range.from < 20) {
                     const currentRange = range
 
                     const result = await loadAdjacentWindow({
+                        chart,
                         series,
                         candlesRef,
                         candleMapRef,
@@ -88,6 +97,7 @@ export function useInfiniteScroll({
 
                 if (range.to > candlesRef.current.length - 20) {
                     await loadAdjacentWindow({
+                        chart,
                         series,
                         candlesRef,
                         candleMapRef,
@@ -102,14 +112,21 @@ export function useInfiniteScroll({
             } catch (err) {
                 console.error(err)
             } finally {
-                isLoadingOlderRef.current = false
+                requestAnimationFrame(() => {
+                    isLoadingDataRef.current = false
+                })
             }
         }
+
+        const unsubscribeDrag = eventBus.on('chartDragEnded', () => {
+            handleRangeChange()
+        })
 
         timeScale.subscribeVisibleLogicalRangeChange(handleRangeChange)
 
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handleRangeChange)
+            unsubscribeDrag()
         }
     }, [
         chartReady,
@@ -121,8 +138,9 @@ export function useInfiniteScroll({
         candleMapRef,
         timesRef,
         totalFilesRef,
-        isLoadingOlderRef,
         loadedWindowRef,
         isChangingTimeframeRef,
+        isLoadingDataRef,
+        isDraggingRef,
     ])
 }

@@ -27,6 +27,8 @@ type EventMap = {
     jumpTo: {
         timestamp: number
     }
+
+    chartDragEnded: void
 }
 
 type EventKey = keyof EventMap

@@ -86,21 +86,29 @@ export function restoreViewport({
     })
 }
 
-export function scrollViewportToBar({
+export function scrollViewportToTime({
     chart,
     series,
     viewport,
-    barIndex,
+    timestamp,
     align = 'center',
 }: {
     chart: IChartApi
     series: ISeriesApi<'Candlestick'>
     viewport: React.RefObject<ViewportState>
-    barIndex: number
+    timestamp: number
     align?: 'center' | 'right'
 }) {
-    if (series.data().length === 0) {
+    const candles = series.data()
+
+    if (candles.length === 0) {
         return
+    }
+
+    let barIndex = candles.findIndex((c) => Number(c.time) >= timestamp)
+
+    if (barIndex === -1) {
+        barIndex = candles.length - 1
     }
 
     const { visibleBars, rightWhitespace } = viewport.current

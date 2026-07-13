@@ -46,6 +46,9 @@ function Chart({ id, ticker, timeframe }: Props) {
     const viewportRef = useRef<ViewportState>(defaultViewport)
     const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
+    const jumpAnchorRef = useRef<number | null>(null)
+    const isDraggingRef = useRef(false)
+
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
 
@@ -55,7 +58,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     })
 
     const totalFilesRef = useRef(0)
-    const isLoadingOlderRef = useRef(false)
+    const isLoadingDataRef = useRef(false)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -68,6 +71,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         seriesRef,
         candlesRef,
         isChangingTimeframeRef,
+        isLoadingDataRef,
         chartReady,
         viewportRef,
     })
@@ -83,8 +87,9 @@ function Chart({ id, ticker, timeframe }: Props) {
         chartReady,
         loadedWindowRef,
         totalFilesRef,
-        isLoadingOlderRef,
+        isLoadingDataRef,
         isChangingTimeframeRef,
+        isDraggingRef,
     })
 
     useChartResize({
@@ -166,6 +171,23 @@ function Chart({ id, ticker, timeframe }: Props) {
         })
     }, [timeframe])
 
+    useEffect(() => {
+        const handleMouseUp = () => {
+            if (!isDraggingRef.current) {
+                return
+            }
+
+            isDraggingRef.current = false
+            eventBus.emit('chartDragEnded')
+        }
+
+        window.addEventListener('mouseup', handleMouseUp)
+
+        return () => {
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [])
+
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
@@ -206,6 +228,9 @@ function Chart({ id, ticker, timeframe }: Props) {
         >
             <div
                 ref={containerRef}
+                onMouseDown={() => {
+                    isDraggingRef.current = true
+                }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={handleReplaySelection}

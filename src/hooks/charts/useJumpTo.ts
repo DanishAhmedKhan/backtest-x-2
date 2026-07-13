@@ -12,7 +12,7 @@ import { applyChartData } from '../utilities/applyChartData'
 
 import type { ViewportState } from '../../types/Viewport'
 import type { LoadedWindow } from '../../types/LoadedWindow'
-import { scrollViewportToBar } from '../utilities/viewport'
+import { scrollViewportToTime } from '../utilities/viewport'
 
 type Params = {
     ticker: Ticker
@@ -57,10 +57,9 @@ export function useJumpTo({
             )
 
             raw1mCandlesRef.current = rawResult.candles
-
             loadedWindowRef.current = chartResult.loadedWindow
 
-            const barCount = applyChartData({
+            applyChartData({
                 candles: chartResult.candles,
                 series,
                 candlesRef,
@@ -68,48 +67,17 @@ export function useJumpTo({
                 timesRef,
             })
 
-            let index = candlesRef.current.findIndex((c) => Number(c.time) >= timestamp)
-
-            if (index === -1) {
-                index = barCount - 1
-            }
-
-            // const { visibleBars, rightOffset } = viewportRef.current
-
-            // const to = index + rightOffset
-            // const from = to - visibleBars + 1
-
-            // requestAnimationFrame(() => {
-            //     // this preserves that position
-            //     // chart.timeScale().setVisibleLogicalRange({
-            //     //     from,
-            //     //     to,
-            //     // })
-
-            //     // This centers the candle in the chart
-            //     chart.timeScale().setVisibleLogicalRange({
-            //         from: index - visibleBars / 2,
-            //         to: index + visibleBars / 2 + rightOffset,
-            //     })
-
-            //     series.applyOptions({
-            //         autoscaleInfoProvider: () => null,
-            //     })
-
-            //     // chart.timeScale().fitContent()
-            // })
-
             requestAnimationFrame(() => {
-                scrollViewportToBar({
+                scrollViewportToTime({
                     chart,
-                    candles: candlesRef.current,
+                    series,
                     viewport: viewportRef,
-                    barIndex: index,
+                    timestamp,
                     align: 'center',
                 })
 
-                series.applyOptions({
-                    autoscaleInfoProvider: () => null,
+                chart.priceScale('right').applyOptions({
+                    autoScale: true,
                 })
             })
         })

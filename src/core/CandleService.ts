@@ -81,8 +81,8 @@ export class CandleService {
         ticker: Ticker,
         timeframe: Timeframe,
         timestamp: number,
-        beforeFiles: number = 1,
-        afterFiles: number = 1,
+        beforeFiles: number = 4,
+        afterFiles: number = 4,
     ) {
         const centerFile = await CsvCandleLoader.findFileIndex(ticker.value, timestamp)
 
@@ -104,6 +104,7 @@ export class CandleService {
             },
         }
     }
+
     static async getTotalFiles(ticker: Ticker): Promise<number> {
         return CsvCandleLoader.getFileCount(ticker.value)
     }

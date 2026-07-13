@@ -2,12 +2,14 @@ import { useEffect } from 'react'
 import type { IChartApi, Time, CandlestickData, ISeriesApi } from 'lightweight-charts'
 import type { ViewportState } from '../../types/Viewport'
 import { captureViewport } from '../utilities/viewport'
+import { replayStore } from '../../replay/ReplayStore'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     isChangingTimeframeRef: React.RefObject<boolean>
+    isLoadingDataRef: React.RefObject<boolean>
     chartReady: boolean
     viewportRef: React.RefObject<ViewportState>
 }
@@ -17,6 +19,7 @@ export function useViewportSync({
     seriesRef,
     candlesRef,
     isChangingTimeframeRef,
+    isLoadingDataRef,
     chartReady,
     viewportRef,
 }: Params) {
@@ -31,7 +34,7 @@ export function useViewportSync({
         const timeScale = chart.timeScale()
 
         const handler = () => {
-            if (isChangingTimeframeRef.current) {
+            if (isChangingTimeframeRef.current || isLoadingDataRef.current || replayStore.enabled) {
                 return
             }
 
@@ -53,5 +56,5 @@ export function useViewportSync({
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [chartReady, chartRef, seriesRef, viewportRef, isChangingTimeframeRef, candlesRef])
+    }, [chartReady, chartRef, seriesRef, viewportRef, isChangingTimeframeRef, candlesRef, isLoadingDataRef])
 }
