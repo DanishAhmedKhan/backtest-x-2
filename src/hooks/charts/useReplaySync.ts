@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import type { CandlestickData, ISeriesApi, IChartApi, Time } from 'lightweight-charts'
 
 import { Timeframe } from '../../core/Timeframe'
@@ -19,6 +19,7 @@ type Props = {
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     viewportRef: React.RefObject<ViewportState>
+    replayViewportRef: React.RefObject<ViewportState>
 }
 
 export function useReplaySync({
@@ -30,9 +31,8 @@ export function useReplaySync({
     candleMapRef,
     timesRef,
     viewportRef,
+    replayViewportRef,
 }: Props) {
-    const previousCountRef = useRef(0)
-
     useEffect(() => {
         const rebuildReplay = (restore = false) => {
             const chart = chartRef.current
@@ -83,8 +83,6 @@ export function useReplaySync({
                 replayCandles = [...historical, ...rebuilt]
             }
 
-            const previousCount = previousCountRef.current
-
             const formatted: CandlestickData<Time>[] = replayCandles.map((c) => ({
                 time: c.time as Time,
                 open: c.open,
@@ -95,21 +93,15 @@ export function useReplaySync({
 
             series.setData(formatted)
 
-            const currentCount = formatted.length
-
             requestAnimationFrame(() => {
                 restoreViewport({
                     chart,
                     series,
-                    viewport: viewportRef,
+                    viewport: restore ? replayViewportRef : viewportRef,
                 })
             })
-
-            previousCountRef.current = currentCount
         }
         const unsubStart = eventBus.on('replayStart', () => {
-            previousCountRef.current = 0
-
             rebuildReplay(true)
         })
 
@@ -123,5 +115,15 @@ export function useReplaySync({
             unsubStart()
             unsubChange()
         }
-    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, candleMapRef, timesRef, viewportRef])
+    }, [
+        timeframe,
+        chartRef,
+        seriesRef,
+        candlesRef,
+        raw1mCandlesRef,
+        candleMapRef,
+        timesRef,
+        viewportRef,
+        replayViewportRef,
+    ])
 }

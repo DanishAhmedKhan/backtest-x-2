@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { IChartApi, ISeriesApi } from 'lightweight-charts'
+import type { CandlestickData, IChartApi, ISeriesApi, Time } from 'lightweight-charts'
 import type { ViewportState } from '../../types/Viewport'
 
 export function captureViewport({
@@ -120,4 +120,34 @@ export function scrollViewportToBar({
         from,
         to,
     })
+}
+
+export function captureViewportAroundTime({
+    chart,
+    candles,
+    viewport,
+    timestamp,
+}: {
+    chart: IChartApi
+    candles: CandlestickData<Time>[]
+    viewport: React.RefObject<ViewportState>
+    timestamp: number
+}) {
+    const range = chart.timeScale().getVisibleLogicalRange()
+
+    if (!range || candles.length === 0) {
+        return
+    }
+
+    const barIndex = candles.findIndex((c) => Number(c.time) >= timestamp)
+
+    if (barIndex === -1) {
+        return
+    }
+
+    viewport.current = {
+        visibleBars: range.to - range.from + 1,
+        rightWhitespace: range.to - barIndex,
+        barsAfterViewport: 0,
+    }
 }

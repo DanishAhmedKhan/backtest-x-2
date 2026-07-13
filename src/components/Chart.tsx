@@ -21,6 +21,7 @@ import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 
 type Props = {
     id: string
@@ -32,16 +33,18 @@ function Chart({ id, ticker, timeframe }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
-    const fullCandlesRef = useRef<CandlestickData<Time>[]>([])
     const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
-    const viewportRef = useRef<ViewportState>({
+    const defaultViewport = {
         visibleBars: DEFAULT_VISIBLE_CANDLE,
         rightWhitespace: DEFAULT_BLANK_CANDLE,
         barsAfterViewport: 0,
-    })
+    }
+
+    const viewportRef = useRef<ViewportState>(defaultViewport)
+    const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
@@ -124,6 +127,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         candleMapRef,
         timesRef,
         viewportRef,
+        replayViewportRef,
     })
 
     useJumpTo({
@@ -166,6 +170,20 @@ function Chart({ id, ticker, timeframe }: Props) {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
+
+        const chart = chartRef.current
+        const series = seriesRef.current
+
+        if (!chart || !series) {
+            return
+        }
+
+        captureViewportAroundTime({
+            chart,
+            candles: candlesRef.current,
+            viewport: replayViewportRef,
+            timestamp: previewTime,
+        })
 
         replayStore.start(previewTime, timeframe.toSeconds())
 
