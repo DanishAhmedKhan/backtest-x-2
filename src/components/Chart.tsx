@@ -17,11 +17,11 @@ import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
 import { useJumpTo } from '../hooks/charts/useJumpTo'
 
+import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 
 type Props = {
     id: string
@@ -194,6 +194,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         })
     }
 
+    const showReplayOverlay = replayStore.showToolbar && replayStore.isSelecting && previewX !== null
+
     return (
         <div
             style={{
@@ -210,7 +212,7 @@ function Chart({ id, ticker, timeframe }: Props) {
                 style={{ width: '100%', height: '100%' }}
             />
 
-            {replayStore.showToolbar && replayStore.isSelecting && previewX !== null && <ReplayOverlay x={previewX} />}
+            {showReplayOverlay && <ReplayOverlay x={previewX} />}
         </div>
     )
 }

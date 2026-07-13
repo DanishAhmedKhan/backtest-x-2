@@ -10,9 +10,16 @@ export class CsvCandleLoader {
         const files: string[] = await fetch(manifestUrl).then((res) => res.json())
 
         return files.sort((a, b) => {
-            const numA = parseInt(a.replace(/\D/g, ''))
-            const numB = parseInt(b.replace(/\D/g, ''))
-            return numA - numB
+            const [, yearA, weekA] = a.match(/^(\d{4})-(\d+)\.csv$/)!
+            const [, yearB, weekB] = b.match(/^(\d{4})-(\d+)\.csv$/)!
+
+            const yDiff = Number(yearA) - Number(yearB)
+
+            if (yDiff !== 0) {
+                return yDiff
+            }
+
+            return Number(weekA) - Number(weekB)
         })
     }
 
