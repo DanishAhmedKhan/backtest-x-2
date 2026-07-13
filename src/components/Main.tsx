@@ -20,21 +20,21 @@ import { eventBus } from '../event/EventBus'
 
 const storage = new LocalStorageProvider()
 
-const loadConfig = () => {
-    const config = storage.get<AppConfig>(STORAGE_KEYS.APP_CONFIG)
-
-    if (!config) {
-        return {
-            layout: '2x1' as LayoutType,
-            charts: [
-                { ticker: 'EURUSD', timeframe: '1m' },
-                { ticker: 'EURUSD', timeframe: '5m' },
-            ],
-        }
-    }
-
-    return config
+const DEFAULT_CONFIG: AppConfig = {
+    layout: '2x1',
+    charts: [
+        {
+            ticker: 'EURUSD',
+            timeframe: '1m',
+        },
+        {
+            ticker: 'EURUSD',
+            timeframe: '5m',
+        },
+    ],
 }
+
+const loadConfig = () => storage.get<AppConfig>(STORAGE_KEYS.APP_CONFIG) ?? DEFAULT_CONFIG
 
 const createCharts = (charts: ChartConfig[]): ChartState[] => {
     return charts.map((chart, i) => ({
@@ -44,20 +44,23 @@ const createCharts = (charts: ChartConfig[]): ChartState[] => {
     }))
 }
 
-const createNewCharts = (count: number, startIndex: number = 0): ChartState[] => {
+const createNewCharts = (count: number, nextChartIndex: number = 0): ChartState[] => {
     return Array.from({ length: count }).map((_, i) => ({
-        id: `chart-${startIndex + i}`,
+        id: `chart-${nextChartIndex + i}`,
         ticker: TickerRegistry.getDefault(),
         timeframe: TimeframeRegistry.getDefault(),
     }))
 }
 
+const getChartCount = (layout: LayoutType) => LAYOUTS[layout]
+
 export default function Main() {
     const config = loadConfig()
+    const initialCharts = createCharts(config.charts)
 
     const [layout, setLayout] = useState<LayoutType>(config.layout)
-    const [charts, setCharts] = useState<ChartState[]>(createCharts(config.charts))
-    const [activeChartId, setActiveChartId] = useState('chart-1')
+    const [charts, setCharts] = useState<ChartState[]>(initialCharts)
+    const [activeChartId, setActiveChartId] = useState(initialCharts[0]?.id ?? '')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
     const [jumpOpen, setJumpOpen] = useState(false)
 
@@ -68,22 +71,23 @@ export default function Main() {
     }
 
     const handleLayoutChange = (newLayout: LayoutType) => {
-        const oldLayout = layout
         setLayout(newLayout)
 
-        const oldChartCount = LAYOUTS[oldLayout]
-        const newChartCount = LAYOUTS[newLayout]
+        const newChartCount = getChartCount(newLayout)
 
-        let newCharts = []
+        let newCharts = charts
 
-        if (newChartCount > oldChartCount) {
+        if (charts.length < newChartCount) {
             newCharts = [...charts, ...createNewCharts(newChartCount - charts.length, charts.length)]
-        } else if (newChartCount < oldChartCount) {
+        } else if (charts.length > newChartCount) {
             newCharts = charts.slice(0, newChartCount)
         }
 
         setCharts(newCharts)
-        setActiveChartId(newCharts[0].id)
+
+        if (!newCharts.some((c) => c.id === activeChartId)) {
+            setActiveChartId(newCharts[0].id)
+        }
     }
 
     useEffect(() => {

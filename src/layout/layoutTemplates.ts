@@ -12,6 +12,8 @@ const BUILDERS: Record<LayoutType, LayoutBuilder> = {
 
     '2x1': ({ chart, split }) => split('vertical', 0.5, chart(0), chart(1)),
 
+    '1x2': ({ chart, split }) => split('horizontal', 0.5, chart(0), chart(1)),
+
     '3x1': ({ chart, split }) => split('vertical', 1 / 3, chart(0), split('vertical', 0.5, chart(1), chart(2))),
 
     '2x2': ({ chart, split }) =>
