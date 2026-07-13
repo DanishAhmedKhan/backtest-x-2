@@ -7,7 +7,7 @@ import type { Candle } from '../../core/Candle'
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import { CandleAggregator } from '../../data/CandleAggregator'
-import { restoreViewport, shiftViewport } from '../utilities/viewport'
+import { restoreViewport } from '../utilities/viewport'
 import type { ViewportState } from '../../types/Viewport'
 
 type Props = {
@@ -97,23 +97,13 @@ export function useReplaySync({
 
             const currentCount = formatted.length
 
-            if (restore) {
-                requestAnimationFrame(() => {
-                    restoreViewport({
-                        chart,
-                        series,
-                        viewport: viewportRef,
-                    })
+            requestAnimationFrame(() => {
+                restoreViewport({
+                    chart,
+                    series,
+                    viewport: viewportRef,
                 })
-            } else {
-                requestAnimationFrame(() => {
-                    restoreViewport({
-                        chart,
-                        series,
-                        viewport: viewportRef,
-                    })
-                })
-            }
+            })
 
             previousCountRef.current = currentCount
         }

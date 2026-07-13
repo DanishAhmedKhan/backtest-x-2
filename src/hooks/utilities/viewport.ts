@@ -121,20 +121,3 @@ export function scrollViewportToBar({
         to,
     })
 }
-
-export function shiftViewport({ chart, bars }: { chart: IChartApi; bars: number }) {
-    if (bars <= 0) {
-        return
-    }
-
-    const range = chart.timeScale().getVisibleLogicalRange()
-
-    if (!range) {
-        return
-    }
-
-    chart.timeScale().setVisibleLogicalRange({
-        from: range.from + bars,
-        to: range.to + bars,
-    })
-}
