@@ -48,7 +48,12 @@ export default function ReplayToolbar() {
     }
 
     const handleTogglePlay = () => {
-        setIsPlaying((prev) => !prev)
+        // setIsPlaying((prev) => !prev)
+        setIsPlaying((prev) => {
+            const next = !prev
+            replayStore.setPlaying(next)
+            return next
+        })
     }
 
     const handleForward = () => {
@@ -89,8 +94,18 @@ export default function ReplayToolbar() {
         })
     }
 
+    // const handleExit = () => {
+    //     setIsPlaying(false)
+
+    //     replayStore.stop()
+
+    //     eventBus.emit('replayStop')
+    // }
+
     const handleExit = () => {
         setIsPlaying(false)
+
+        replayStore.setPlaying(false)
 
         replayStore.stop()
 

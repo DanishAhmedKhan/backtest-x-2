@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { IChartApi, ISeriesApi } from 'lightweight-charts'
 import type { ViewportState } from '../../types/Viewport'
 import { captureViewport } from '../utilities/viewport'
+import { replayStore } from '../../replay/ReplayStore'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -10,6 +11,8 @@ type Params = {
     isLoadingDataRef: React.RefObject<boolean>
     chartReady: boolean
     viewportRef: React.RefObject<ViewportState>
+    replayViewportRef: React.RefObject<ViewportState>
+    isUserInteractingRef: React.RefObject<boolean>
 }
 
 export function useViewportSync({
@@ -19,6 +22,8 @@ export function useViewportSync({
     isLoadingDataRef,
     chartReady,
     viewportRef,
+    replayViewportRef,
+    isUserInteractingRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -35,11 +40,17 @@ export function useViewportSync({
                 return
             }
 
+            if (replayStore.enabled && replayStore.isPlaying && !isUserInteractingRef.current) {
+                return
+            }
+
             const lastBarIndex = series.data().length - 1
 
             if (lastBarIndex < 0) {
                 return
             }
+
+            console.count('capture')
 
             captureViewport({
                 chart,
@@ -53,5 +64,14 @@ export function useViewportSync({
         return () => {
             timeScale.unsubscribeVisibleLogicalRangeChange(handler)
         }
-    }, [chartReady, chartRef, seriesRef, viewportRef, isChangingTimeframeRef, isLoadingDataRef])
+    }, [
+        chartReady,
+        chartRef,
+        seriesRef,
+        viewportRef,
+        isChangingTimeframeRef,
+        isLoadingDataRef,
+        replayViewportRef,
+        isUserInteractingRef,
+    ])
 }

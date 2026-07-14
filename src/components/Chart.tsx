@@ -47,7 +47,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const viewportRef = useRef<ViewportState>(defaultViewport)
     const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
-    const isDraggingRef = useRef(false)
+    const isUserInteractingRef = useRef(false)
+    const wheelTimeout = useRef<number>(0)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
@@ -73,6 +74,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         isLoadingDataRef,
         chartReady,
         viewportRef,
+        replayViewportRef,
+        isUserInteractingRef,
     })
 
     useInfiniteScroll({
@@ -88,7 +91,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         totalFilesRef,
         isLoadingDataRef,
         isChangingTimeframeRef,
-        isDraggingRef,
+        isUserInteractingRef,
     })
 
     useChartResize({
@@ -170,11 +173,11 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useEffect(() => {
         const handleMouseUp = () => {
-            if (!isDraggingRef.current) {
+            if (!isUserInteractingRef.current) {
                 return
             }
 
-            isDraggingRef.current = false
+            isUserInteractingRef.current = false
             eventBus.emit('chartDragEnded')
         }
 
@@ -225,8 +228,17 @@ function Chart({ id, ticker, timeframe }: Props) {
         >
             <div
                 ref={containerRef}
+                onWheel={() => {
+                    isUserInteractingRef.current = true
+
+                    clearTimeout(wheelTimeout.current)
+
+                    wheelTimeout.current = window.setTimeout(() => {
+                        isUserInteractingRef.current = false
+                    }, 150)
+                }}
                 onMouseDown={() => {
-                    isDraggingRef.current = true
+                    isUserInteractingRef.current = true
                 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}

@@ -23,7 +23,7 @@ type Params = {
     totalFilesRef: React.RefObject<number>
     isLoadingDataRef: React.RefObject<boolean>
     isChangingTimeframeRef: React.RefObject<boolean>
-    isDraggingRef: React.RefObject<boolean>
+    isUserInteractingRef: React.RefObject<boolean>
 }
 
 export function useInfiniteScroll({
@@ -39,7 +39,7 @@ export function useInfiniteScroll({
     totalFilesRef,
     isLoadingDataRef,
     isChangingTimeframeRef,
-    isDraggingRef,
+    isUserInteractingRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -56,7 +56,7 @@ export function useInfiniteScroll({
                 isChangingTimeframeRef.current ||
                 replayStore.enabled ||
                 isLoadingDataRef.current ||
-                isDraggingRef.current
+                isUserInteractingRef.current
             ) {
                 return
             }
@@ -142,6 +142,6 @@ export function useInfiniteScroll({
         loadedWindowRef,
         isChangingTimeframeRef,
         isLoadingDataRef,
-        isDraggingRef,
+        isUserInteractingRef,
     ])
 }
