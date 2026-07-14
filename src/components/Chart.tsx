@@ -17,10 +17,11 @@ import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
 import { useJumpTo } from '../hooks/charts/useJumpTo'
 
-import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
+import { captureViewportAroundTime } from '../hooks/utilities/viewport'
+
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
 type Props = {
@@ -46,7 +47,6 @@ function Chart({ id, ticker, timeframe }: Props) {
     const viewportRef = useRef<ViewportState>(defaultViewport)
     const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
-    const jumpAnchorRef = useRef<number | null>(null)
     const isDraggingRef = useRef(false)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
@@ -69,7 +69,6 @@ function Chart({ id, ticker, timeframe }: Props) {
     useViewportSync({
         chartRef,
         seriesRef,
-        candlesRef,
         isChangingTimeframeRef,
         isLoadingDataRef,
         chartReady,
@@ -129,8 +128,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         seriesRef,
         candlesRef,
         raw1mCandlesRef,
-        candleMapRef,
-        timesRef,
         viewportRef,
         replayViewportRef,
     })

@@ -16,8 +16,6 @@ type Props = {
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     raw1mCandlesRef: React.RefObject<Candle[]>
-    candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
-    timesRef: React.RefObject<number[]>
     viewportRef: React.RefObject<ViewportState>
     replayViewportRef: React.RefObject<ViewportState>
 }
@@ -28,8 +26,6 @@ export function useReplaySync({
     seriesRef,
     candlesRef,
     raw1mCandlesRef,
-    candleMapRef,
-    timesRef,
     viewportRef,
     replayViewportRef,
 }: Props) {
@@ -93,12 +89,10 @@ export function useReplaySync({
 
             series.setData(formatted)
 
-            requestAnimationFrame(() => {
-                restoreViewport({
-                    chart,
-                    series,
-                    viewport: restore ? replayViewportRef : viewportRef,
-                })
+            restoreViewport({
+                chart,
+                series,
+                viewport: restore ? replayViewportRef : viewportRef,
             })
         }
         const unsubStart = eventBus.on('replayStart', () => {
@@ -115,15 +109,5 @@ export function useReplaySync({
             unsubStart()
             unsubChange()
         }
-    }, [
-        timeframe,
-        chartRef,
-        seriesRef,
-        candlesRef,
-        raw1mCandlesRef,
-        candleMapRef,
-        timesRef,
-        viewportRef,
-        replayViewportRef,
-    ])
+    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, viewportRef, replayViewportRef])
 }

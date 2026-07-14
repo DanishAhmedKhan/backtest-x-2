@@ -66,12 +66,14 @@ export function useInfiniteScroll({
 
             isLoadingDataRef.current = true
 
+            // const threshold = max(visibleBars * 2, 150)
+            const threshold = 150
+
             try {
-                if (range.from < 20) {
+                if (range.from < threshold) {
                     const currentRange = range
 
                     const result = await loadAdjacentWindow({
-                        chart,
                         series,
                         candlesRef,
                         candleMapRef,
@@ -95,9 +97,8 @@ export function useInfiniteScroll({
                     }
                 }
 
-                if (range.to > candlesRef.current.length - 20) {
+                if (range.to > candlesRef.current.length - threshold) {
                     await loadAdjacentWindow({
-                        chart,
                         series,
                         candlesRef,
                         candleMapRef,
