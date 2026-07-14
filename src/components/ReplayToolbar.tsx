@@ -48,7 +48,6 @@ export default function ReplayToolbar() {
     }
 
     const handleTogglePlay = () => {
-        // setIsPlaying((prev) => !prev)
         setIsPlaying((prev) => {
             const next = !prev
             replayStore.setPlaying(next)
@@ -93,14 +92,6 @@ export default function ReplayToolbar() {
             time: replayStore.marketTime!,
         })
     }
-
-    // const handleExit = () => {
-    //     setIsPlaying(false)
-
-    //     replayStore.stop()
-
-    //     eventBus.emit('replayStop')
-    // }
 
     const handleExit = () => {
         setIsPlaying(false)

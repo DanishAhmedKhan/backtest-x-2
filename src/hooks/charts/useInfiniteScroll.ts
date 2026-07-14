@@ -9,6 +9,7 @@ import { loadAdjacentWindow } from '../utilities/loadAdjacentWidow,'
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import type { LoadedWindow } from '../../types/LoadedWindow'
+import type { ViewportState } from '../../types/Viewport'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -23,7 +24,8 @@ type Params = {
     totalFilesRef: React.RefObject<number>
     isLoadingDataRef: React.RefObject<boolean>
     isChangingTimeframeRef: React.RefObject<boolean>
-    isUserInteractingRef: React.RefObject<boolean>
+    isViewportInteractionRef: React.RefObject<boolean>
+    viewportRef: React.RefObject<ViewportState>
 }
 
 export function useInfiniteScroll({
@@ -39,7 +41,8 @@ export function useInfiniteScroll({
     totalFilesRef,
     isLoadingDataRef,
     isChangingTimeframeRef,
-    isUserInteractingRef,
+    isViewportInteractionRef,
+    viewportRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -56,7 +59,7 @@ export function useInfiniteScroll({
                 isChangingTimeframeRef.current ||
                 replayStore.enabled ||
                 isLoadingDataRef.current ||
-                isUserInteractingRef.current
+                isViewportInteractionRef.current
             ) {
                 return
             }
@@ -66,8 +69,7 @@ export function useInfiniteScroll({
 
             isLoadingDataRef.current = true
 
-            // const threshold = max(visibleBars * 2, 150)
-            const threshold = 150
+            const threshold = Math.max(Math.ceil(viewportRef.current.visibleBars * 2), 150)
 
             try {
                 if (range.from < threshold) {
@@ -142,6 +144,7 @@ export function useInfiniteScroll({
         loadedWindowRef,
         isChangingTimeframeRef,
         isLoadingDataRef,
-        isUserInteractingRef,
+        isViewportInteractionRef,
+        viewportRef,
     ])
 }

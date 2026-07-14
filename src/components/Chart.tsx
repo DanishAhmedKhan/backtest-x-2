@@ -47,7 +47,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const viewportRef = useRef<ViewportState>(defaultViewport)
     const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
-    const isUserInteractingRef = useRef(false)
+    const isDraggingRef = useRef(false)
+    const isViewportInteractionRef = useRef(false)
     const wheelTimeout = useRef<number>(0)
 
     const isChangingTimeframeRef = useRef<boolean>(false)
@@ -74,8 +75,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         isLoadingDataRef,
         chartReady,
         viewportRef,
-        replayViewportRef,
-        isUserInteractingRef,
+        isViewportInteractionRef,
     })
 
     useInfiniteScroll({
@@ -91,7 +91,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         totalFilesRef,
         isLoadingDataRef,
         isChangingTimeframeRef,
-        isUserInteractingRef,
+        isViewportInteractionRef,
+        viewportRef,
     })
 
     useChartResize({
@@ -173,14 +174,15 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useEffect(() => {
         const handleMouseUp = () => {
-            if (!isUserInteractingRef.current) {
+            if (!isDraggingRef.current) {
                 return
             }
 
-            isUserInteractingRef.current = false
+            isDraggingRef.current = false
+            isViewportInteractionRef.current = false
+
             eventBus.emit('chartDragEnded')
         }
-
         window.addEventListener('mouseup', handleMouseUp)
 
         return () => {
@@ -229,16 +231,17 @@ function Chart({ id, ticker, timeframe }: Props) {
             <div
                 ref={containerRef}
                 onWheel={() => {
-                    isUserInteractingRef.current = true
+                    isViewportInteractionRef.current = true
 
                     clearTimeout(wheelTimeout.current)
 
                     wheelTimeout.current = window.setTimeout(() => {
-                        isUserInteractingRef.current = false
+                        isViewportInteractionRef.current = false
                     }, 150)
                 }}
                 onMouseDown={() => {
-                    isUserInteractingRef.current = true
+                    isDraggingRef.current = true
+                    isViewportInteractionRef.current = true
                 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}

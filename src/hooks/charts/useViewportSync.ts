@@ -11,8 +11,7 @@ type Params = {
     isLoadingDataRef: React.RefObject<boolean>
     chartReady: boolean
     viewportRef: React.RefObject<ViewportState>
-    replayViewportRef: React.RefObject<ViewportState>
-    isUserInteractingRef: React.RefObject<boolean>
+    isViewportInteractionRef: React.RefObject<boolean>
 }
 
 export function useViewportSync({
@@ -22,8 +21,7 @@ export function useViewportSync({
     isLoadingDataRef,
     chartReady,
     viewportRef,
-    replayViewportRef,
-    isUserInteractingRef,
+    isViewportInteractionRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -40,7 +38,7 @@ export function useViewportSync({
                 return
             }
 
-            if (replayStore.enabled && replayStore.isPlaying && !isUserInteractingRef.current) {
+            if (replayStore.enabled && replayStore.isPlaying && !isViewportInteractionRef.current) {
                 return
             }
 
@@ -49,8 +47,6 @@ export function useViewportSync({
             if (lastBarIndex < 0) {
                 return
             }
-
-            console.count('capture')
 
             captureViewport({
                 chart,
@@ -71,7 +67,6 @@ export function useViewportSync({
         viewportRef,
         isChangingTimeframeRef,
         isLoadingDataRef,
-        replayViewportRef,
-        isUserInteractingRef,
+        isViewportInteractionRef,
     ])
 }
