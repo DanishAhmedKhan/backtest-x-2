@@ -4,12 +4,13 @@ import type { CandlestickData, ISeriesApi, IChartApi, Time } from 'lightweight-c
 import { Timeframe } from '../../core/Timeframe'
 import type { Candle } from '../../core/Candle'
 
+import { restoreViewport } from '../utilities/viewport'
+import { binarySearch } from '../../helper/binarySearch'
+
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import { CandleAggregator } from '../../data/CandleAggregator'
-import { restoreViewport } from '../utilities/viewport'
 import type { ViewportState } from '../../types/Viewport'
-import { findNextAvailableTime } from '../utilities/findNextAvailableTime'
 
 type Props = {
     timeframe: Timeframe
@@ -17,6 +18,7 @@ type Props = {
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
     raw1mCandlesRef: React.RefObject<Candle[]>
+    raw1mTimesRef: React.RefObject<number[]>
     viewportRef: React.RefObject<ViewportState>
     replayViewportRef: React.RefObject<ViewportState>
 }
@@ -27,6 +29,7 @@ export function useReplaySync({
     seriesRef,
     candlesRef,
     raw1mCandlesRef,
+    raw1mTimesRef,
     viewportRef,
     replayViewportRef,
 }: Props) {
@@ -97,80 +100,68 @@ export function useReplaySync({
             })
         }
 
-        const unsubStart = eventBus.on('replayStart', () => {
-            rebuildReplay(true)
-        })
+        function findNextAvailableTime(times: number[], target: number) {
+            const { left } = binarySearch(times, target)
 
-        const unsubForward = eventBus.on('replayForward', () => {
+            return left < times.length ? times[left] : null
+        }
+
+        function findPreviousAvailableTime(times: number[], target: number) {
+            const { right } = binarySearch(times, target)
+
+            return right >= 0 ? times[right] : null
+        }
+
+        function moveReplay(direction: 1 | -1, finder: (times: number[], target: number) => number | null) {
             const current = replayStore.marketTime
 
             if (current === null) {
                 return
             }
 
-            let next: number
+            let next: number | null
 
             if (replayStore.pendingStepSeconds !== null) {
-                next = current + replayStore.pendingStepSeconds
+                next = current + direction * replayStore.pendingStepSeconds
                 replayStore.pendingStepSeconds = null
             } else {
-                const desired = current + replayStore.updateIntervalSeconds
+                const desired = current + direction * replayStore.updateIntervalSeconds
 
-                const resolved = findNextAvailableTime(
-                    raw1mCandlesRef.current.map((c) => c.time),
-                    desired,
-                )
+                next = finder(raw1mTimesRef.current, desired)
+            }
 
-                if (resolved === null) {
-                    return
-                }
-
-                next = resolved
+            if (next === null) {
+                return
             }
 
             replayStore.marketTime = next
 
             rebuildReplay(false)
+        }
+
+        const unsubStart = eventBus.on('replayStart', () => {
+            rebuildReplay(true)
         })
 
-        const unsubBackward = eventBus.on('replayBackward', () => {
-            const current = replayStore.marketTime
-
-            if (current === null) {
-                return
-            }
-
-            let previous: number | null = null
-
-            if (replayStore.pendingStepSeconds !== null) {
-                previous = current - replayStore.pendingStepSeconds
-                replayStore.pendingStepSeconds = null
-            } else {
-                const desired = current - replayStore.updateIntervalSeconds
-
-                const times = raw1mCandlesRef.current.map((c) => c.time)
-
-                for (let i = times.length - 1; i >= 0; i--) {
-                    if (times[i] <= desired) {
-                        previous = times[i]
-                        break
-                    }
-                }
-            }
-
-            if (previous === null) {
-                return
-            }
-
-            replayStore.marketTime = previous
+        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => {
+            replayStore.marketTime = time
 
             rebuildReplay(false)
         })
 
+        const unsubForward = eventBus.on('replayForward', () => {
+            moveReplay(1, findNextAvailableTime)
+        })
+
+        const unsubBackward = eventBus.on('replayBackward', () => {
+            moveReplay(-1, findPreviousAvailableTime)
+        })
+
         return () => {
             unsubStart()
+            unsubChange()
             unsubForward()
             unsubBackward()
         }
-    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, viewportRef, replayViewportRef])
+    }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, viewportRef, replayViewportRef, raw1mTimesRef])
 }

@@ -25,6 +25,7 @@ type Params = {
     raw1mCandlesRef: React.RefObject<Candle[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
+    raw1mTimesRef: React.RefObject<number[]>
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     viewportRef: React.RefObject<ViewportState>
@@ -41,6 +42,7 @@ export function useChartData({
     raw1mCandlesRef,
     candleMapRef,
     timesRef,
+    raw1mTimesRef,
     loadedWindowRef,
     totalFilesRef,
     viewportRef,
@@ -67,6 +69,7 @@ export function useChartData({
                 totalFiles,
             )
             raw1mCandlesRef.current = rawResult.candles
+            raw1mTimesRef.current = rawResult.candles.map((c) => c.time)
 
             loadedWindowRef.current = {
                 oldestFile: chartResult.oldestFile,

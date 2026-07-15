@@ -37,6 +37,7 @@ function Chart({ id, ticker, timeframe }: Props) {
     const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
+    const raw1mTimesRef = useRef<number[]>([])
 
     const defaultViewport = {
         visibleBars: DEFAULT_VISIBLE_CANDLE,
@@ -118,6 +119,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         raw1mCandlesRef,
         candleMapRef,
         timesRef,
+        raw1mTimesRef,
         loadedWindowRef,
         totalFilesRef,
         viewportRef,
@@ -132,6 +134,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         seriesRef,
         candlesRef,
         raw1mCandlesRef,
+        raw1mTimesRef,
         viewportRef,
         replayViewportRef,
     })

@@ -1,17 +1,9 @@
-export function findNearestTime(times: number[], target: number): number | null {
+import { binarySearch } from '../../helper/binarySearch'
+
+export function findNearestTime(times: number[], target: number) {
     if (!times.length) return null
 
-    let left = 0
-    let right = times.length - 1
-
-    while (left <= right) {
-        const mid = Math.floor((left + right) / 2)
-
-        if (times[mid] === target) return times[mid]
-
-        if (times[mid] < target) left = mid + 1
-        else right = mid - 1
-    }
+    const { right } = binarySearch(times, target)
 
     return right >= 0 ? times[right] : times[0]
 }
