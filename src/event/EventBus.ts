@@ -14,6 +14,10 @@ type EventMap = {
 
     replayStop: void
 
+    replayForward: void
+
+    replayBackward: void
+
     replayNextCandle: void
 
     replayTimeChanged: {

@@ -56,27 +56,11 @@ export default function ReplayToolbar() {
     }
 
     const handleForward = () => {
-        replayStore.step()
-
-        if (replayStore.marketTime === null) {
-            return
-        }
-
-        eventBus.emit('replayTimeChanged', {
-            time: replayStore.marketTime,
-        })
+        eventBus.emit('replayForward')
     }
 
     const handleBackward = () => {
-        replayStore.rewind()
-
-        if (replayStore.marketTime === null) {
-            return
-        }
-
-        eventBus.emit('replayTimeChanged', {
-            time: replayStore.marketTime,
-        })
+        eventBus.emit('replayBackward')
     }
 
     const handleUpdateInterval = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -95,7 +79,6 @@ export default function ReplayToolbar() {
 
     const handleExit = () => {
         setIsPlaying(false)
-
         replayStore.setPlaying(false)
 
         replayStore.stop()
@@ -109,15 +92,7 @@ export default function ReplayToolbar() {
         }
 
         const interval = setInterval(() => {
-            replayStore.step()
-
-            if (replayStore.marketTime === null) {
-                return
-            }
-
-            eventBus.emit('replayTimeChanged', {
-                time: replayStore.marketTime,
-            })
+            eventBus.emit('replayForward')
         }, 1000 / speed)
 
         return () => clearInterval(interval)

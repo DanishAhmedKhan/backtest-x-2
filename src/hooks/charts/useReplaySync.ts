@@ -9,6 +9,7 @@ import { eventBus } from '../../event/EventBus'
 import { CandleAggregator } from '../../data/CandleAggregator'
 import { restoreViewport } from '../utilities/viewport'
 import type { ViewportState } from '../../types/Viewport'
+import { findNextAvailableTime } from '../utilities/findNextAvailableTime'
 
 type Props = {
     timeframe: Timeframe
@@ -95,19 +96,81 @@ export function useReplaySync({
                 viewport: restore ? replayViewportRef : viewportRef,
             })
         }
+
         const unsubStart = eventBus.on('replayStart', () => {
             rebuildReplay(true)
         })
 
-        const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => {
-            replayStore.marketTime = time
+        const unsubForward = eventBus.on('replayForward', () => {
+            const current = replayStore.marketTime
+
+            if (current === null) {
+                return
+            }
+
+            let next: number
+
+            if (replayStore.pendingStepSeconds !== null) {
+                next = current + replayStore.pendingStepSeconds
+                replayStore.pendingStepSeconds = null
+            } else {
+                const desired = current + replayStore.updateIntervalSeconds
+
+                const resolved = findNextAvailableTime(
+                    raw1mCandlesRef.current.map((c) => c.time),
+                    desired,
+                )
+
+                if (resolved === null) {
+                    return
+                }
+
+                next = resolved
+            }
+
+            replayStore.marketTime = next
+
+            rebuildReplay(false)
+        })
+
+        const unsubBackward = eventBus.on('replayBackward', () => {
+            const current = replayStore.marketTime
+
+            if (current === null) {
+                return
+            }
+
+            let previous: number | null = null
+
+            if (replayStore.pendingStepSeconds !== null) {
+                previous = current - replayStore.pendingStepSeconds
+                replayStore.pendingStepSeconds = null
+            } else {
+                const desired = current - replayStore.updateIntervalSeconds
+
+                const times = raw1mCandlesRef.current.map((c) => c.time)
+
+                for (let i = times.length - 1; i >= 0; i--) {
+                    if (times[i] <= desired) {
+                        previous = times[i]
+                        break
+                    }
+                }
+            }
+
+            if (previous === null) {
+                return
+            }
+
+            replayStore.marketTime = previous
 
             rebuildReplay(false)
         })
 
         return () => {
             unsubStart()
-            unsubChange()
+            unsubForward()
+            unsubBackward()
         }
     }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, viewportRef, replayViewportRef])
 }
