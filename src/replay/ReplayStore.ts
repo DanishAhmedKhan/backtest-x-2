@@ -61,6 +61,7 @@ class ReplayStore {
         this.updateIntervalSeconds = 60
         this.isSelecting = true
         this.isPlaying = false
+        this.pendingStepSeconds = null
     }
 
     public openToolbar() {

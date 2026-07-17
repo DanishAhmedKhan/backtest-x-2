@@ -157,11 +157,29 @@ export function useReplaySync({
             moveReplay(-1, findPreviousAvailableTime)
         })
 
+        const unsubStop = eventBus.on('replayStop', () => {
+            const chart = chartRef.current
+            const series = seriesRef.current
+
+            if (!chart || !series) {
+                return
+            }
+
+            series.setData(candlesRef.current)
+
+            restoreViewport({
+                chart,
+                series,
+                viewport: viewportRef,
+            })
+        })
+
         return () => {
             unsubStart()
             unsubChange()
             unsubForward()
             unsubBackward()
+            unsubStop()
         }
     }, [timeframe, chartRef, seriesRef, candlesRef, raw1mCandlesRef, viewportRef, replayViewportRef, raw1mTimesRef])
 }

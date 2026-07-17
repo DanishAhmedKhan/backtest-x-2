@@ -102,6 +102,14 @@ export default function Main() {
         storage.set(STORAGE_KEYS.APP_CONFIG, config)
     }, [layout, charts])
 
+    useEffect(() => {
+        const unsub = eventBus.on('replayStop', () => {
+            setShowReplayToolbar(false)
+        })
+
+        return unsub
+    }, [])
+
     return (
         <div
             style={{

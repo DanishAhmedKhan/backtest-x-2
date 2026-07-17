@@ -79,8 +79,6 @@ export default function ReplayToolbar() {
 
     const handleExit = () => {
         setIsPlaying(false)
-        replayStore.setPlaying(false)
-
         replayStore.stop()
 
         eventBus.emit('replayStop')
