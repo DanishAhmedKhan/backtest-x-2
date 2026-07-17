@@ -217,7 +217,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         clearPreview()
 
         eventBus.emit('replayUpdateIntervalChanged', {
-            seconds: replayStore.updateIntervalSeconds,
+            seconds: timeframe.toSeconds(),
         })
 
         eventBus.emit('replayStart', {

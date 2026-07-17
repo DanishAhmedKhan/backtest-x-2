@@ -23,6 +23,8 @@ type Props = {
     replayViewportRef: React.RefObject<ViewportState>
 }
 
+let isProcessingStep = false
+
 export function useReplaySync({
     timeframe,
     chartRef,
@@ -49,7 +51,8 @@ export function useReplaySync({
                 return
             }
 
-            const tfSeconds = replayStore.chartTimeframeSeconds
+            // const tfSeconds = replayStore.chartTimeframeSeconds
+            const tfSeconds = timeframe.toSeconds()
 
             let replayCandles
 
@@ -113,11 +116,18 @@ export function useReplaySync({
         }
 
         function moveReplay(direction: 1 | -1, finder: (times: number[], target: number) => number | null) {
+            if (isProcessingStep) {
+                rebuildReplay(false)
+                return
+            }
+
             const current = replayStore.marketTime
 
             if (current === null) {
                 return
             }
+
+            isProcessingStep = true
 
             let next: number | null
 
@@ -137,6 +147,10 @@ export function useReplaySync({
             replayStore.marketTime = next
 
             rebuildReplay(false)
+
+            setTimeout(() => {
+                isProcessingStep = false
+            }, 0)
         }
 
         const unsubStart = eventBus.on('replayStart', () => {
@@ -150,6 +164,7 @@ export function useReplaySync({
         })
 
         const unsubForward = eventBus.on('replayForward', () => {
+            console.log('f')
             moveReplay(1, findNextAvailableTime)
         })
 
