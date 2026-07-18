@@ -11,6 +11,8 @@ export type OhlcData = {
     high: number
     low: number
     close: number
+    change: number
+    changePercent: number
 }
 
 export function useOHLCOverlay({ chartRef, seriesRef }: Props) {
@@ -27,15 +29,18 @@ export function useOHLCOverlay({ chartRef, seriesRef }: Props) {
         const handleCrosshairMove = (param) => {
             const candle = param.seriesData.get(series) as CandlestickData<Time> | undefined
 
-            if (!candle) {
-                return
-            }
+            if (!candle) return
+
+            const change = candle.close - candle.open
+            const changePercent = candle.open === 0 ? 0 : (change / candle.open) * 100
 
             setOhlc({
                 open: candle.open,
                 high: candle.high,
                 low: candle.low,
                 close: candle.close,
+                change,
+                changePercent,
             })
         }
 

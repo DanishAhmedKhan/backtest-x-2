@@ -24,6 +24,7 @@ import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import ChartOHLC from './ChartOHLC'
 
 type Props = {
     id: string
@@ -241,25 +242,7 @@ function Chart({ id, ticker, timeframe }: Props) {
                 height: '100%',
             }}
         >
-            {ohlc && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: 8,
-                        left: 8,
-                        zIndex: 20,
-                        fontSize: 12,
-                        fontFamily: 'monospace',
-                        pointerEvents: 'none',
-                        color: '#ddd',
-                    }}
-                >
-                    <span>O{ohlc.open}</span> <span style={{ color: '#4caf50' }}>H{ohlc.high}</span>{' '}
-                    <span style={{ color: '#f44336' }}>L{ohlc.low}</span>{' '}
-                    <span style={{ color: '#2196f3' }}>C{ohlc.close}</span>
-                </div>
-            )}
-
+            <ChartOHLC ohlc={ohlc} />
             <div
                 ref={containerRef}
                 onWheel={() => {
