@@ -27,26 +27,18 @@ export function useViewportSync({
         const chart = chartRef.current
         const series = seriesRef.current
 
-        if (!chart || !series || !chartReady) {
-            return
-        }
+        if (!chart || !series || !chartReady) return
 
         const timeScale = chart.timeScale()
 
         const handler = () => {
-            if (isChangingTimeframeRef.current || isLoadingDataRef.current) {
-                return
-            }
+            if (isChangingTimeframeRef.current || isLoadingDataRef.current) return
 
-            if (replayStore.enabled && replayStore.isPlaying && !isViewportInteractionRef.current) {
-                return
-            }
+            if (replayStore.enabled && replayStore.isPlaying && !isViewportInteractionRef.current) return
 
             const lastBarIndex = series.data().length - 1
 
-            if (lastBarIndex < 0) {
-                return
-            }
+            if (lastBarIndex < 0) return
 
             captureViewport({
                 chart,

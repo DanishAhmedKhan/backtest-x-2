@@ -12,9 +12,7 @@ export function useChart(containerRef: React.RefObject<HTMLDivElement | null>) {
     useEffect(() => {
         const container = containerRef.current
 
-        if (!container) {
-            return
-        }
+        if (!container) return
 
         const chart = createChart(container, DEFAULT_CHART_CONFIG)
         const series = chart.addSeries(CandlestickSeries, TIME_SERIES_CONFIG)

@@ -48,9 +48,7 @@ export function useInfiniteScroll({
         const chart = chartRef.current
         const series = seriesRef.current
 
-        if (!chart || !series || !chartReady) {
-            return
-        }
+        if (!chart || !series || !chartReady) return
 
         const timeScale = chart.timeScale()
 

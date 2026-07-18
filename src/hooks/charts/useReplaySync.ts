@@ -12,6 +12,8 @@ import { eventBus } from '../../event/EventBus'
 import { CandleAggregator } from '../../data/CandleAggregator'
 import type { ViewportState } from '../../types/Viewport'
 
+let isProcessingStep = false
+
 type Props = {
     timeframe: Timeframe
     chartRef: React.RefObject<IChartApi | null>
@@ -22,8 +24,6 @@ type Props = {
     viewportRef: React.RefObject<ViewportState>
     replayViewportRef: React.RefObject<ViewportState>
 }
-
-let isProcessingStep = false
 
 export function useReplaySync({
     timeframe,
@@ -40,18 +40,13 @@ export function useReplaySync({
             const chart = chartRef.current
             const series = seriesRef.current
 
-            if (!chart || !series) {
-                return
-            }
+            if (!chart || !series) return
 
             const replayTime = replayStore.marketTime
             const replayStart = replayStore.startTime
 
-            if (replayTime === null || replayStart === null) {
-                return
-            }
+            if (replayTime === null || replayStart === null) return
 
-            // const tfSeconds = replayStore.chartTimeframeSeconds
             const tfSeconds = timeframe.toSeconds()
 
             let replayCandles
@@ -123,9 +118,7 @@ export function useReplaySync({
 
             const current = replayStore.marketTime
 
-            if (current === null) {
-                return
-            }
+            if (current === null) return
 
             isProcessingStep = true
 
@@ -140,10 +133,9 @@ export function useReplaySync({
                 next = finder(raw1mTimesRef.current, desired)
             }
 
-            if (next === null) {
-                return
-            }
+            if (next === null) return
 
+            console.log('rebuildReplay')
             replayStore.marketTime = next
 
             rebuildReplay(false)
@@ -164,7 +156,6 @@ export function useReplaySync({
         })
 
         const unsubForward = eventBus.on('replayForward', () => {
-            console.log('f')
             moveReplay(1, findNextAvailableTime)
         })
 
@@ -176,9 +167,7 @@ export function useReplaySync({
             const chart = chartRef.current
             const series = seriesRef.current
 
-            if (!chart || !series) {
-                return
-            }
+            if (!chart || !series) return
 
             series.setData(candlesRef.current)
 

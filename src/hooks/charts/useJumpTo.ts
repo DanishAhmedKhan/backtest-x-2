@@ -44,9 +44,7 @@ export function useJumpTo({
             const chart = chartRef.current
             const series = seriesRef.current
 
-            if (!chart || !series) {
-                return
-            }
+            if (!chart || !series) return
 
             const chartResult = await CandleService.getCandlesAroundTime(ticker, timeframe, timestamp)
 

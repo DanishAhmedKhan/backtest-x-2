@@ -11,9 +11,7 @@ export function useChartResize({ containerRef, chartRef }: Props) {
         const chart = chartRef.current
         const container = containerRef.current
 
-        if (!chart || !container) {
-            return
-        }
+        if (!chart || !container) return
 
         const resize = () => {
             chart.resize(container.clientWidth, container.clientHeight, true)
