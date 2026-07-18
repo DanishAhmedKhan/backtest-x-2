@@ -16,6 +16,7 @@ import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
 import { useReplayPreview } from '../hooks/charts/useReplayPreview'
 import { useReplaySync } from '../hooks/charts/useReplaySync'
 import { useJumpTo } from '../hooks/charts/useJumpTo'
+import { useOHLCOverlay } from '../hooks/charts/useOHLCOverlay'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -67,6 +68,11 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     const { previewTime, previewX, clearPreview } = useReplayPreview({
         chartRef,
+    })
+
+    const ohlc = useOHLCOverlay({
+        chartRef,
+        seriesRef,
     })
 
     useViewportSync({
@@ -235,6 +241,25 @@ function Chart({ id, ticker, timeframe }: Props) {
                 height: '100%',
             }}
         >
+            {ohlc && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: 8,
+                        left: 8,
+                        zIndex: 20,
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        pointerEvents: 'none',
+                        color: '#ddd',
+                    }}
+                >
+                    <span>O{ohlc.open}</span> <span style={{ color: '#4caf50' }}>H{ohlc.high}</span>{' '}
+                    <span style={{ color: '#f44336' }}>L{ohlc.low}</span>{' '}
+                    <span style={{ color: '#2196f3' }}>C{ohlc.close}</span>
+                </div>
+            )}
+
             <div
                 ref={containerRef}
                 onWheel={() => {

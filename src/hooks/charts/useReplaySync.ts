@@ -45,6 +45,8 @@ export function useReplaySync({
             const replayTime = replayStore.marketTime
             const replayStart = replayStore.startTime
 
+            console.log(`replayStart: ${new Date(replayTime * 1000)}`)
+
             if (replayTime === null || replayStart === null) return
 
             const tfSeconds = timeframe.toSeconds()
@@ -100,13 +102,11 @@ export function useReplaySync({
 
         function findNextAvailableTime(times: number[], target: number) {
             const { left } = binarySearch(times, target)
-
             return left < times.length ? times[left] : null
         }
 
         function findPreviousAvailableTime(times: number[], target: number) {
             const { right } = binarySearch(times, target)
-
             return right >= 0 ? times[right] : null
         }
 
@@ -117,7 +117,6 @@ export function useReplaySync({
             }
 
             const current = replayStore.marketTime
-
             if (current === null) return
 
             isProcessingStep = true
@@ -129,13 +128,12 @@ export function useReplaySync({
                 replayStore.pendingStepSeconds = null
             } else {
                 const desired = current + direction * replayStore.updateIntervalSeconds
-
+                console.log(`desired ${new Date(desired * 1000)}`)
                 next = finder(raw1mTimesRef.current, desired)
             }
 
             if (next === null) return
 
-            console.log('rebuildReplay')
             replayStore.marketTime = next
 
             rebuildReplay(false)
@@ -151,7 +149,6 @@ export function useReplaySync({
 
         const unsubChange = eventBus.on('replayTimeChanged', ({ time }) => {
             replayStore.marketTime = time
-
             rebuildReplay(false)
         })
 
