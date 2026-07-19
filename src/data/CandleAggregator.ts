@@ -61,6 +61,44 @@ export class CandleAggregator {
         return result
     }
 
+    public static aggregateRange(candles: Candle[], startIndex: number, endIndex: number, tfSeconds: number): Candle[] {
+        if (candles.length === 0 || startIndex > endIndex || startIndex >= candles.length) {
+            return []
+        }
+
+        endIndex = Math.min(endIndex, candles.length - 1)
+
+        const result: Candle[] = []
+
+        let currentBucket: Candle[] = []
+        let currentBucketTime: number | null = null
+
+        for (let i = startIndex; i <= endIndex; i++) {
+            const candle = candles[i]
+
+            const bucketTime = Math.floor(candle.time / tfSeconds) * tfSeconds
+
+            if (currentBucketTime === null) {
+                currentBucketTime = bucketTime
+            }
+
+            if (bucketTime !== currentBucketTime) {
+                result.push(this.buildBucket(currentBucket, currentBucketTime))
+
+                currentBucket = []
+                currentBucketTime = bucketTime
+            }
+
+            currentBucket.push(candle)
+        }
+
+        if (currentBucket.length) {
+            result.push(this.buildBucket(currentBucket, currentBucketTime!))
+        }
+
+        return result
+    }
+
     private static buildBucket(group: Candle[], time: number): Candle {
         return new Candle({
             time,
