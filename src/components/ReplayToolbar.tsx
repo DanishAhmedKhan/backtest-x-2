@@ -91,7 +91,7 @@ export default function ReplayToolbar() {
         }
 
         const interval = setInterval(() => {
-            eventBus.emit('replayForward')
+            replayController.forward()
         }, 1000 / speed)
 
         return () => clearInterval(interval)

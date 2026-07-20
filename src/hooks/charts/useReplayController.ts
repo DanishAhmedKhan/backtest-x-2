@@ -5,18 +5,6 @@ import { replayStore } from '../../replay/ReplayStore'
 
 export function useReplayController() {
     useEffect(() => {
-        const unsubForward = eventBus.on('replayForward', () => {
-            replayController.forward()
-
-            eventBus.emit('replayPositionChanged')
-        })
-
-        const unsubBackward = eventBus.on('replayBackward', () => {
-            replayController.backward()
-
-            eventBus.emit('replayPositionChanged')
-        })
-
         const unsubTimeChanged = eventBus.on('replayTimeChanged', ({ time }) => {
             if (time == null) {
                 return
@@ -49,8 +37,6 @@ export function useReplayController() {
         })
 
         return () => {
-            unsubForward()
-            unsubBackward()
             unsubTimeChanged()
         }
     }, [])
