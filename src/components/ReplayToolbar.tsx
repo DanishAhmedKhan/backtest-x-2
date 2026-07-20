@@ -57,13 +57,11 @@ export default function ReplayToolbar() {
     }
 
     const handleForward = () => {
-        console.log('forward')
         replayController.forward()
-        // eventBus.emit('replayForward')
     }
 
     const handleBackward = () => {
-        eventBus.emit('replayBackward')
+        replayController.backward()
     }
 
     const handleUpdateInterval = (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -45,7 +45,7 @@ export class CandleService {
     private static getInitialFileCount(timeframe: Timeframe): number {
         switch (timeframe.unit) {
             case TimeframeUnit.Minute:
-                return 5 //5
+                return 5
 
             case TimeframeUnit.Hour:
                 return 20

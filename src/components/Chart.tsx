@@ -141,8 +141,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
-        raw1mCandlesRef,
-        raw1mTimesRef,
         viewportRef,
         replayViewportRef,
     })

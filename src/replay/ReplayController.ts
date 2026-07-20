@@ -22,6 +22,7 @@ export class ReplayController {
         replayStore.processedIndex = clamped
         replayStore.displayIndex = clamped
     }
+
     private move(direction: 1 | -1) {
         const candles = replayStore.raw1mCandles
 
@@ -31,14 +32,24 @@ export class ReplayController {
             return
         }
 
-        const tfSeconds = replayStore.updateIntervalSeconds
+        if (direction === 1) {
+            const bucketEnd = this.findBucketEnd(processedIndex)
 
-        const stepCount = Math.max(1, tfSeconds / replayStore.chartTimeframeSeconds)
-
-        for (let step = 0; step < stepCount; step++) {
-            if (direction === 1) {
-                processedIndex = this.findNextBucket(processedIndex)
+            if (bucketEnd > processedIndex) {
+                processedIndex = bucketEnd
             } else {
+                const tfSeconds = replayStore.updateIntervalSeconds
+                const stepCount = Math.max(1, tfSeconds / replayStore.chartTimeframeSeconds)
+
+                for (let step = 0; step < stepCount; step++) {
+                    processedIndex = this.findNextBucket(processedIndex)
+                }
+            }
+        } else {
+            const tfSeconds = replayStore.updateIntervalSeconds
+            const stepCount = Math.max(1, tfSeconds / replayStore.chartTimeframeSeconds)
+
+            for (let step = 0; step < stepCount; step++) {
                 processedIndex = this.findPreviousBucket(processedIndex)
             }
         }
@@ -47,6 +58,21 @@ export class ReplayController {
         replayStore.displayIndex = processedIndex
 
         eventBus.emit('replayPositionChanged')
+    }
+
+    private findBucketEnd(index: number): number {
+        const candles = replayStore.raw1mCandles
+        const tfSeconds = replayStore.chartTimeframeSeconds
+
+        const bucket = Math.floor(candles[index].time / tfSeconds)
+
+        let i = index
+
+        while (i < candles.length - 1 && Math.floor(candles[i + 1].time / tfSeconds) === bucket) {
+            i++
+        }
+
+        return i
     }
 
     private findNextBucket(index: number): number {

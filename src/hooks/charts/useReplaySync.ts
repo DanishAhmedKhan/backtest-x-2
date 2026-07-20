@@ -16,8 +16,6 @@ type Props = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
-    raw1mCandlesRef: React.RefObject<Candle[]>
-    raw1mTimesRef: React.RefObject<number[]>
     viewportRef: React.RefObject<ViewportState>
     replayViewportRef: React.RefObject<ViewportState>
 }
