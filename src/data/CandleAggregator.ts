@@ -2,9 +2,7 @@ import { Candle } from '../core/Candle'
 
 export class CandleAggregator {
     public static aggregate(candles: Candle[], intervalMinutes: number): Candle[] {
-        if (!candles.length) {
-            return []
-        }
+        if (!candles.length) return
 
         const intervalSec = intervalMinutes * 60
 
@@ -24,9 +22,7 @@ export class CandleAggregator {
     }
 
     public static aggregateUntil(candles: Candle[], tfSeconds: number, replayTime: number): Candle[] {
-        if (!candles.length) {
-            return []
-        }
+        if (!candles.length) return []
 
         const result: Candle[] = []
 
@@ -94,6 +90,45 @@ export class CandleAggregator {
 
         if (currentBucket.length) {
             result.push(this.buildBucket(currentBucket, currentBucketTime!))
+        }
+
+        return result
+    }
+
+    public static aggregateReplay(
+        candles: Candle[],
+        startIndex: number,
+        endIndex: number,
+        tfSeconds: number,
+    ): Candle[] {
+        if (startIndex > endIndex) return []
+
+        const result: Candle[] = []
+
+        let currentBucketStart: number | null = null
+        let currentBucket: Candle[] = []
+
+        for (let i = startIndex; i <= endIndex; i++) {
+            const candle = candles[i]
+
+            const bucketStart = Math.floor(candle.time / tfSeconds) * tfSeconds
+
+            if (currentBucketStart === null) {
+                currentBucketStart = bucketStart
+            }
+
+            if (bucketStart !== currentBucketStart) {
+                result.push(this.buildBucket(currentBucket, currentBucketStart))
+
+                currentBucket = []
+                currentBucketStart = bucketStart
+            }
+
+            currentBucket.push(candle)
+        }
+
+        if (currentBucket.length) {
+            result.push(this.buildBucket(currentBucket, currentBucketStart!))
         }
 
         return result

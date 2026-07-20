@@ -1,3 +1,4 @@
+import { eventBus } from '../event/EventBus'
 import { replayStore } from './ReplayStore'
 
 export class ReplayController {
@@ -16,13 +17,16 @@ export class ReplayController {
             return
         }
 
-        replayStore.replayIndex = Math.max(replayStore.startIndex ?? 0, Math.min(index, candles.length - 1))
+        const clamped = Math.max(replayStore.startIndex ?? 0, Math.min(index, candles.length - 1))
+
+        replayStore.processedIndex = clamped
+        replayStore.displayIndex = clamped
     }
 
     private move(direction: 1 | -1) {
         const candles = replayStore.raw1mCandles
 
-        let index = replayStore.replayIndex
+        let index = replayStore.processedIndex
 
         if (index === null || !candles.length) {
             return
@@ -56,7 +60,11 @@ export class ReplayController {
             }
         }
 
-        replayStore.replayIndex = index
+        replayStore.processedIndex = index
+
+        replayStore.displayIndex = index
+
+        eventBus.emit('replayPositionChanged')
     }
 }
 

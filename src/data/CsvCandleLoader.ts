@@ -87,8 +87,6 @@ export class CsvCandleLoader {
 
         if (lines.length <= 1) return []
 
-        lines.shift()
-
         return lines.map((line) => {
             const [timeStr, open, high, low, close] = line.split(',')
 

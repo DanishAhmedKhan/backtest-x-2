@@ -16,9 +16,7 @@ export class CandleService {
         latestFile: number
     }> {
         const tfSeconds = timeframe.toSeconds()
-
         const intervalFolder = tfSeconds < 3600 ? 'M' : 'H'
-
         const fileCount = this.getInitialFileCount(timeframe)
 
         if (totalFiles === undefined) {
@@ -47,7 +45,7 @@ export class CandleService {
     private static getInitialFileCount(timeframe: Timeframe): number {
         switch (timeframe.unit) {
             case TimeframeUnit.Minute:
-                return 5
+                return 5 //5
 
             case TimeframeUnit.Hour:
                 return 20
