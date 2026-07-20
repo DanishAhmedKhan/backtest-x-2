@@ -10,6 +10,7 @@ import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
+import { CandleService } from '../../core/CandleService'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -68,12 +69,11 @@ export function useInfiniteScroll({
             isLoadingDataRef.current = true
 
             const threshold = Math.max(Math.ceil(viewportRef.current.visibleBars * 2), 150)
+            const fileCount = CandleService.getAdjacentLoadFileCount(timeframe)
 
             try {
-                if (range.from < threshold) {
-                    const currentRange = range
-
-                    const result = await loadAdjacentWindow({
+                const loadWindow = (direction: 'older' | 'newer') =>
+                    loadAdjacentWindow({
                         series,
                         candlesRef,
                         candleMapRef,
@@ -82,8 +82,14 @@ export function useInfiniteScroll({
                         timeframe,
                         loadedWindowRef,
                         totalFilesRef,
-                        direction: 'older',
+                        direction,
+                        fileCount,
                     })
+
+                if (range.from < threshold) {
+                    const currentRange = range
+
+                    const result = await loadWindow('older')
 
                     if (result.loaded) {
                         requestAnimationFrame(() => {
@@ -98,17 +104,7 @@ export function useInfiniteScroll({
                 }
 
                 if (range.to > candlesRef.current.length - threshold) {
-                    await loadAdjacentWindow({
-                        series,
-                        candlesRef,
-                        candleMapRef,
-                        timesRef,
-                        ticker,
-                        timeframe,
-                        loadedWindowRef,
-                        totalFilesRef,
-                        direction: 'newer',
-                    })
+                    await loadWindow('newer')
                 }
             } catch (err) {
                 console.error(err)

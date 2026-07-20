@@ -11,15 +11,15 @@ export class TimeframeRegistry {
         Timeframe.parse('1d'),
     ]
 
-    static getAll(): Timeframe[] {
+    public static getAll(): Timeframe[] {
         return [...this.timeframes]
     }
 
-    static getDefault(): Timeframe {
+    public static getDefault(): Timeframe {
         return this.timeframes[0]
     }
 
-    static getByValue(value: string): Timeframe | undefined {
+    public static getByValue(value: string): Timeframe | undefined {
         return this.timeframes.find((tf) => tf.toKey() === value)
     }
 }

@@ -8,19 +8,19 @@ export class TickerRegistry {
         new Ticker('GBPUSD', AssetType.FOREX),
     ]
 
-    static getAll(): Ticker[] {
+    public static getAll(): Ticker[] {
         return [...this.tickers]
     }
 
-    static getDefault(): Ticker {
+    public static getDefault(): Ticker {
         return this.tickers[0]
     }
 
-    static register(ticker: Ticker) {
+    public static register(ticker: Ticker) {
         this.tickers.push(ticker)
     }
 
-    static getByValue(value: string): Ticker | undefined {
+    public static getByValue(value: string): Ticker | undefined {
         return this.tickers.find((t) => t.value === value)
     }
 }

@@ -1,8 +1,8 @@
 import type { CandlestickData, ISeriesApi, Time } from 'lightweight-charts'
 
-import { CandleService } from '../../core/CandleService'
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
+import { CandleService } from '../../core/CandleService'
 
 import type { LoadedWindow } from '../../types/LoadedWindow'
 
@@ -21,6 +21,7 @@ type Params = {
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     direction: 'older' | 'newer'
+    fileCount: number
 }
 
 export async function loadAdjacentWindow({
@@ -33,24 +34,32 @@ export async function loadAdjacentWindow({
     loadedWindowRef,
     totalFilesRef,
     direction,
+    fileCount,
 }: Params): Promise<LoadAdjacentWindowResult> {
-    let fileIndex: number
+    let startIndex: number
+    let actualFileCount: number
 
     if (direction === 'older') {
         if (loadedWindowRef.current.oldestFile <= 0) {
             return { loaded: false, addedBars: 0 }
         }
 
-        fileIndex = loadedWindowRef.current.oldestFile - 1
+        actualFileCount = Math.min(fileCount, loadedWindowRef.current.oldestFile)
+
+        startIndex = loadedWindowRef.current.oldestFile - actualFileCount
     } else {
-        if (loadedWindowRef.current.latestFile >= totalFilesRef.current - 1) {
+        const remaining = totalFilesRef.current - loadedWindowRef.current.latestFile - 1
+
+        if (remaining <= 0) {
             return { loaded: false, addedBars: 0 }
         }
 
-        fileIndex = loadedWindowRef.current.latestFile + 1
+        actualFileCount = Math.min(fileCount, remaining)
+
+        startIndex = loadedWindowRef.current.latestFile + 1
     }
 
-    const candles = await CandleService.getCandlesWindow(ticker, timeframe, fileIndex, 1)
+    const candles = await CandleService.getCandlesWindow(ticker, timeframe, startIndex, actualFileCount)
 
     if (!candles.length) {
         return {
@@ -69,10 +78,10 @@ export async function loadAdjacentWindow({
 
     if (direction === 'older') {
         candlesRef.current = [...formatted, ...candlesRef.current]
-        loadedWindowRef.current.oldestFile = fileIndex
+        loadedWindowRef.current.oldestFile = startIndex
     } else {
         candlesRef.current = [...candlesRef.current, ...formatted]
-        loadedWindowRef.current.latestFile = fileIndex
+        loadedWindowRef.current.latestFile = startIndex + actualFileCount - 1
     }
 
     candleMapRef.current.clear()

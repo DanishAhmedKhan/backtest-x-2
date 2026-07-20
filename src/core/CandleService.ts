@@ -1,12 +1,12 @@
 import type { Ticker } from './Ticker'
 import type { Timeframe } from './Timeframe'
+import type { Candle } from './Candle'
+
 import { CandleAggregator } from '../data/CandleAggregator'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
-import type { Candle } from './Candle'
-import { TimeframeUnit } from './TimeframeUnit'
 
 export class CandleService {
-    static async getInitialWindow(
+    public static async getInitialWindow(
         ticker: Ticker,
         timeframe: Timeframe,
         totalFiles?: number,
@@ -42,26 +42,44 @@ export class CandleService {
         }
     }
 
+    // private static getInitialFileCount(timeframe: Timeframe): number {
+    //     switch (timeframe.unit) {
+    //         case TimeframeUnit.Minute:
+    //             return 5
+
+    //         case TimeframeUnit.Hour:
+    //             return 20
+
+    //         case TimeframeUnit.Day:
+    //         case TimeframeUnit.Week:
+    //         case TimeframeUnit.Month:
+    //         case TimeframeUnit.Year:
+    //             return 20
+
+    //         default:
+    //             return 5
+    //     }
+    // }
+
+    private static readonly loadingPolicy = {
+        60: { initial: 5, adjacent: 2 },
+        300: { initial: 8, adjacent: 3 },
+        900: { initial: 12, adjacent: 5 },
+        1800: { initial: 16, adjacent: 8 },
+        3600: { initial: 20, adjacent: 10 },
+        14400: { initial: 24, adjacent: 12 },
+        86400: { initial: 30, adjacent: 15 },
+    } as const
+
     private static getInitialFileCount(timeframe: Timeframe): number {
-        switch (timeframe.unit) {
-            case TimeframeUnit.Minute:
-                return 5
-
-            case TimeframeUnit.Hour:
-                return 20
-
-            case TimeframeUnit.Day:
-            case TimeframeUnit.Week:
-            case TimeframeUnit.Month:
-            case TimeframeUnit.Year:
-                return 20
-
-            default:
-                return 5
-        }
+        return this.loadingPolicy[timeframe.toSeconds() as keyof typeof this.loadingPolicy]?.initial ?? 20
     }
 
-    static async getCandlesWindow(ticker: Ticker, timeframe: Timeframe, startIndex: number, fileCount: number) {
+    public static getAdjacentLoadFileCount(timeframe: Timeframe): number {
+        return this.loadingPolicy[timeframe.toSeconds() as keyof typeof this.loadingPolicy]?.adjacent ?? 10
+    }
+
+    public static async getCandlesWindow(ticker: Ticker, timeframe: Timeframe, startIndex: number, fileCount: number) {
         const tfSeconds = timeframe.toSeconds()
 
         const intervalFolder = tfSeconds < 3600 ? 'M' : 'H'
@@ -75,7 +93,7 @@ export class CandleService {
         return CandleAggregator.aggregate(raw, tfSeconds / 60)
     }
 
-    static async getCandlesAroundTime(
+    public static async getCandlesAroundTime(
         ticker: Ticker,
         timeframe: Timeframe,
         timestamp: number,
@@ -103,7 +121,7 @@ export class CandleService {
         }
     }
 
-    static async getTotalFiles(ticker: Ticker): Promise<number> {
+    public static async getTotalFiles(ticker: Ticker): Promise<number> {
         return CsvCandleLoader.getFileCount(ticker.value)
     }
 }

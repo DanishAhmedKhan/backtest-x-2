@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: Config = {
 const CONFIG_KEY = 'config_key'
 
 export class ConfigService {
-    static getConfig(): Config {
+    public static getConfig(): Config {
         const saved = storage.get<Config>(CONFIG_KEY)
 
         return {
@@ -22,7 +22,7 @@ export class ConfigService {
         }
     }
 
-    static updateConfig(partial: Partial<Config>) {
+    public static updateConfig(partial: Partial<Config>) {
         const current = this.getConfig()
 
         const updated = {
@@ -33,7 +33,7 @@ export class ConfigService {
         storage.set(CONFIG_KEY, updated)
     }
 
-    static reset() {
+    public static reset() {
         storage.remove(CONFIG_KEY)
     }
 }
