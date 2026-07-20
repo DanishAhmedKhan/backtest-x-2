@@ -8,9 +8,7 @@ type EventMap = {
         time: number
     }
 
-    replayStart: {
-        time: number
-    }
+    replayStart
 
     replayStop: void
 
@@ -19,6 +17,8 @@ type EventMap = {
     replayBackward: void
 
     replayNextCandle: void
+
+    replayPositionChanged
 
     replayTimeChanged: {
         time: number

@@ -10,7 +10,14 @@ type Params = {
     timesRef: React.RefObject<number[]>
 }
 
-export function applyChartData({ candles, series, candlesRef, candleMapRef, timesRef }: Params) {
+export function applyChartData({
+    candles,
+    series,
+    candlesRef,
+    candleMapRef,
+    timesRef,
+    skipSeriesUpdate = false,
+}: Params & { skipSeriesUpdate?: boolean }) {
     const formatted: CandlestickData<Time>[] = candles.map((c) => ({
         time: c.time as Time,
         open: c.open,
@@ -29,7 +36,9 @@ export function applyChartData({ candles, series, candlesRef, candleMapRef, time
 
     timesRef.current = formatted.map((c) => Number(c.time))
 
-    series.setData(formatted)
+    if (!skipSeriesUpdate) {
+        series.setData(formatted)
+    }
 
     return formatted.length
 }

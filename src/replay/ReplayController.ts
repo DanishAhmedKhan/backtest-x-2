@@ -22,49 +22,85 @@ export class ReplayController {
         replayStore.processedIndex = clamped
         replayStore.displayIndex = clamped
     }
-
     private move(direction: 1 | -1) {
         const candles = replayStore.raw1mCandles
 
-        let index = replayStore.processedIndex
+        let processedIndex = replayStore.processedIndex
 
-        if (index === null || !candles.length) {
+        if (processedIndex === null || !candles.length) {
             return
         }
 
-        const required = replayStore.pendingStepSeconds ?? replayStore.updateIntervalSeconds
+        const tfSeconds = replayStore.updateIntervalSeconds
 
-        replayStore.pendingStepSeconds = null
+        const stepCount = Math.max(1, tfSeconds / replayStore.chartTimeframeSeconds)
 
-        let elapsed = 0
-
-        if (direction === 1) {
-            while (index < candles.length - 1) {
-                elapsed += candles[index + 1].time - candles[index].time
-
-                index++
-
-                if (elapsed >= required) {
-                    break
-                }
-            }
-        } else {
-            while (index > (replayStore.startIndex ?? 0)) {
-                elapsed += candles[index].time - candles[index - 1].time
-
-                index--
-
-                if (elapsed >= required) {
-                    break
-                }
+        for (let step = 0; step < stepCount; step++) {
+            if (direction === 1) {
+                processedIndex = this.findNextBucket(processedIndex)
+            } else {
+                processedIndex = this.findPreviousBucket(processedIndex)
             }
         }
 
-        replayStore.processedIndex = index
-
-        replayStore.displayIndex = index
+        replayStore.processedIndex = processedIndex
+        replayStore.displayIndex = processedIndex
 
         eventBus.emit('replayPositionChanged')
+    }
+
+    private findNextBucket(index: number): number {
+        const candles = replayStore.raw1mCandles
+        const tfSeconds = replayStore.chartTimeframeSeconds
+
+        const currentBucket = Math.floor(candles[index].time / tfSeconds)
+
+        let i = index + 1
+
+        while (i < candles.length && Math.floor(candles[i].time / tfSeconds) === currentBucket) {
+            i++
+        }
+
+        if (i >= candles.length) {
+            return candles.length - 1
+        }
+
+        const nextBucket = Math.floor(candles[i].time / tfSeconds)
+
+        while (i < candles.length - 1 && Math.floor(candles[i + 1].time / tfSeconds) === nextBucket) {
+            i++
+        }
+
+        return i
+    }
+
+    private findPreviousBucket(index: number): number {
+        const candles = replayStore.raw1mCandles
+        const tfSeconds = replayStore.chartTimeframeSeconds
+
+        const currentBucket = Math.floor(candles[index].time / tfSeconds)
+
+        let i = index - 1
+
+        while (i >= 0 && Math.floor(candles[i].time / tfSeconds) === currentBucket) {
+            i--
+        }
+
+        if (i < (replayStore.startIndex ?? 0)) {
+            return replayStore.startIndex!
+        }
+
+        const previousBucket = Math.floor(candles[i].time / tfSeconds)
+
+        while (i > (replayStore.startIndex ?? 0) && Math.floor(candles[i - 1].time / tfSeconds) === previousBucket) {
+            i--
+        }
+
+        while (i < candles.length - 1 && Math.floor(candles[i + 1].time / tfSeconds) === previousBucket) {
+            i++
+        }
+
+        return i
     }
 }
 

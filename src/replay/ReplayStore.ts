@@ -1,67 +1,110 @@
-class ReplayStore {
+import type { Candle } from '../core/Candle'
+
+export class ReplayStore {
     public enabled = false
 
     public showToolbar = false
 
-    public previewTime: number | null = null
-    public startTime: number | null = null
-    public marketTime: number | null = null
-
     public isSelecting = true
     public isPlaying = false
 
+    public startIndex: number | null = null
+
+    public replayStartIndex: number | null = null
+
+    public processedIndex: number | null = null
+
+    public displayIndex: number | null = null
+
+    public raw1mCandles: Candle[] = []
+
     public chartTimeframeSeconds = 60
+
     public updateIntervalSeconds = 60
 
     public pendingStepSeconds: number | null = null
 
-    public start(selectedTime: number, chartTimeframeSeconds: number) {
+    public previewTime: number | null = null
+
+    public start(startIndex: number, raw1mCandles: Candle[], chartTimeframeSeconds: number) {
         this.enabled = true
-        this.startTime = selectedTime
+
+        this.raw1mCandles = raw1mCandles
+
+        this.startIndex = startIndex
+
+        const replayBucket = Math.floor(raw1mCandles[startIndex].time / chartTimeframeSeconds) * chartTimeframeSeconds
+
+        let replayStartIndex = startIndex
+
+        while (replayStartIndex > 0 && raw1mCandles[replayStartIndex - 1].time >= replayBucket) {
+            replayStartIndex--
+        }
+
+        this.replayStartIndex = replayStartIndex
+
+        const lastVisibleTime = raw1mCandles[startIndex].time + chartTimeframeSeconds - 60
+
+        let replayIndex = startIndex
+
+        while (replayIndex < raw1mCandles.length - 1 && raw1mCandles[replayIndex + 1].time <= lastVisibleTime) {
+            replayIndex++
+        }
+
+        this.processedIndex = replayIndex
+        this.displayIndex = replayIndex
+
         this.chartTimeframeSeconds = chartTimeframeSeconds
         this.updateIntervalSeconds = chartTimeframeSeconds
-        this.marketTime = selectedTime + chartTimeframeSeconds - 60
+
         this.isSelecting = false
-        this.previewTime = null
         this.showToolbar = false
+        this.previewTime = null
         this.isPlaying = false
-    }
 
-    public setPlaying(value: boolean) {
-        this.isPlaying = value
-    }
-
-    public step() {
-        if (this.marketTime === null) {
-            return
-        }
-
-        if (this.pendingStepSeconds !== null) {
-            this.marketTime += this.pendingStepSeconds
-            this.pendingStepSeconds = null
-            return
-        }
-
-        this.marketTime += this.updateIntervalSeconds
-    }
-
-    public rewind() {
-        if (this.marketTime === null) {
-            return
-        }
-
-        this.marketTime -= this.updateIntervalSeconds
+        this.pendingStepSeconds = null
     }
 
     public stop() {
         this.enabled = false
-        this.startTime = null
-        this.marketTime = null
+
+        this.startIndex = null
+        this.replayStartIndex = null
+
+        this.processedIndex = null
+        this.displayIndex = null
+
+        this.raw1mCandles = []
+
         this.previewTime = null
+
         this.updateIntervalSeconds = 60
+
+        this.chartTimeframeSeconds = 60
+
+        this.pendingStepSeconds = null
+
         this.isSelecting = true
         this.isPlaying = false
-        this.pendingStepSeconds = null
+    }
+
+    public seek(index: number) {
+        if (!this.raw1mCandles.length) {
+            return
+        }
+
+        const clamped = Math.max(this.startIndex ?? 0, Math.min(index, this.raw1mCandles.length - 1))
+
+        this.processedIndex = clamped
+        this.displayIndex = clamped
+    }
+
+    public setChartTimeframeSeconds(seconds: number) {
+        this.chartTimeframeSeconds = seconds
+    }
+
+    public setPlaying(value: boolean) {
+        this.isPlaying = value
     }
 
     public openToolbar() {
@@ -74,24 +117,44 @@ class ReplayStore {
         this.previewTime = null
     }
 
-    public setChartTimeframeSeconds(seconds: number) {
-        this.chartTimeframeSeconds = seconds
+    public setUpdateIntervalSeconds(seconds: number) {
+        this.updateIntervalSeconds = seconds
     }
 
-    public setUpdateIntervalSeconds(seconds: number) {
-        if (this.marketTime !== null && this.updateIntervalSeconds !== seconds) {
-            const bucketEnd = Math.floor(this.marketTime / seconds) * seconds + seconds - 60
-
-            const remaining = bucketEnd - this.marketTime
-
-            if (remaining > 0) {
-                this.pendingStepSeconds = remaining
-            } else {
-                this.pendingStepSeconds = null
-            }
+    public get currentCandle(): Candle | null {
+        if (this.displayIndex === null) {
+            return null
         }
 
-        this.updateIntervalSeconds = seconds
+        return this.raw1mCandles[this.displayIndex] ?? null
+    }
+
+    public get marketTime(): number | null {
+        return this.currentCandle?.time ?? null
+    }
+
+    public get replayCandles(): Candle[] {
+        if (this.displayIndex === null) {
+            return []
+        }
+
+        return this.raw1mCandles.slice(0, this.displayIndex + 1)
+    }
+
+    public get replayLength(): number {
+        if (this.displayIndex === null) {
+            return 0
+        }
+
+        return this.displayIndex + 1
+    }
+
+    public canMoveForward() {
+        return this.displayIndex !== null && this.displayIndex < this.raw1mCandles.length - 1
+    }
+
+    public canMoveBackward() {
+        return this.displayIndex !== null && this.displayIndex > (this.startIndex ?? 0)
     }
 }
 

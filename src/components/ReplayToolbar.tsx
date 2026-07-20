@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import { DEFAULT_REPLAY_SPEED, REPLAY_SPEEDS, REPLAY_UPDATE_INTERVALS } from '../config/default/ReplayConfig'
+import { replayController } from '../replay/ReplayController'
 
 export default function ReplayToolbar() {
     const [position, setPosition] = useState({
@@ -56,7 +57,9 @@ export default function ReplayToolbar() {
     }
 
     const handleForward = () => {
-        eventBus.emit('replayForward')
+        console.log('forward')
+        replayController.forward()
+        // eventBus.emit('replayForward')
     }
 
     const handleBackward = () => {

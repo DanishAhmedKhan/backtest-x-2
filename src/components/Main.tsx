@@ -17,6 +17,7 @@ import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
 import type { AppConfig, ChartConfig } from '../types/AppConfig'
 import { eventBus } from '../event/EventBus'
+import { useReplayController } from '../hooks/charts/useReplayController'
 
 const storage = new LocalStorageProvider()
 
@@ -109,6 +110,8 @@ export default function Main() {
 
         return unsub
     }, [])
+
+    useReplayController()
 
     return (
         <div

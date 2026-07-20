@@ -82,6 +82,7 @@ export function useChartData({
                 candlesRef,
                 candleMapRef,
                 timesRef,
+                skipSeriesUpdate: replayStore.enabled,
             })
 
             restoreViewport({
@@ -90,15 +91,28 @@ export function useChartData({
                 viewport: viewportRef,
             })
 
+            if (replayStore.enabled) {
+                const seconds = timeframe.toSeconds()
+
+                replayStore.setChartTimeframeSeconds(seconds)
+                replayStore.setUpdateIntervalSeconds(seconds)
+
+                eventBus.emit('replayUpdateIntervalChanged', {
+                    seconds,
+                })
+
+                eventBus.emit('replayPositionChanged')
+            } else {
+                restoreViewport({
+                    chart,
+                    series,
+                    viewport: viewportRef,
+                })
+            }
+
             requestAnimationFrame(() => {
                 setIsChangingTimeframe(false)
             })
-
-            if (replayStore.enabled && replayStore.marketTime !== null) {
-                eventBus.emit('replayTimeChanged', {
-                    time: replayStore.marketTime,
-                })
-            }
         }
 
         load()

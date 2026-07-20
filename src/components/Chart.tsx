@@ -25,6 +25,7 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import ChartOHLC from './ChartOHLC'
+import { binarySearch } from '../helper/binarySearch'
 
 type Props = {
     id: string
@@ -168,21 +169,6 @@ function Chart({ id, ticker, timeframe }: Props) {
     }, [chartRef, isHovered])
 
     useEffect(() => {
-        if (!replayStore.enabled) {
-            return
-        }
-
-        const seconds = timeframe.toSeconds()
-
-        replayStore.setChartTimeframeSeconds(seconds)
-        replayStore.setUpdateIntervalSeconds(seconds)
-
-        eventBus.emit('replayUpdateIntervalChanged', {
-            seconds,
-        })
-    }, [timeframe])
-
-    useEffect(() => {
         const handleMouseUp = () => {
             if (!isDraggingRef.current) {
                 return
@@ -219,7 +205,9 @@ function Chart({ id, ticker, timeframe }: Props) {
             timestamp: previewTime,
         })
 
-        replayStore.start(previewTime, timeframe.toSeconds())
+        const { left: startIndex } = binarySearch(raw1mTimesRef.current, previewTime)
+
+        replayStore.start(startIndex, raw1mCandlesRef.current, timeframe.toSeconds())
 
         clearPreview()
 
@@ -227,9 +215,7 @@ function Chart({ id, ticker, timeframe }: Props) {
             seconds: timeframe.toSeconds(),
         })
 
-        eventBus.emit('replayStart', {
-            time: previewTime,
-        })
+        eventBus.emit('replayStart')
     }
 
     const showReplayOverlay = replayStore.showToolbar && replayStore.isSelecting && previewX !== null
