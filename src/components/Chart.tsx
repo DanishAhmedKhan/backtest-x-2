@@ -165,6 +165,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useDrawingTools({
         chartRef,
+        seriesRef,
         containerRef,
         drawingContextRef,
     })

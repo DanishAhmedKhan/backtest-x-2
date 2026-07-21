@@ -1,11 +1,7 @@
+import type { ChartPoint } from './ChartPoint'
+
 export interface ChartPointerEvent {
-    x: number
-
-    y: number
-
-    time?: number
-
-    price?: number
+    point: ChartPoint
 
     shiftKey: boolean
 
