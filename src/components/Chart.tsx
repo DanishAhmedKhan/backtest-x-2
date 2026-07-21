@@ -19,7 +19,7 @@ import { useJumpTo } from '../hooks/charts/useJumpTo'
 import { useOHLCOverlay } from '../hooks/charts/useOHLCOverlay'
 import { useDrawingTools } from '../hooks/charts/useDrawingTool'
 
-import { DrawingContext } from '../drawing/drawings/DrawingContext'
+import { DrawingContext } from '../drawing/DrawingContext'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -165,6 +165,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useDrawingTools({
         chartRef,
+        containerRef,
         drawingContextRef,
     })
 

@@ -8,13 +8,13 @@ export interface Tool {
 
     deactivate(): void
 
-    mouseDown(event: ChartPointerEvent): void
+    handlePointerDown(event: ChartPointerEvent): void
 
-    mouseMove(event: ChartPointerEvent): void
+    handlePointerMove(event: ChartPointerEvent): void
 
-    mouseUp(event: ChartPointerEvent): void
+    handlePointerUp(event: ChartPointerEvent): void
 
-    mouseLeave(): void
+    handlePointerLeave(): void
 
     cancel(): void
 }

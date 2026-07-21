@@ -25,19 +25,19 @@ export class ToolManager {
     }
 
     public handlePointerDown(event: ChartPointerEvent) {
-        this.currentTool?.mouseDown(event)
+        this.currentTool?.handlePointerDown(event)
     }
 
     public handlePointerMove(event: ChartPointerEvent) {
-        this.currentTool?.mouseMove(event)
+        this.currentTool?.handlePointerMove(event)
     }
 
     public handlePointerUp(event: ChartPointerEvent) {
-        this.currentTool?.mouseUp(event)
+        this.currentTool?.handlePointerUp(event)
     }
 
     public handlePointerLeave() {
-        this.currentTool?.mouseLeave()
+        this.currentTool?.handlePointerLeave()
     }
 
     public cancel() {
