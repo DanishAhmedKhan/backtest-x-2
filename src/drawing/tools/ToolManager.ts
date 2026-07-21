@@ -24,19 +24,19 @@ export class ToolManager {
         this.setTool(null)
     }
 
-    public mouseDown(event: ChartPointerEvent) {
+    public handlePointerDown(event: ChartPointerEvent) {
         this.currentTool?.mouseDown(event)
     }
 
-    public mouseMove(event: ChartPointerEvent) {
+    public handlePointerMove(event: ChartPointerEvent) {
         this.currentTool?.mouseMove(event)
     }
 
-    public mouseUp(event: ChartPointerEvent) {
+    public handlePointerUp(event: ChartPointerEvent) {
         this.currentTool?.mouseUp(event)
     }
 
-    public mouseLeave() {
+    public handlePointerLeave() {
         this.currentTool?.mouseLeave()
     }
 
