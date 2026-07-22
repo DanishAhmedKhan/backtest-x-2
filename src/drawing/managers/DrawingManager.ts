@@ -1,35 +1,54 @@
 import type { Drawing } from '../drawings/Drawing'
-import type { RendererManager } from '../renderer/RendererManager'
+
+type Listener = () => void
 
 export class DrawingManager {
     private readonly drawings = new Map<string, Drawing>()
 
-    private rendererManager: RendererManager | null = null
+    private readonly listeners = new Set<Listener>()
 
-    public setRendererManager(rendererManager: RendererManager) {
-        this.rendererManager = rendererManager
+    private notify() {
+        for (const listener of this.listeners) {
+            listener()
+        }
+    }
+
+    public subscribe(listener: Listener) {
+        this.listeners.add(listener)
+
+        return () => {
+            this.listeners.delete(listener)
+        }
     }
 
     public addDrawing(drawing: Drawing) {
         this.drawings.set(drawing.id, drawing)
-        this.rendererManager?.render(drawing)
+
+        this.notify()
     }
 
     public removeDrawing(id: string) {
         const drawing = this.drawings.get(id)
-        if (!drawing) return
 
-        this.rendererManager?.destroy(drawing)
+        if (!drawing) {
+            return
+        }
+
         drawing.destroy()
+
         this.drawings.delete(id)
+
+        this.notify()
     }
 
-    public clear() {
+    public clearDrawing() {
         for (const drawing of this.drawings.values()) {
             drawing.destroy()
         }
 
         this.drawings.clear()
+
+        this.notify()
     }
 
     public getDrawing(id: string) {

@@ -25,8 +25,8 @@ export function useDrawingCanvas({ canvasRef, containerRef }: Params) {
                 return
             }
 
-            // ctx.fillStyle = 'red'
-            // ctx.fillRect(20, 20, 120, 80)
+            ctx.fillStyle = 'red'
+            ctx.fillRect(20, 20, 120, 80)
         }
 
         resize()

@@ -25,6 +25,9 @@ import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 import { DrawingContext } from '../drawing/DrawingContext'
 import { PointerController } from '../drawing/input/PointerController'
 import { ToolController } from '../drawing/ToolController'
+import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer'
+import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
+import { RenderScheduler } from '../drawing/renderer/RenderScheduler'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -78,6 +81,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const drawingContextRef = useRef(new DrawingContext())
     const pointerControllerRef = useRef<PointerController | null>(null)
     const toolControllerRef = useRef<ToolController | null>(null)
+    const drawingCanvasRendererRef = useRef<DrawingCanvasRenderer | null>(null)
+    const renderSchedulerRef = useRef<RenderScheduler | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -175,6 +180,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         chartRef,
         containerRef,
         pointerControllerRef,
+        renderSchedulerRef,
     })
 
     useToolSync({
@@ -215,8 +221,9 @@ function Chart({ id, ticker, timeframe }: Props) {
     useEffect(() => {
         const chart = chartRef.current
         const series = seriesRef.current
+        const canvas = drawingCanvasRef.current
 
-        if (!chart || !series) {
+        if (!chart || !series || !canvas) {
             return
         }
 
@@ -224,10 +231,65 @@ function Chart({ id, ticker, timeframe }: Props) {
             return
         }
 
-        pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, chart, series)
+        const transformer = new CoordinateTransformer(chart, series)
+
+        pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, transformer)
 
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager)
-    }, [chartReady, chartRef, seriesRef])
+
+        drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
+            drawingContextRef.current.drawingManager,
+            drawingContextRef.current.previewDrawingManager,
+            drawingContextRef.current.rendererManager,
+            canvas,
+            chart,
+            series,
+        )
+
+        renderSchedulerRef.current = new RenderScheduler(() => {
+            drawingCanvasRendererRef.current?.render()
+        })
+
+        const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribe(() => {
+            renderSchedulerRef.current?.invalidate()
+        })
+
+        const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribe(() => {
+            renderSchedulerRef.current?.invalidate()
+        })
+
+        renderSchedulerRef.current.invalidate()
+
+        return () => {
+            unsubscribeDrawings()
+            unsubscribePreview()
+
+            pointerControllerRef.current = null
+            toolControllerRef.current = null
+            drawingCanvasRendererRef.current = null
+            renderSchedulerRef.current = null
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chartReady])
+
+    useEffect(() => {
+        const chart = chartRef.current
+
+        if (!chart) {
+            return
+        }
+
+        const invalidate = () => {
+            renderSchedulerRef.current?.invalidate()
+        }
+
+        chart.timeScale().subscribeVisibleLogicalRangeChange(invalidate)
+
+        return () => {
+            chart.timeScale().unsubscribeVisibleLogicalRangeChange(invalidate)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chartReady])
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return

@@ -1,15 +1,10 @@
-import type { IChartApi, ISeriesApi } from 'lightweight-charts'
-
-import { ToolManager } from '../tools/ToolManager'
-import type { RawPointerEvent } from '../models/RawPointerEvent'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
+import type { RawPointerEvent } from '../models/RawPointerEvent'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
+import { ToolManager } from '../tools/ToolManager'
 
 export class PointerController {
-    constructor(
-        private readonly toolManager: ToolManager,
-        private readonly chart: IChartApi,
-        private readonly series: ISeriesApi<'Candlestick'>,
-    ) {}
+    constructor(private readonly toolManager: ToolManager, private readonly transformer: CoordinateTransformer) {}
 
     public handlePointerDown(event: RawPointerEvent) {
         const converted = this.convert(event)
@@ -50,23 +45,18 @@ export class PointerController {
     }
 
     private convert(event: RawPointerEvent): ChartPointerEvent | null {
-        const time = event.time ?? this.chart.timeScale().coordinateToTime(event.x)
+        const point = this.transformer.toDomain(event.x, event.y)
 
-        const price = this.series.coordinateToPrice(event.y)
-
-        if (typeof time !== 'number') {
-            return null
-        }
-
-        if (price == null) {
+        if (!point) {
             return null
         }
 
         return {
-            point: {
-                time,
-                price,
+            screen: {
+                x: event.x,
+                y: event.y,
             },
+            point,
             shiftKey: event.shiftKey,
             ctrlKey: event.ctrlKey,
             altKey: event.altKey,

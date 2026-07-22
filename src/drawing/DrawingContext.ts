@@ -4,6 +4,7 @@ import { RendererManager } from './renderer/RendererManager'
 
 import { ToolType } from './tools/ToolType'
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
+import { PreviewDrawingManager } from './PreviewDrawingManager'
 
 import { registerTools } from './utils/registerTools'
 
@@ -14,9 +15,9 @@ export class DrawingContext {
 
     public readonly toolManager = new ToolManager()
 
-    public initialize() {
-        this.drawingManager.setRendererManager(this.rendererManager)
+    public readonly previewDrawingManager = new PreviewDrawingManager()
 
+    public initialize() {
         this.rendererManager.register(new TrendLineRenderer())
 
         registerTools(this.toolManager, this.drawingManager)

@@ -1,4 +1,5 @@
 import type { Drawing } from '../drawings/Drawing'
+import type { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderer } from './DrawingRenderer'
 
 export class RendererManager {
@@ -8,10 +9,10 @@ export class RendererManager {
         this.renderers.push(renderer)
     }
 
-    public render(drawing: Drawing) {
+    public render(drawing: Drawing, ctx: CanvasRenderingContext2D, transformer: CoordinateTransformer) {
         for (const renderer of this.renderers) {
             if (renderer.canRender(drawing)) {
-                renderer.render(drawing)
+                renderer.render(drawing, ctx, transformer)
 
                 return
             }

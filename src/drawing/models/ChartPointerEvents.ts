@@ -1,11 +1,14 @@
 import type { ChartPoint } from './ChartPoint'
 
-export interface ChartPointerEvent {
+export type ChartPointerEvent = {
+    screen: {
+        x: number
+        y: number
+    }
+
     point: ChartPoint
 
     shiftKey: boolean
-
     ctrlKey: boolean
-
     altKey: boolean
 }
