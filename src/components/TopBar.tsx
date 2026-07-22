@@ -15,7 +15,7 @@ type Props = {
     onJumpToClick: () => void
 }
 
-export default function TopBar({
+export default function Topbar({
     ticker,
     timeframe,
     layout,

@@ -1,33 +1,26 @@
-import type { IChartApi, ISeriesApi } from 'lightweight-charts'
-
-import { DrawingManager } from './managers/DrawingManager'
 import { ToolManager } from './tools/ToolManager'
-import { PointerController } from './input/PointerController'
+import { DrawingManager } from './managers/DrawingManager'
+import { RendererManager } from './renderer/RendererManager'
 
-import { PanTool } from './drawings/PanTool'
+import { ToolType } from './tools/ToolType'
+import { TrendLineRenderer } from './renderer/TrendLineRenderer'
+
+import { registerTools } from './utils/registerTools'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
 
+    public readonly rendererManager = new RendererManager()
+
     public readonly toolManager = new ToolManager()
 
-    private inputController: PointerController | null = null
+    public initialize() {
+        this.drawingManager.setRendererManager(this.rendererManager)
 
-    public readonly panTool = new PanTool(this.drawingManager)
+        this.rendererManager.register(new TrendLineRenderer())
 
-    constructor() {
-        this.toolManager.setTool(this.panTool)
-    }
+        registerTools(this.toolManager, this.drawingManager)
 
-    public initialize(chart: IChartApi, series: ISeriesApi<'Candlestick'>) {
-        this.inputController = new PointerController(this.toolManager, chart, series)
-    }
-
-    public getInputController() {
-        if (!this.inputController) {
-            throw new Error('DrawingContext not initialized.')
-        }
-
-        return this.inputController
+        this.toolManager.selectByType(ToolType.Pan)
     }
 }

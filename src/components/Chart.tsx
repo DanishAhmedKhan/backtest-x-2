@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, memo } from 'react'
 import type { CandlestickData, Time } from 'lightweight-charts'
 
 import ReplayOverlay from './ReplayOverlay'
+import DrawingCanvas from './DrawingCanvas'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -18,8 +19,12 @@ import { useReplaySync } from '../hooks/charts/useReplaySync'
 import { useJumpTo } from '../hooks/charts/useJumpTo'
 import { useOHLCOverlay } from '../hooks/charts/useOHLCOverlay'
 import { useDrawingTools } from '../hooks/charts/useDrawingTool'
+import { useToolSync } from '../hooks/drawings/useToolSync'
+import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 
 import { DrawingContext } from '../drawing/DrawingContext'
+import { PointerController } from '../drawing/input/PointerController'
+import { ToolController } from '../drawing/ToolController'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -38,6 +43,7 @@ type Props = {
 
 function Chart({ id, ticker, timeframe }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
+    const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
     const raw1mCandlesRef = useRef<Candle[]>([])
@@ -70,6 +76,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const isLoadingDataRef = useRef(false)
 
     const drawingContextRef = useRef(new DrawingContext())
+    const pointerControllerRef = useRef<PointerController | null>(null)
+    const toolControllerRef = useRef<ToolController | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -165,9 +173,17 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useDrawingTools({
         chartRef,
-        seriesRef,
         containerRef,
-        drawingContextRef,
+        pointerControllerRef,
+    })
+
+    useToolSync({
+        controllerRef: toolControllerRef,
+    })
+
+    useDrawingCanvas({
+        canvasRef: drawingCanvasRef,
+        containerRef,
     })
 
     useEffect(() => {
@@ -195,6 +211,23 @@ function Chart({ id, ticker, timeframe }: Props) {
             window.removeEventListener('mouseup', handleMouseUp)
         }
     }, [])
+
+    useEffect(() => {
+        const chart = chartRef.current
+        const series = seriesRef.current
+
+        if (!chart || !series) {
+            return
+        }
+
+        if (pointerControllerRef.current) {
+            return
+        }
+
+        pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, chart, series)
+
+        toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager)
+    }, [chartReady, chartRef, seriesRef])
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
@@ -259,6 +292,8 @@ function Chart({ id, ticker, timeframe }: Props) {
                 onClick={handleReplaySelection}
                 style={{ width: '100%', height: '100%' }}
             />
+
+            <DrawingCanvas ref={drawingCanvasRef} />
 
             {showReplayOverlay && <ReplayOverlay x={previewX} />}
         </div>

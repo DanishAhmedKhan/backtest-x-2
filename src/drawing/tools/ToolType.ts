@@ -1,7 +1,7 @@
 export enum ToolType {
     Pan = 'pan',
 
-    TrendLine = 'trendLine',
+    TrendLine = 'trend-line',
 
     Rectangle = 'rectangle',
 }

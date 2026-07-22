@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import TopBar from './TopBar'
+
+import Topbar from './TopBar'
 import ChartWindow from './ChartWindow'
-import ToolBar from './ToolBar'
+import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
 import JumpToDialog from './JumpToDialog'
 
@@ -126,7 +127,7 @@ export default function Main() {
             }}
         >
             <div style={{ gridColumn: '1 / span 2' }}>
-                <TopBar
+                <Topbar
                     ticker={activeChart.ticker}
                     timeframe={activeChart.timeframe}
                     layout={layout}
@@ -154,7 +155,7 @@ export default function Main() {
                 />
             </div>
 
-            <ToolBar />
+            <DrawingToolbar />
 
             <ChartWindow
                 charts={charts}

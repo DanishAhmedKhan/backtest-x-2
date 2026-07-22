@@ -1,21 +1,26 @@
 import type { Drawing } from '../drawings/Drawing'
+import type { RendererManager } from '../renderer/RendererManager'
 
 export class DrawingManager {
     private readonly drawings = new Map<string, Drawing>()
 
-    public add(drawing: Drawing) {
-        this.drawings.set(drawing.id, drawing)
+    private rendererManager: RendererManager | null = null
+
+    public setRendererManager(rendererManager: RendererManager) {
+        this.rendererManager = rendererManager
     }
 
-    public remove(id: string) {
+    public addDrawing(drawing: Drawing) {
+        this.drawings.set(drawing.id, drawing)
+        this.rendererManager?.render(drawing)
+    }
+
+    public removeDrawing(id: string) {
         const drawing = this.drawings.get(id)
+        if (!drawing) return
 
-        if (!drawing) {
-            return
-        }
-
+        this.rendererManager?.destroy(drawing)
         drawing.destroy()
-
         this.drawings.delete(id)
     }
 
@@ -27,11 +32,11 @@ export class DrawingManager {
         this.drawings.clear()
     }
 
-    public get(id: string) {
+    public getDrawing(id: string) {
         return this.drawings.get(id)
     }
 
-    public getAll() {
+    public getDrawings() {
         return [...this.drawings.values()]
     }
 

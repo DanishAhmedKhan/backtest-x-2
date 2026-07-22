@@ -1,3 +1,5 @@
+import type { ToolType } from '../drawing/tools/ToolType'
+
 type EventMap = {
     crosshairMove: {
         time: number | null
@@ -29,6 +31,10 @@ type EventMap = {
     }
 
     chartDragEnded: void
+
+    toolChanged: {
+        tool: ToolType
+    }
 }
 
 type EventKey = keyof EventMap

@@ -1,27 +1,27 @@
 import { useEffect } from 'react'
-import type { MouseEventParams, Time, IChartApi, ISeriesApi } from 'lightweight-charts'
+import type { MouseEventParams, Time, IChartApi } from 'lightweight-charts'
 
-import { DrawingContext } from '../../drawing/DrawingContext'
+import type { PointerController } from '../../drawing/input/PointerController'
 import type { RawPointerEvent } from '../../drawing/models/RawPointerEvent'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
-    seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
+
     containerRef: React.RefObject<HTMLDivElement | null>
-    drawingContextRef: React.RefObject<DrawingContext>
+
+    pointerControllerRef: React.RefObject<PointerController | null>
 }
 
-export function useDrawingTools({ chartRef, seriesRef, containerRef, drawingContextRef }: Params) {
+export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }: Params) {
     useEffect(() => {
         const chart = chartRef.current
-        const series = seriesRef.current
-
-        if (!chart || !series) return
+        if (!chart) return
 
         const container = containerRef.current
         if (!container) return
 
-        drawingContextRef.current.initialize(chart, series)
+        const pointerController = pointerControllerRef.current
+        if (!pointerController) return
 
         const createRawPointerEvent = (
             x: number,
@@ -40,34 +40,28 @@ export function useDrawingTools({ chartRef, seriesRef, containerRef, drawingCont
         })
 
         const handlePointerMove = (param: MouseEventParams<Time>) => {
-            drawingContextRef.current
-                .getInputController()
-                .handlePointerMove(
-                    createRawPointerEvent(
-                        param.point?.x ?? 0,
-                        param.point?.y ?? 0,
-                        typeof param.time === 'number' ? param.time : undefined,
-                        false,
-                        false,
-                        false,
-                    ),
-                )
+            pointerController.handlePointerMove(
+                createRawPointerEvent(
+                    param.point?.x ?? 0,
+                    param.point?.y ?? 0,
+                    typeof param.time === 'number' ? param.time : undefined,
+                    false,
+                    false,
+                    false,
+                ),
+            )
         }
 
         const handlePointerDown = (e: PointerEvent) => {
-            drawingContextRef.current
-                .getInputController()
-                .handlePointerDown(
-                    createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
-                )
+            pointerController.handlePointerDown(
+                createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
+            )
         }
 
         const handlePointerUp = (e: PointerEvent) => {
-            drawingContextRef.current
-                .getInputController()
-                .handlePointerUp(
-                    createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
-                )
+            pointerController.handlePointerUp(
+                createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
+            )
         }
 
         chart.subscribeCrosshairMove(handlePointerMove)
@@ -79,5 +73,5 @@ export function useDrawingTools({ chartRef, seriesRef, containerRef, drawingCont
             container.removeEventListener('pointerdown', handlePointerDown)
             window.removeEventListener('pointerup', handlePointerUp)
         }
-    }, [chartRef, seriesRef, containerRef, drawingContextRef])
+    }, [chartRef, containerRef, pointerControllerRef])
 }
