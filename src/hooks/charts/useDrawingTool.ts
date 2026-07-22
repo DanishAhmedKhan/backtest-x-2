@@ -1,17 +1,15 @@
 import { useEffect } from 'react'
 import type { IChartApi, MouseEventParams, Time } from 'lightweight-charts'
 import type { PointerController } from '../../drawing/input/PointerController'
-import type { RenderScheduler } from '../../drawing/renderer/RenderScheduler'
 import type { RawPointerEvent } from '../../drawing/models/RawPointerEvent'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
     containerRef: React.RefObject<HTMLDivElement | null>
     pointerControllerRef: React.RefObject<PointerController | null>
-    renderSchedulerRef: React.RefObject<RenderScheduler | null>
 }
 
-export function useDrawingTools({ chartRef, containerRef, pointerControllerRef, renderSchedulerRef }: Params) {
+export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }: Params) {
     useEffect(() => {
         const chart = chartRef.current
 
@@ -47,10 +45,6 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef, 
             altKey,
         })
 
-        const invalidate = () => {
-            renderSchedulerRef.current?.invalidate()
-        }
-
         const handlePointerMove = (param: MouseEventParams<Time>) => {
             pointerController.handlePointerMove(
                 createRawPointerEvent(
@@ -62,24 +56,18 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef, 
                     false,
                 ),
             )
-
-            invalidate()
         }
 
         const handlePointerDown = (e: PointerEvent) => {
             pointerController.handlePointerDown(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
-
-            invalidate()
         }
 
         const handlePointerUp = (e: PointerEvent) => {
             pointerController.handlePointerUp(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
-
-            invalidate()
         }
 
         chart.subscribeCrosshairMove(handlePointerMove)
@@ -91,5 +79,5 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef, 
             container.removeEventListener('pointerdown', handlePointerDown)
             window.removeEventListener('pointerup', handlePointerUp)
         }
-    }, [chartRef, containerRef, pointerControllerRef, renderSchedulerRef])
+    }, [chartRef, containerRef, pointerControllerRef])
 }

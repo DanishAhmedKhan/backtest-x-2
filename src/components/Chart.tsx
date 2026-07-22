@@ -180,7 +180,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         chartRef,
         containerRef,
         pointerControllerRef,
-        renderSchedulerRef,
     })
 
     useToolSync({
@@ -250,11 +249,11 @@ function Chart({ id, ticker, timeframe }: Props) {
             drawingCanvasRendererRef.current?.render()
         })
 
-        const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribe(() => {
+        const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
             renderSchedulerRef.current?.invalidate()
         })
 
-        const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribe(() => {
+        const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
             renderSchedulerRef.current?.invalidate()
         })
 

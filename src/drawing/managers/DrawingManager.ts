@@ -13,7 +13,7 @@ export class DrawingManager {
         }
     }
 
-    public subscribe(listener: Listener) {
+    public subscribeChanged(listener: Listener) {
         this.listeners.add(listener)
 
         return () => {
