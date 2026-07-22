@@ -1,48 +1,61 @@
-import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
-import type { DrawingManager } from '../managers/DrawingManager'
-import type { ChartPoint } from '../models/ChartPoint'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-import type { Tool } from '../tools/Tool'
-import { ToolType } from '../tools/ToolType'
+import type { Tool } from './Tool'
+import { ToolType } from './ToolType'
+import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+import { PreviewDrawingManager } from '../PreviewDrawingManager'
+import type { DrawingManager } from '../managers/DrawingManager'
 
 export class TrendLineTool implements Tool {
     public readonly type = ToolType.TrendLine
 
-    private startPoint: ChartPoint | null = null
+    private preview: TrendLineDrawing | null = null
 
-    constructor(private readonly drawingManager: DrawingManager) {}
+    constructor(
+        private readonly drawingManager: DrawingManager,
+        private readonly previewDrawingManager: PreviewDrawingManager,
+    ) {}
 
-    public activate(): void {}
+    public activate() {}
 
-    public deactivate(): void {
-        this.startPoint = null
+    public deactivate() {
+        this.cancel()
     }
 
-    public handlePointerDown(event: ChartPointerEvent): void {
-        if (!this.startPoint) {
-            this.startPoint = event.point
+    public handlePointerDown(event: ChartPointerEvent) {
+        if (!this.preview) {
+            this.preview = new TrendLineDrawing(event.point, event.point)
 
-            console.log('Trend line start', event.point)
+            this.previewDrawingManager.set(this.preview)
 
             return
         }
 
-        const drawing = new TrendLineDrawing(crypto.randomUUID(), this.startPoint, event.point)
+        this.preview.end = event.point
 
-        this.drawingManager.addDrawing(drawing)
+        this.drawingManager.addDrawing(this.preview)
 
-        console.log('Trend line finished', drawing)
+        this.previewDrawingManager.clear()
 
-        this.startPoint = null
+        this.preview = null
     }
 
-    public handlePointerMove(_event: ChartPointerEvent): void {}
+    public handlePointerMove(event: ChartPointerEvent) {
+        if (!this.preview) {
+            return
+        }
 
-    public handlePointerUp(_event: ChartPointerEvent): void {}
+        this.preview.end = event.point
 
-    public handlePointerLeave(): void {}
+        this.previewDrawingManager.set(this.preview)
+    }
 
-    public cancel(): void {
-        this.startPoint = null
+    public handlePointerUp() {}
+
+    public handlePointerLeave() {}
+
+    public cancel() {
+        this.preview = null
+
+        this.previewDrawingManager.clear()
     }
 }

@@ -20,7 +20,7 @@ export class DrawingContext {
     public initialize() {
         this.rendererManager.register(new TrendLineRenderer())
 
-        registerTools(this.toolManager, this.drawingManager)
+        registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager)
 
         this.toolManager.selectByType(ToolType.Pan)
     }

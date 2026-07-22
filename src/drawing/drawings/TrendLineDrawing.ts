@@ -1,17 +1,13 @@
 import type { Drawing } from './Drawing'
+import { DrawingType } from '../DrawingType'
+import type { ChartPoint } from '../models/ChartPoint'
 
 export class TrendLineDrawing implements Drawing {
-    constructor(
-        public readonly id: string,
+    public readonly id = crypto.randomUUID()
 
-        public startTime: number,
+    public readonly type = DrawingType.TrendLine
 
-        public startPrice: number,
-
-        public endTime: number,
-
-        public endPrice: number,
-    ) {}
+    constructor(public start: ChartPoint, public end: ChartPoint) {}
 
     public destroy() {}
 }

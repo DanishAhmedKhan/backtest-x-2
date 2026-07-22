@@ -1,17 +1,18 @@
 import type { Drawing } from '../drawings/Drawing'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
-
+import { DrawingType } from '../DrawingType'
+import { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderer } from './DrawingRenderer'
 
 export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
     public canRender(drawing: Drawing): drawing is TrendLineDrawing {
-        return drawing.constructor === TrendLineDrawing
+        return drawing.type === DrawingType.TrendLine
     }
 
     public render(drawing: TrendLineDrawing, ctx: CanvasRenderingContext2D, transformer: CoordinateTransformer) {
-        const start = transformer.toPoint(drawing.startTime, drawing.startPrice)
+        const start = transformer.toPoint(drawing.start.time, drawing.start.price)
 
-        const end = transformer.toPoint(drawing.endTime, drawing.endPrice)
+        const end = transformer.toPoint(drawing.end.time, drawing.end.price)
 
         if (!start || !end) {
             return
@@ -29,7 +30,5 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         ctx.stroke()
     }
 
-    public destroy(drawing: TrendLineDrawing): void {
-        console.log('Destroy trend line', drawing.id)
-    }
+    public destroy(_drawing: TrendLineDrawing) {}
 }
