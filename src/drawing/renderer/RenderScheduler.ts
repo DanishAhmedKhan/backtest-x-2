@@ -1,4 +1,4 @@
-export class RenderScheduler {
+export class RenderScheduler1 {
     private scheduled = false
 
     constructor(private readonly render: () => void) {}

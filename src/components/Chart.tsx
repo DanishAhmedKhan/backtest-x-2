@@ -27,7 +27,8 @@ import { PointerController } from '../drawing/input/PointerController'
 import { ToolController } from '../drawing/ToolController'
 import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer'
 import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
-import { RenderScheduler } from '../drawing/renderer/RenderScheduler'
+import { RenderLoop } from '../drawing/renderer/RenderLoop'
+import { ChartSnapshot } from '../drawing/renderer/ChartSnapshot'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -83,7 +84,8 @@ function Chart({ id, ticker, timeframe }: Props) {
     const pointerControllerRef = useRef<PointerController | null>(null)
     const toolControllerRef = useRef<ToolController | null>(null)
     const drawingCanvasRendererRef = useRef<DrawingCanvasRenderer | null>(null)
-    const renderSchedulerRef = useRef<RenderScheduler | null>(null)
+    // const renderSchedulerRef = useRef<RenderScheduler | null>(null)
+    const renderLoopRef = useRef<RenderLoop | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -216,12 +218,17 @@ function Chart({ id, ticker, timeframe }: Props) {
         const chart = chartRef.current
         const series = seriesRef.current
         const canvas = drawingCanvasRef.current
+        const container = containerRef.current
 
         if (!chart || !series || !canvas) {
             return
         }
 
         if (pointerControllerRef.current) {
+            return
+        }
+
+        if (!container) {
             return
         }
 
@@ -242,47 +249,49 @@ function Chart({ id, ticker, timeframe }: Props) {
             series,
         )
 
-        renderSchedulerRef.current = new RenderScheduler(() => {
+        // renderSchedulerRef.current = new RenderScheduler(() => {
+        //     drawingCanvasRendererRef.current?.render()
+        // })
+
+        const snapshot = new ChartSnapshot(chart, series, container)
+
+        renderLoopRef.current = new RenderLoop(snapshot, () => {
             drawingCanvasRendererRef.current?.render()
         })
 
+        renderLoopRef.current.start()
+
+        // const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
+        //     renderSchedulerRef.current?.invalidate()
+        // })
+
+        // const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
+        //     renderSchedulerRef.current?.invalidate()
+        // })
+
         const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
-            renderSchedulerRef.current?.invalidate()
+            renderLoopRef.current?.invalidate()
         })
 
         const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
-            renderSchedulerRef.current?.invalidate()
+            renderLoopRef.current?.invalidate()
         })
 
-        renderSchedulerRef.current.invalidate()
+        // renderSchedulerRef.current.invalidate()
+        renderLoopRef.current?.stop()
 
         return () => {
+            // unsubscribeDrawings()
+            // unsubscribePreview()
+
             unsubscribeDrawings()
             unsubscribePreview()
 
             pointerControllerRef.current = null
             toolControllerRef.current = null
             drawingCanvasRendererRef.current = null
-            renderSchedulerRef.current = null
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chartReady])
-
-    useEffect(() => {
-        const chart = chartRef.current
-
-        if (!chart) {
-            return
-        }
-
-        const invalidate = () => {
-            renderSchedulerRef.current?.invalidate()
-        }
-
-        chart.timeScale().subscribeVisibleLogicalRangeChange(invalidate)
-
-        return () => {
-            chart.timeScale().unsubscribeVisibleLogicalRangeChange(invalidate)
+            // renderSchedulerRef.current = null
+            renderLoopRef.current = null
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chartReady])
