@@ -17,7 +17,11 @@ export class DrawingContext {
 
     public readonly previewDrawingManager = new PreviewDrawingManager()
 
-    public initialize() {
+    constructor() {
+        this.initialize()
+    }
+
+    private initialize() {
         this.rendererManager.register(new TrendLineRenderer())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager)

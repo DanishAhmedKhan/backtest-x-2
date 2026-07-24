@@ -37,6 +37,7 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import ChartOHLC from './ChartOHLC'
 import { binarySearch } from '../helper/binarySearch'
+import { ToolType } from '../drawing/tools/ToolType'
 
 type Props = {
     id: string
@@ -176,12 +177,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         viewportRef,
     })
 
-    useDrawingTools({
-        chartRef,
-        containerRef,
-        pointerControllerRef,
-    })
-
     useToolSync({
         controllerRef: toolControllerRef,
     })
@@ -236,6 +231,8 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager)
 
+        toolControllerRef.current.setTool(ToolType.TrendLine)
+
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
             drawingContextRef.current.drawingManager,
             drawingContextRef.current.previewDrawingManager,
@@ -289,6 +286,12 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chartReady])
+
+    useDrawingTools({
+        chartRef,
+        containerRef,
+        pointerControllerRef,
+    })
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return

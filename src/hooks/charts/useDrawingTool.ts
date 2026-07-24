@@ -12,19 +12,16 @@ type Params = {
 export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }: Params) {
     useEffect(() => {
         const chart = chartRef.current
-
         if (!chart) {
             return
         }
 
         const container = containerRef.current
-
         if (!container) {
             return
         }
 
         const pointerController = pointerControllerRef.current
-
         if (!pointerController) {
             return
         }

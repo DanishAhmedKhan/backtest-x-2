@@ -1,14 +1,14 @@
 import type { IChartApi, ISeriesApi } from 'lightweight-charts'
 
-import type { DrawingManager } from '../managers/DrawingManager'
-import type { PreviewDrawingManager } from '../PreviewDrawingManager'
 import { CoordinateTransformer } from './CoordinateTransformer'
-import type { RendererManager } from './RendererManager'
+import { PreviewDrawingManager } from '../PreviewDrawingManager'
+import { RendererManager } from './RendererManager'
+import type { DrawingManager } from '../managers/DrawingManager'
 
 export class DrawingCanvasRenderer {
-    private readonly transformer: CoordinateTransformer
-
     private readonly ctx: CanvasRenderingContext2D
+
+    private readonly transformer: CoordinateTransformer
 
     constructor(
         private readonly drawingManager: DrawingManager,
@@ -18,15 +18,15 @@ export class DrawingCanvasRenderer {
         chart: IChartApi,
         series: ISeriesApi<'Candlestick'>,
     ) {
-        this.transformer = new CoordinateTransformer(chart, series)
-
         const ctx = canvas.getContext('2d')
 
         if (!ctx) {
-            throw new Error('Unable to get 2D drawing context.')
+            throw new Error('Unable to get drawing context.')
         }
 
         this.ctx = ctx
+
+        this.transformer = new CoordinateTransformer(chart, series)
     }
 
     public render() {
