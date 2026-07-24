@@ -50,6 +50,10 @@ export class ToolManager {
         this.currentTool?.handlePointerLeave()
     }
 
+    public allowsViewportInteraction(): boolean {
+        return this.currentTool?.allowsViewportInteraction ?? true
+    }
+
     public cancel() {
         this.currentTool?.cancel()
     }

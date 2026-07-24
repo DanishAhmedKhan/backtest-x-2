@@ -6,6 +6,8 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 export class PanTool implements Tool {
     public readonly type = ToolType.Pan
 
+    public readonly allowsViewportInteraction = true
+
     constructor(protected readonly drawingManager: DrawingManager) {}
 
     public activate(): void {

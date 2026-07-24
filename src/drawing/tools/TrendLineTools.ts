@@ -4,9 +4,12 @@ import { ToolType } from './ToolType'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingManager } from '../managers/DrawingManager'
+import { eventBus } from '../../event/EventBus'
 
 export class TrendLineTool implements Tool {
     public readonly type = ToolType.TrendLine
+
+    public readonly allowsViewportInteraction = false
 
     private preview: TrendLineDrawing | null = null
 
@@ -37,6 +40,8 @@ export class TrendLineTool implements Tool {
         this.previewDrawingManager.clear()
 
         this.preview = null
+
+        eventBus.emit('drawingCompleted')
     }
 
     public handlePointerMove(event: ChartPointerEvent) {

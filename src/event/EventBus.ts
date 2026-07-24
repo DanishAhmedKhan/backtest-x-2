@@ -35,6 +35,8 @@ type EventMap = {
     toolChanged: {
         tool: ToolType
     }
+
+    drawingCompleted: void
 }
 
 type EventKey = keyof EventMap

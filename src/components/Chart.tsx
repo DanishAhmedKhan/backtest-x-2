@@ -229,9 +229,9 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, transformer)
 
-        toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager)
+        toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
 
-        toolControllerRef.current.setTool(ToolType.TrendLine)
+        toolControllerRef.current.setTool(drawingContextRef.current.toolManager.getCurrentTool()!.type)
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
             drawingContextRef.current.drawingManager,
@@ -286,6 +286,14 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chartReady])
+
+    useEffect(() => {
+        const unsubscribe = eventBus.on('drawingCompleted', () => {
+            toolControllerRef.current?.setTool(ToolType.Pan)
+        })
+
+        return unsubscribe
+    }, [])
 
     useDrawingTools({
         chartRef,
@@ -348,6 +356,10 @@ function Chart({ id, ticker, timeframe }: Props) {
                     }, 150)
                 }}
                 onMouseDown={() => {
+                    if (!toolControllerRef.current?.allowsViewportInteraction()) {
+                        return
+                    }
+
                     isDraggingRef.current = true
                     isViewportInteractionRef.current = true
                 }}

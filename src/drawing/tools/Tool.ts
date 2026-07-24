@@ -4,6 +4,8 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 export interface Tool {
     readonly type: ToolType
 
+    readonly allowsViewportInteraction: boolean
+
     activate(): void
 
     deactivate(): void

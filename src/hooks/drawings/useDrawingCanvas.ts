@@ -24,9 +24,6 @@ export function useDrawingCanvas({ canvasRef, containerRef }: Params) {
             if (!ctx) {
                 return
             }
-
-            ctx.fillStyle = 'red'
-            ctx.fillRect(20, 20, 120, 80)
         }
 
         resize()
