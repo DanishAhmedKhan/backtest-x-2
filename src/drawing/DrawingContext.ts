@@ -5,6 +5,7 @@ import { RendererManager } from './renderer/RendererManager'
 import { ToolType } from './tools/ToolType'
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { PreviewDrawingManager } from './PreviewDrawingManager'
+import { DrawingStateManager } from './managers/DrawingStateManager'
 
 import { registerTools } from './utils/registerTools'
 
@@ -17,6 +18,8 @@ export class DrawingContext {
 
     public readonly previewDrawingManager = new PreviewDrawingManager()
 
+    public readonly drawingStateManager = new DrawingStateManager()
+
     constructor() {
         this.initialize()
     }
@@ -26,7 +29,7 @@ export class DrawingContext {
 
         this.rendererManager.register(new TrendLineRenderer())
 
-        registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager)
+        registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 
         this.toolManager.selectByType(ToolType.Pan)
     }

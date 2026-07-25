@@ -4,13 +4,15 @@ import type { DrawingManager } from '../managers/DrawingManager'
 import { PanTool } from '../drawings/PanTool'
 import { TrendLineTool } from '../tools/TrendLineTools'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
+import type { DrawingStateManager } from '../managers/DrawingStateManager'
 
 export function registerTools(
     toolManager: ToolManager,
     drawingManager: DrawingManager,
     previewDrawingManager: PreviewDrawingManager,
+    drawingStateManager: DrawingStateManager,
 ) {
     toolManager.register(new PanTool(drawingManager))
 
-    toolManager.register(new TrendLineTool(drawingManager, previewDrawingManager))
+    toolManager.register(new TrendLineTool(drawingManager, previewDrawingManager, drawingStateManager))
 }

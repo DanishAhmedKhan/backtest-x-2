@@ -240,6 +240,7 @@ function Chart({ id, ticker, timeframe }: Props) {
             drawingContextRef.current.drawingManager,
             drawingContextRef.current.previewDrawingManager,
             drawingContextRef.current.rendererManager,
+            drawingContextRef.current.drawingStateManager,
             canvas,
             chart,
             series,

@@ -1,6 +1,6 @@
 import { DrawingType } from '../DrawingType'
-import type { ChartPoint } from '../models/ChartPoint'
 import { DrawingObject } from './DrawingObject'
+import type { ChartPoint } from '../models/ChartPoint'
 
 export class TrendLineDrawing extends DrawingObject {
     constructor(id: string, public start: ChartPoint, public end: ChartPoint) {

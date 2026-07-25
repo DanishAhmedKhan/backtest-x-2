@@ -1,9 +1,10 @@
-import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { Tool } from './Tool'
 import { ToolType } from './ToolType'
+import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingManager } from '../managers/DrawingManager'
+import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import { eventBus } from '../../event/EventBus'
 
 export class TrendLineTool implements Tool {
@@ -16,6 +17,7 @@ export class TrendLineTool implements Tool {
     constructor(
         private readonly drawingManager: DrawingManager,
         private readonly previewDrawingManager: PreviewDrawingManager,
+        private readonly drawingStateManager: DrawingStateManager,
     ) {}
 
     public activate() {}
@@ -26,7 +28,7 @@ export class TrendLineTool implements Tool {
 
     public handlePointerDown(event: ChartPointerEvent) {
         if (!this.preview) {
-            this.preview = new TrendLineDrawing(event.point, event.point)
+            this.preview = new TrendLineDrawing(crypto.randomUUID(), event.point, event.point)
 
             this.previewDrawingManager.set(this.preview)
 
@@ -38,6 +40,8 @@ export class TrendLineTool implements Tool {
         this.drawingManager.addDrawing(this.preview)
 
         this.previewDrawingManager.clear()
+
+        this.drawingStateManager.setSelected(this.preview)
 
         this.preview = null
 
