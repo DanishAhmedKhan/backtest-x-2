@@ -29,6 +29,7 @@ import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer
 import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
 import { RenderLoop } from '../drawing/renderer/RenderLoop'
 import { ChartSnapshot } from '../drawing/renderer/ChartSnapshot'
+import { toolStore } from '../drawing/ToolStore'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -278,7 +279,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
     useEffect(() => {
         const unsubscribe = eventBus.on('drawingCompleted', () => {
-            toolControllerRef.current?.setTool(ToolType.Pan)
+            toolStore.select(ToolType.Pan)
         })
 
         return unsubscribe
