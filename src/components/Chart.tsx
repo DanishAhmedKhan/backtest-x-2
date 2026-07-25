@@ -80,11 +80,10 @@ function Chart({ id, ticker, timeframe }: Props) {
     const totalFilesRef = useRef(0)
     const isLoadingDataRef = useRef(false)
 
-    const drawingContextRef = useRef(new DrawingContext())
+    const drawingContextRef = useRef<DrawingContext | null>(null)
     const pointerControllerRef = useRef<PointerController | null>(null)
     const toolControllerRef = useRef<ToolController | null>(null)
     const drawingCanvasRendererRef = useRef<DrawingCanvasRenderer | null>(null)
-    // const renderSchedulerRef = useRef<RenderScheduler | null>(null)
     const renderLoopRef = useRef<RenderLoop | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
@@ -220,16 +219,14 @@ function Chart({ id, ticker, timeframe }: Props) {
         const canvas = drawingCanvasRef.current
         const container = containerRef.current
 
-        if (!chart || !series || !canvas) {
-            return
-        }
+        if (!chart || !series || !canvas) return
 
-        if (pointerControllerRef.current) {
-            return
-        }
+        if (!container) return
 
-        if (!container) {
-            return
+        if (pointerControllerRef.current) return
+
+        if (!drawingContextRef.current) {
+            drawingContextRef.current = new DrawingContext()
         }
 
         const transformer = new CoordinateTransformer(chart, series)
@@ -238,7 +235,7 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
 
-        toolControllerRef.current.setTool(drawingContextRef.current.toolManager.getCurrentTool()!.type)
+        toolControllerRef.current.syncChartInteraction()
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
             drawingContextRef.current.drawingManager,
@@ -249,10 +246,6 @@ function Chart({ id, ticker, timeframe }: Props) {
             series,
         )
 
-        // renderSchedulerRef.current = new RenderScheduler(() => {
-        //     drawingCanvasRendererRef.current?.render()
-        // })
-
         const snapshot = new ChartSnapshot(chart, series, container)
 
         renderLoopRef.current = new RenderLoop(snapshot, () => {
@@ -260,14 +253,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         })
 
         renderLoopRef.current.start()
-
-        // const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
-        //     renderSchedulerRef.current?.invalidate()
-        // })
-
-        // const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
-        //     renderSchedulerRef.current?.invalidate()
-        // })
 
         const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
             renderLoopRef.current?.invalidate()
@@ -277,20 +262,15 @@ function Chart({ id, ticker, timeframe }: Props) {
             renderLoopRef.current?.invalidate()
         })
 
-        // renderSchedulerRef.current.invalidate()
-        renderLoopRef.current?.stop()
-
         return () => {
-            // unsubscribeDrawings()
-            // unsubscribePreview()
-
             unsubscribeDrawings()
             unsubscribePreview()
+
+            renderLoopRef.current?.stop()
 
             pointerControllerRef.current = null
             toolControllerRef.current = null
             drawingCanvasRendererRef.current = null
-            // renderSchedulerRef.current = null
             renderLoopRef.current = null
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

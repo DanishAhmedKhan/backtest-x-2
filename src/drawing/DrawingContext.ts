@@ -22,6 +22,8 @@ export class DrawingContext {
     }
 
     private initialize() {
+        console.log('DrawingContext.initialize')
+
         this.rendererManager.register(new TrendLineRenderer())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager)

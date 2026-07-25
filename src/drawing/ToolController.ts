@@ -16,6 +16,10 @@ export class ToolController {
         return this.toolManager.allowsViewportInteraction()
     }
 
+    public syncChartInteraction() {
+        this.updateChartInteraction()
+    }
+
     private updateChartInteraction() {
         const enabled = this.allowsViewportInteraction()
 
