@@ -6,6 +6,7 @@ import { ToolType } from './tools/ToolType'
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { PreviewDrawingManager } from './PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
+import { HitTestManager } from './hitTest/HitTestManager'
 
 import { registerTools } from './utils/registerTools'
 
@@ -20,14 +21,16 @@ export class DrawingContext {
 
     public readonly drawingStateManager = new DrawingStateManager()
 
+    public readonly hitTestManager = new HitTestManager()
+
     constructor() {
         this.initialize()
     }
 
     private initialize() {
-        console.log('DrawingContext.initialize')
-
         this.rendererManager.register(new TrendLineRenderer())
+
+        // this.hitTestManager.register(new TrendLineHitTester())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 

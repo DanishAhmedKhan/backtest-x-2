@@ -31,6 +31,7 @@ import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer
 import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
 import { RenderLoop } from '../drawing/renderer/RenderLoop'
 import { ChartSnapshot } from '../drawing/renderer/ChartSnapshot'
+import { HoverController } from '../drawing/input/HoverController'
 import { toolStore } from '../drawing/ToolStore'
 
 import { eventBus } from '../event/EventBus'
@@ -231,8 +232,18 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
 
         const transformer = new CoordinateTransformer(chart, series)
+        const hoverController = new HoverController(
+            drawingContextRef.current.drawingManager,
+            drawingContextRef.current.drawingStateManager,
+            drawingContextRef.current.hitTestManager,
+            transformer,
+        )
 
-        pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, transformer)
+        pointerControllerRef.current = new PointerController(
+            drawingContextRef.current.toolManager,
+            hoverController,
+            transformer,
+        )
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
         toolControllerRef.current.syncChartInteraction()
 

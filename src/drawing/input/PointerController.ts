@@ -1,10 +1,15 @@
+import { ToolManager } from '../tools/ToolManager'
+import type { HoverController } from './HoverController'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
-import { ToolManager } from '../tools/ToolManager'
 
 export class PointerController {
-    constructor(private readonly toolManager: ToolManager, private readonly transformer: CoordinateTransformer) {}
+    constructor(
+        private readonly toolManager: ToolManager,
+        private readonly hoverController: HoverController,
+        private readonly transformer: CoordinateTransformer,
+    ) {}
 
     public handlePointerDown(event: RawPointerEvent) {
         const converted = this.convert(event)
@@ -23,6 +28,7 @@ export class PointerController {
             return
         }
 
+        this.hoverController.handlePointerMove(converted)
         this.toolManager.handlePointerMove(converted)
     }
 
@@ -37,6 +43,7 @@ export class PointerController {
     }
 
     public handlePointerLeave() {
+        this.hoverController.handlePointerLeave()
         this.toolManager.handlePointerLeave()
     }
 

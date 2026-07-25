@@ -67,14 +67,20 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
             )
         }
 
+        const handlePointerLeave = () => {
+            pointerController.handlePointerLeave()
+        }
+
         chart.subscribeCrosshairMove(handlePointerMove)
         container.addEventListener('pointerdown', handlePointerDown)
         window.addEventListener('pointerup', handlePointerUp)
+        container.addEventListener('pointerleave', handlePointerLeave)
 
         return () => {
             chart.unsubscribeCrosshairMove(handlePointerMove)
             container.removeEventListener('pointerdown', handlePointerDown)
             window.removeEventListener('pointerup', handlePointerUp)
+            container.removeEventListener('pointerleave', handlePointerLeave)
         }
     }, [chartRef, containerRef, pointerControllerRef])
 }
