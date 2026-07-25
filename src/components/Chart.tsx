@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, memo } from 'react'
 import type { CandlestickData, Time } from 'lightweight-charts'
 
+import ChartOHLC from './ChartOHLC'
 import ReplayOverlay from './ReplayOverlay'
 import DrawingCanvas from './DrawingCanvas'
 
@@ -22,6 +23,7 @@ import { useDrawingTools } from '../hooks/charts/useDrawingTool'
 import { useToolSync } from '../hooks/drawings/useToolSync'
 import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 
+import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import { PointerController } from '../drawing/input/PointerController'
 import { ToolController } from '../drawing/ToolController'
@@ -35,11 +37,9 @@ import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
+import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import ChartOHLC from './ChartOHLC'
-import { binarySearch } from '../helper/binarySearch'
-import { ToolType } from '../drawing/tools/ToolType'
 
 type Props = {
     id: string
@@ -233,9 +233,7 @@ function Chart({ id, ticker, timeframe }: Props) {
         const transformer = new CoordinateTransformer(chart, series)
 
         pointerControllerRef.current = new PointerController(drawingContextRef.current.toolManager, transformer)
-
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
-
         toolControllerRef.current.syncChartInteraction()
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
