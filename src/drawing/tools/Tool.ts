@@ -6,6 +6,8 @@ export interface Tool {
 
     readonly allowsViewportInteraction: boolean
 
+    readonly allowsSelection: boolean
+
     activate(): void
 
     deactivate(): void

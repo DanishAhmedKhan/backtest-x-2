@@ -8,6 +8,8 @@ export class PanTool implements Tool {
 
     public readonly allowsViewportInteraction = true
 
+    public readonly allowsSelection = true
+
     constructor(protected readonly drawingManager: DrawingManager) {}
 
     public activate(): void {

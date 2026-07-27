@@ -1,13 +1,15 @@
 import { ToolManager } from '../tools/ToolManager'
 import type { HoverController } from './HoverController'
+import type { SelectionController } from './SelectionController'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
-import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class PointerController {
     constructor(
         private readonly toolManager: ToolManager,
         private readonly hoverController: HoverController,
+        private readonly selectionController: SelectionController,
         private readonly transformer: CoordinateTransformer,
     ) {}
 
@@ -16,6 +18,10 @@ export class PointerController {
 
         if (!converted) {
             return
+        }
+
+        if (this.toolManager.allowsSelection()) {
+            this.selectionController.handlePointerDown(converted)
         }
 
         this.toolManager.handlePointerDown(converted)

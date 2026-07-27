@@ -2,8 +2,8 @@ import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../DrawingType'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { DrawingRenderer } from './DrawingRenderer'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import { CoordinateTransformer } from './CoordinateTransformer'
+import type { DrawingRenderState } from './DrawingrendererState'
 
 export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
     public canRender(drawing: Drawing): drawing is TrendLineDrawing {
@@ -14,10 +14,13 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         drawing: TrendLineDrawing,
         ctx: CanvasRenderingContext2D,
         transformer: CoordinateTransformer,
-        drawingStateManager: DrawingStateManager,
+        state: DrawingRenderState,
     ) {
         const start = transformer.toPoint(drawing.start.time, drawing.start.price)
         const end = transformer.toPoint(drawing.end.time, drawing.end.price)
+
+        const hovered = state.hovered === drawing
+        const selected = state.selected === drawing
 
         if (!start || !end) return
 
@@ -27,24 +30,33 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         ctx.lineTo(end.x, end.y)
 
-        ctx.strokeStyle = '#2196F3'
-        ctx.lineWidth = 2
+        ctx.strokeStyle = hovered || selected ? '#42A5F5' : '#2196F3'
+
+        ctx.lineWidth = hovered || selected ? 3 : 2
 
         ctx.stroke()
 
-        if (!drawingStateManager.isSelected(drawing)) {
-            return
+        if (hovered || selected) {
+            this.drawHandle(ctx, start.x, start.y)
+
+            this.drawHandle(ctx, end.x, end.y)
         }
+    }
 
-        ctx.fillStyle = '#2962ff'
-
+    private drawHandle(ctx: CanvasRenderingContext2D, x: number, y: number) {
         ctx.beginPath()
-        ctx.arc(start.x, start.y, 5, 0, Math.PI * 2)
+
+        ctx.arc(x, y, 5, 0, Math.PI * 2)
+
+        ctx.fillStyle = '#2196F3'
+
         ctx.fill()
 
-        ctx.beginPath()
-        ctx.arc(end.x, end.y, 5, 0, Math.PI * 2)
-        ctx.fill()
+        ctx.strokeStyle = '#ffffff'
+
+        ctx.lineWidth = 2
+
+        ctx.stroke()
     }
 
     public destroy(drawing: TrendLineDrawing) {

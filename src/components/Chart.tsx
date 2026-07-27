@@ -41,6 +41,7 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { SelectionController } from '../drawing/input/SelectionController'
 
 type Props = {
     id: string
@@ -232,7 +233,15 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
 
         const transformer = new CoordinateTransformer(chart, series)
+
         const hoverController = new HoverController(
+            drawingContextRef.current.drawingManager,
+            drawingContextRef.current.drawingStateManager,
+            drawingContextRef.current.hitTestManager,
+            transformer,
+        )
+
+        const selectionController = new SelectionController(
             drawingContextRef.current.drawingManager,
             drawingContextRef.current.drawingStateManager,
             drawingContextRef.current.hitTestManager,
@@ -242,8 +251,10 @@ function Chart({ id, ticker, timeframe }: Props) {
         pointerControllerRef.current = new PointerController(
             drawingContextRef.current.toolManager,
             hoverController,
+            selectionController,
             transformer,
         )
+
         toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
         toolControllerRef.current.syncChartInteraction()
 

@@ -32,16 +32,21 @@ export class DrawingCanvasRenderer {
     }
 
     public render() {
+        const state = {
+            hovered: this.drawingStateManager.getHovered(),
+            selected: this.drawingStateManager.getSelected(),
+        }
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         for (const drawing of this.drawingManager.getDrawings()) {
-            this.rendererManager.render(drawing, this.ctx, this.transformer, this.drawingStateManager)
+            this.rendererManager.render(drawing, this.ctx, this.transformer, state)
         }
 
         const preview = this.previewDrawingManager.get()
 
         if (preview) {
-            this.rendererManager.render(preview, this.ctx, this.transformer, this.drawingStateManager)
+            this.rendererManager.render(preview, this.ctx, this.transformer, state)
         }
     }
 }

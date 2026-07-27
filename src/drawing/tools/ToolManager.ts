@@ -54,6 +54,10 @@ export class ToolManager {
         return this.currentTool?.allowsViewportInteraction ?? true
     }
 
+    public allowsSelection() {
+        return this.currentTool?.allowsSelection ?? false
+    }
+
     public cancel() {
         this.currentTool?.cancel()
     }

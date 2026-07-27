@@ -1,7 +1,7 @@
 import type { Drawing } from '../drawings/Drawing'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderer } from './DrawingRenderer'
+import type { DrawingRenderState } from './DrawingrendererState'
 
 export class RendererManager {
     private readonly renderers: DrawingRenderer[] = []
@@ -14,11 +14,11 @@ export class RendererManager {
         drawing: Drawing,
         ctx: CanvasRenderingContext2D,
         transformer: CoordinateTransformer,
-        drawingStateManager: DrawingStateManager,
+        state: DrawingRenderState,
     ) {
         for (const renderer of this.renderers) {
             if (renderer.canRender(drawing)) {
-                renderer.render(drawing, ctx, transformer, drawingStateManager)
+                renderer.render(drawing, ctx, transformer, state)
 
                 return
             }

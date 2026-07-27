@@ -12,6 +12,8 @@ export class TrendLineTool implements Tool {
 
     public readonly allowsViewportInteraction = false
 
+    public readonly allowsSelection = false
+
     private preview: TrendLineDrawing | null = null
 
     constructor(
