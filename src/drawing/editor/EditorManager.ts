@@ -16,32 +16,17 @@ export class EditorManager {
     }
 
     public beginEdit(session: EditingSession, event: ChartPointerEvent) {
-        const drawing = session.getTarget()?.drawing
-
-        if (!drawing) {
-            return
-        }
-
+        const drawing = session.getTarget()!.drawing
         this.getEditor(drawing)?.beginEdit(session, event)
     }
 
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
-        const drawing = session.getTarget()?.drawing
-
-        if (!drawing) {
-            return
-        }
-
+        const drawing = session.getTarget()!.drawing
         this.getEditor(drawing)?.updateEdit(session, event)
     }
 
     public endEdit(session: EditingSession) {
-        const drawing = session.getTarget()?.drawing
-
-        if (!drawing) {
-            return
-        }
-
+        const drawing = session.getTarget()!.drawing
         this.getEditor(drawing)?.endEdit(session)
     }
 }

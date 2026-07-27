@@ -2,8 +2,8 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 
 import { DrawingManager } from '../managers/DrawingManager'
 import { HitTestManager } from '../hitTest/HitTestManager'
-import { EditingSession } from '../edit/EditingSession'
-import type { EditorManager } from '../edit/EditorManager'
+import { EditingSession } from '../editor/EditingSession'
+import type { EditorManager } from '../editor/EditorManager'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class EditController {

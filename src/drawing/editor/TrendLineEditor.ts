@@ -4,7 +4,7 @@ import type { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 
 import type { DrawingEditor } from './DrawingEditor'
 
-import type { EditingSession } from '../edit/EditingSession'
+import type { EditingSession } from './EditingSession'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import { HitTarget } from '../hitTest/HitTestResult'
 

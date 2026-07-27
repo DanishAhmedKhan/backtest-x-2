@@ -3,14 +3,17 @@ import { DrawingManager } from './managers/DrawingManager'
 import { RendererManager } from './renderer/RendererManager'
 
 import { ToolType } from './tools/ToolType'
-import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { PreviewDrawingManager } from './PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
 import { HitTestManager } from './hitTest/HitTestManager'
-import { EditingSession } from './edit/EditingSession'
-import { EditorManager } from './edit/EditorManager'
+import { EditingSession } from './editor/EditingSession'
+import { EditorManager } from './editor/EditorManager'
 
 import { registerTools } from './utils/registerTools'
+
+import { TrendLineRenderer } from './renderer/TrendLineRenderer'
+import { TrendLineEditor } from './editor/TrendLineEditor'
+import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -36,9 +39,9 @@ export class DrawingContext {
     private initialize() {
         this.rendererManager.register(new TrendLineRenderer())
 
-        // this.hitTestManager.register(new TrendLineHitTester())
+        this.hitTestManager.register(new TrendLineHitTester())
 
-        // this.editorManager.register(new TrendLineEditor())
+        this.editorManager.register(new TrendLineEditor())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 

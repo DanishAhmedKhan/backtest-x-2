@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { IChartApi, MouseEventParams, Time } from 'lightweight-charts'
-import type { PointerController } from '../../drawing/input/PointerController'
+import type { PointerController } from '../../drawing/controller/PointerController'
 import type { RawPointerEvent } from '../../drawing/models/RawPointerEvent'
 
 type Params = {
