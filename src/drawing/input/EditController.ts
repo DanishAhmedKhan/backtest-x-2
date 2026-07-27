@@ -31,27 +31,23 @@ export class EditController {
             result.drawing.clone(),
         )
 
-        this.editorManager.beginEdit(this.editingSession.getTarget()!, event)
+        this.editorManager.beginEdit(this.editingSession, event)
     }
 
     public handlePointerMove(event: ChartPointerEvent) {
-        const target = this.editingSession.getTarget()
-
-        if (!target) {
+        if (!this.editingSession.isEditing()) {
             return
         }
 
-        this.editorManager.updateEdit(target, event)
+        this.editorManager.updateEdit(this.editingSession, event)
     }
 
     public handlePointerUp() {
-        const target = this.editingSession.getTarget()
-
-        if (!target) {
+        if (!this.editingSession.isEditing()) {
             return
         }
 
-        this.editorManager.endEdit(target)
+        this.editorManager.endEdit(this.editingSession)
 
         this.editingSession.end()
     }
