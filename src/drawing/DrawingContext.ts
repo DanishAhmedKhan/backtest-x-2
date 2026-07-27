@@ -8,6 +8,7 @@ import { PreviewDrawingManager } from './PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
 import { HitTestManager } from './hitTest/HitTestManager'
 import { EditingSession } from './edit/EditingSession'
+import { EditorManager } from './edit/EditorManager'
 
 import { registerTools } from './utils/registerTools'
 
@@ -26,12 +27,18 @@ export class DrawingContext {
 
     public readonly editingSession = new EditingSession()
 
+    public readonly editorManager = new EditorManager()
+
     constructor() {
         this.initialize()
     }
 
     private initialize() {
         this.rendererManager.register(new TrendLineRenderer())
+
+        // this.hitTestManager.register(new TrendLineHitTester())
+
+        // this.editorManager.register(new TrendLineEditor())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 

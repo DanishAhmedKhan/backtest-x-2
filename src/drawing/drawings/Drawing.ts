@@ -5,5 +5,7 @@ export interface Drawing {
 
     readonly type: DrawingType
 
+    clone(): Drawing
+
     destroy(): void
 }

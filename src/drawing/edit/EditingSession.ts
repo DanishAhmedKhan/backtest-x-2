@@ -1,18 +1,37 @@
+import type { Drawing } from '../drawings/Drawing'
+import type { ChartPoint } from '../models/ChartPoint'
+
 import type { EditTarget } from './EditTarget'
 
 export class EditingSession {
     private target: EditTarget | null = null
 
-    public begin(target: EditTarget) {
+    private startPointer: ChartPoint | null = null
+
+    private originalDrawing: Drawing | null = null
+
+    public begin(target: EditTarget, startPointer: ChartPoint, originalDrawing: Drawing) {
         this.target = target
+        this.startPointer = startPointer
+        this.originalDrawing = originalDrawing
     }
 
     public end() {
         this.target = null
+        this.startPointer = null
+        this.originalDrawing = null
     }
 
     public getTarget() {
         return this.target
+    }
+
+    public getStartPointer() {
+        return this.startPointer
+    }
+
+    public getOriginalDrawing() {
+        return this.originalDrawing
     }
 
     public isEditing() {

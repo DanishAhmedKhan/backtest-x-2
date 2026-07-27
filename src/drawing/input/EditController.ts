@@ -2,10 +2,9 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 
 import { DrawingManager } from '../managers/DrawingManager'
 import { HitTestManager } from '../hitTest/HitTestManager'
-
-import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
-
 import { EditingSession } from '../edit/EditingSession'
+import type { EditorManager } from '../edit/EditorManager'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class EditController {
     constructor(
@@ -13,6 +12,7 @@ export class EditController {
         private readonly hitTestManager: HitTestManager,
         private readonly transformer: CoordinateTransformer,
         private readonly editingSession: EditingSession,
+        private readonly editorManager: EditorManager,
     ) {}
 
     public handlePointerDown(event: ChartPointerEvent) {
@@ -22,13 +22,37 @@ export class EditController {
             return
         }
 
-        this.editingSession.begin({
-            drawing: result.drawing,
-            target: result.target,
-        })
+        this.editingSession.begin(
+            {
+                drawing: result.drawing,
+                target: result.target,
+            },
+            event.point,
+            result.drawing.clone(),
+        )
+
+        this.editorManager.beginEdit(this.editingSession.getTarget()!, event)
+    }
+
+    public handlePointerMove(event: ChartPointerEvent) {
+        const target = this.editingSession.getTarget()
+
+        if (!target) {
+            return
+        }
+
+        this.editorManager.updateEdit(target, event)
     }
 
     public handlePointerUp() {
+        const target = this.editingSession.getTarget()
+
+        if (!target) {
+            return
+        }
+
+        this.editorManager.endEdit(target)
+
         this.editingSession.end()
     }
 }

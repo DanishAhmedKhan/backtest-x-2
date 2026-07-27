@@ -254,8 +254,8 @@ function Chart({ id, ticker, timeframe }: Props) {
             drawingContextRef.current.hitTestManager,
             transformer,
             drawingContextRef.current.editingSession,
+            drawingContextRef.current.editorManager,
         )
-
         pointerControllerRef.current = new PointerController(
             drawingContextRef.current.toolManager,
             hoverController,

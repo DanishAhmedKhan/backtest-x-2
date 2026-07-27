@@ -38,6 +38,7 @@ export class PointerController {
         }
 
         this.hoverController.handlePointerMove(converted)
+        this.editController.handlePointerMove(converted)
         this.toolManager.handlePointerMove(converted)
     }
 
