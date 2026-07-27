@@ -26,6 +26,7 @@ export class PointerController {
 
         if (startEditing) {
             this.editController.handlePointerDown(converted)
+            return
         }
 
         this.toolManager.handlePointerDown(converted)
@@ -38,8 +39,13 @@ export class PointerController {
             return
         }
 
+        if (this.editController.isEditing()) {
+            this.editController.handlePointerMove(converted)
+            return
+        }
+
         this.hoverController.handlePointerMove(converted)
-        this.editController.handlePointerMove(converted)
+
         this.toolManager.handlePointerMove(converted)
     }
 
@@ -50,7 +56,11 @@ export class PointerController {
             return
         }
 
-        this.editController.handlePointerUp()
+        if (this.editController.isEditing()) {
+            this.editController.handlePointerUp()
+            return
+        }
+
         this.toolManager.handlePointerUp(converted)
     }
 

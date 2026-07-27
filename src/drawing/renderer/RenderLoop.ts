@@ -6,6 +6,8 @@ export class RenderLoop implements RenderInvalidator {
 
     private previousSnapshot: ChartSnapshotState | null = null
 
+    private invalidated = false
+
     constructor(private readonly snapshot: ChartSnapshot, private readonly render: () => void) {}
 
     public start() {
@@ -19,11 +21,12 @@ export class RenderLoop implements RenderInvalidator {
 
         const loop = () => {
             const current = this.snapshot.capture()
+            const snapshotChanged = !this.previousSnapshot || !this.snapshot.equals(current, this.previousSnapshot)
 
-            if (!this.previousSnapshot || !this.snapshot.equals(current, this.previousSnapshot)) {
+            if (this.invalidated || snapshotChanged) {
                 this.render()
-
                 this.previousSnapshot = current
+                this.invalidated = false
             }
 
             this.animationFrameId = requestAnimationFrame(loop)
@@ -43,6 +46,6 @@ export class RenderLoop implements RenderInvalidator {
     }
 
     public invalidate() {
-        this.previousSnapshot = null
+        this.invalidated = true
     }
 }

@@ -2,13 +2,13 @@ import { ToolManager } from './tools/ToolManager'
 import { ToolType } from './tools/ToolType'
 
 import type { IChartApi } from 'lightweight-charts'
+import type { ViewportInteractionController } from './controller/ViewportInterationController'
 
-export class ToolController {
+export class ToolController implements ViewportInteractionController {
     constructor(private readonly toolManager: ToolManager, private readonly chart: IChartApi) {}
 
     public setTool(type: ToolType) {
         this.toolManager.selectByType(type)
-
         this.updateChartInteraction()
     }
 
@@ -17,6 +17,21 @@ export class ToolController {
     }
 
     public syncChartInteraction() {
+        this.updateChartInteraction()
+    }
+
+    public disableViewportInteraction() {
+        this.chart.applyOptions({
+            handleScroll: {
+                pressedMouseMove: false,
+                mouseWheel: true,
+                horzTouchDrag: false,
+                vertTouchDrag: false,
+            },
+        })
+    }
+
+    public enableViewportInteraction() {
         this.updateChartInteraction()
     }
 

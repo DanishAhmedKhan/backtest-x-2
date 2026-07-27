@@ -1,5 +1,6 @@
 import { DrawingStateManager } from '../managers/DrawingStateManager'
 import { HitTestManager } from '../hitTest/HitTestManager'
+import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
@@ -8,6 +9,7 @@ export class SelectionController {
         private readonly drawingStateManager: DrawingStateManager,
         private readonly hitTestManager: HitTestManager,
         private readonly transformer: CoordinateTransformer,
+        private readonly renderInvalidator: RenderInvalidator,
     ) {}
 
     public handlePointerDown(event: ChartPointerEvent): boolean {
@@ -15,6 +17,7 @@ export class SelectionController {
 
         if (!result) {
             this.drawingStateManager.clearSelection()
+            this.renderInvalidator.invalidate()
 
             return false
         }
@@ -24,6 +27,7 @@ export class SelectionController {
         }
 
         this.drawingStateManager.setSelected(result.drawing)
+        this.renderInvalidator.invalidate()
 
         return false
     }

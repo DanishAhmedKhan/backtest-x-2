@@ -4,6 +4,7 @@ import type { EditorManager } from '../editor/EditorManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
+import type { ViewportInteractionController } from './ViewportInterationController'
 
 export class EditController {
     constructor(
@@ -12,7 +13,12 @@ export class EditController {
         private readonly editingSession: EditingSession,
         private readonly editorManager: EditorManager,
         private readonly renderInvalidator: RenderInvalidator,
+        private readonly viewportInteraction: ViewportInteractionController,
     ) {}
+
+    public isEditing() {
+        return this.editingSession.isEditing()
+    }
 
     public handlePointerDown(event: ChartPointerEvent) {
         const result = this.hitTestManager.hitTest(event.point, this.transformer)
@@ -29,6 +35,8 @@ export class EditController {
             event.point,
             result.drawing.clone(),
         )
+
+        this.viewportInteraction.disableViewportInteraction()
 
         this.editorManager.beginEdit(this.editingSession, event)
     }
@@ -49,6 +57,8 @@ export class EditController {
         }
 
         this.editorManager.endEdit(this.editingSession)
+
+        this.viewportInteraction.enableViewportInteraction()
 
         this.editingSession.end()
     }

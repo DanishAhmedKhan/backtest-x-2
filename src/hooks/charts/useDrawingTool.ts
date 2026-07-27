@@ -21,11 +21,6 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
             return
         }
 
-        const pointerController = pointerControllerRef.current
-        if (!pointerController) {
-            return
-        }
-
         const createRawPointerEvent = (
             x: number,
             y: number,
@@ -43,7 +38,7 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
         })
 
         const handlePointerMove = (param: MouseEventParams<Time>) => {
-            pointerController.handlePointerMove(
+            pointerControllerRef.current.handlePointerMove(
                 createRawPointerEvent(
                     param.point?.x ?? 0,
                     param.point?.y ?? 0,
@@ -56,19 +51,19 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
         }
 
         const handlePointerDown = (e: PointerEvent) => {
-            pointerController.handlePointerDown(
+            pointerControllerRef.current.handlePointerDown(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
         }
 
         const handlePointerUp = (e: PointerEvent) => {
-            pointerController.handlePointerUp(
+            pointerControllerRef.current.handlePointerUp(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
         }
 
         const handlePointerLeave = () => {
-            pointerController.handlePointerLeave()
+            pointerControllerRef.current.handlePointerLeave()
         }
 
         chart.subscribeCrosshairMove(handlePointerMove)
