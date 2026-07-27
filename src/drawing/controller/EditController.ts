@@ -1,15 +1,12 @@
-import { HitTestManager } from '../hitTest/HitTestManager'
 import { EditingSession } from '../editor/EditingSession'
 import type { EditorManager } from '../editor/EditorManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
-import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { ViewportInteractionController } from './ViewportInterationController'
+import type { HitTestResult } from '../hitTest/HitTestResult'
 
 export class EditController {
     constructor(
-        private readonly hitTestManager: HitTestManager,
-        private readonly transformer: CoordinateTransformer,
         private readonly editingSession: EditingSession,
         private readonly editorManager: EditorManager,
         private readonly renderInvalidator: RenderInvalidator,
@@ -20,20 +17,14 @@ export class EditController {
         return this.editingSession.isEditing()
     }
 
-    public handlePointerDown(event: ChartPointerEvent) {
-        const result = this.hitTestManager.hitTest(event.point, this.transformer)
-
-        if (!result) {
-            return
-        }
-
+    public handlePointerDown(event: ChartPointerEvent, hit: HitTestResult) {
         this.editingSession.begin(
             {
-                drawing: result.drawing,
-                target: result.target,
+                drawing: hit.drawing,
+                target: hit.target,
             },
             event.point,
-            result.drawing.clone(),
+            hit.drawing.clone(),
         )
 
         this.viewportInteraction.disableViewportInteraction()

@@ -3,6 +3,7 @@ import { HitTestManager } from '../hitTest/HitTestManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
+import { HitTestConstants } from '../hitTest/HitTestConstant'
 
 export class HoverController {
     constructor(
@@ -13,7 +14,7 @@ export class HoverController {
     ) {}
 
     public handlePointerMove(event: ChartPointerEvent) {
-        const result = this.hitTestManager.hitTest(event.point, this.transformer)
+        const result = this.hitTestManager.hitTest(event.point, this.transformer, HitTestConstants.HOVER_LINE_TOLERANCE)
 
         const hovered = result?.drawing ?? null
 

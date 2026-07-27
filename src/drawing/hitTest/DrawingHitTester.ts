@@ -7,5 +7,5 @@ import type { HitTestResult } from './HitTestResult'
 export interface DrawingHitTester<T extends Drawing = Drawing> {
     canHitTest(drawing: Drawing): drawing is T
 
-    hitTest(drawing: T, point: ChartPoint, transformer: CoordinateTransformer): HitTestResult | null
+    hitTest(drawing: T, point: ChartPoint, transformer: CoordinateTransformer, tolerance?: number): HitTestResult | null
 }

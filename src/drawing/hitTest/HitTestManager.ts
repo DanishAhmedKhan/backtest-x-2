@@ -14,7 +14,7 @@ export class HitTestManager {
         this.hitTesters.push(hitTester)
     }
 
-    public hitTest(point: ChartPoint, transformer: CoordinateTransformer): HitTestResult | null {
+    public hitTest(point: ChartPoint, transformer: CoordinateTransformer, tolerance = 5): HitTestResult | null {
         const drawings = this.drawingManager.getDrawings()
 
         for (let i = drawings.length - 1; i >= 0; i--) {
@@ -25,7 +25,7 @@ export class HitTestManager {
                     continue
                 }
 
-                const result = tester.hitTest(drawing, point, transformer)
+                const result = tester.hitTest(drawing, point, transformer, tolerance)
 
                 if (result) {
                     return result

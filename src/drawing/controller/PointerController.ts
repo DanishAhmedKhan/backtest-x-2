@@ -22,10 +22,10 @@ export class PointerController {
             return
         }
 
-        const startEditing = this.selectionController.handlePointerDown(converted)
+        const hit = this.selectionController.handlePointerDown(converted)
 
-        if (startEditing) {
-            this.editController.handlePointerDown(converted)
+        if (hit) {
+            this.editController.handlePointerDown(converted, hit)
             return
         }
 
@@ -45,7 +45,6 @@ export class PointerController {
         }
 
         this.hoverController.handlePointerMove(converted)
-
         this.toolManager.handlePointerMove(converted)
     }
 

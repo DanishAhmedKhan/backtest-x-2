@@ -225,7 +225,6 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         if (!chart || !series || !canvas) return
         if (!container) return
-        // if (pointerControllerRef.current) return
 
         if (!drawingContextRef.current) {
             drawingContextRef.current = new DrawingContext()
@@ -271,8 +270,6 @@ function Chart({ id, ticker, timeframe }: Props) {
         toolControllerRef.current.syncChartInteraction()
 
         const editController = new EditController(
-            drawingContext.hitTestManager,
-            transformer,
             drawingContext.editingSession,
             drawingContext.editorManager,
             renderLoopRef.current,
