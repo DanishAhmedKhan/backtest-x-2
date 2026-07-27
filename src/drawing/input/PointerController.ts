@@ -1,6 +1,7 @@
 import { ToolManager } from '../tools/ToolManager'
 import type { HoverController } from './HoverController'
 import type { SelectionController } from './SelectionController'
+import type { EditController } from './EditController'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
@@ -10,6 +11,7 @@ export class PointerController {
         private readonly toolManager: ToolManager,
         private readonly hoverController: HoverController,
         private readonly selectionController: SelectionController,
+        private readonly editController: EditController,
         private readonly transformer: CoordinateTransformer,
     ) {}
 
@@ -22,6 +24,7 @@ export class PointerController {
 
         if (this.toolManager.allowsSelection()) {
             this.selectionController.handlePointerDown(converted)
+            this.editController.handlePointerDown(converted)
         }
 
         this.toolManager.handlePointerDown(converted)
@@ -45,6 +48,7 @@ export class PointerController {
             return
         }
 
+        this.editController.handlePointerUp()
         this.toolManager.handlePointerUp(converted)
     }
 

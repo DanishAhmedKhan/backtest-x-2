@@ -25,13 +25,15 @@ import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
-import { PointerController } from '../drawing/input/PointerController'
 import { ToolController } from '../drawing/ToolController'
 import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer'
 import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
 import { RenderLoop } from '../drawing/renderer/RenderLoop'
 import { ChartSnapshot } from '../drawing/renderer/ChartSnapshot'
+import { PointerController } from '../drawing/input/PointerController'
 import { HoverController } from '../drawing/input/HoverController'
+import { SelectionController } from '../drawing/input/SelectionController'
+import { EditController } from '../drawing/input/EditController'
 import { toolStore } from '../drawing/ToolStore'
 
 import { eventBus } from '../event/EventBus'
@@ -41,7 +43,6 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import { SelectionController } from '../drawing/input/SelectionController'
 
 type Props = {
     id: string
@@ -248,10 +249,18 @@ function Chart({ id, ticker, timeframe }: Props) {
             transformer,
         )
 
+        const editController = new EditController(
+            drawingContextRef.current.drawingManager,
+            drawingContextRef.current.hitTestManager,
+            transformer,
+            drawingContextRef.current.editingSession,
+        )
+
         pointerControllerRef.current = new PointerController(
             drawingContextRef.current.toolManager,
             hoverController,
             selectionController,
+            editController,
             transformer,
         )
 
