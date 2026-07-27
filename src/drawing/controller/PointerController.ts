@@ -22,8 +22,9 @@ export class PointerController {
             return
         }
 
-        if (this.toolManager.allowsSelection()) {
-            this.selectionController.handlePointerDown(converted)
+        const startEditing = this.selectionController.handlePointerDown(converted)
+
+        if (startEditing) {
             this.editController.handlePointerDown(converted)
         }
 

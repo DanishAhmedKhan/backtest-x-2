@@ -217,6 +217,97 @@ function Chart({ id, ticker, timeframe }: Props) {
         }
     }, [])
 
+    // useEffect(() => {
+    //     const chart = chartRef.current
+    //     const series = seriesRef.current
+    //     const canvas = drawingCanvasRef.current
+    //     const container = containerRef.current
+
+    //     if (!chart || !series || !canvas) return
+
+    //     if (!container) return
+
+    //     if (pointerControllerRef.current) return
+
+    //     if (!drawingContextRef.current) {
+    //         drawingContextRef.current = new DrawingContext()
+    //     }
+
+    //     const transformer = new CoordinateTransformer(chart, series)
+
+    //     const hoverController = new HoverController(
+    //         drawingContextRef.current.drawingManager,
+    //         drawingContextRef.current.drawingStateManager,
+    //         drawingContextRef.current.hitTestManager,
+    //         transformer,
+    //     )
+
+    //     const selectionController = new SelectionController(
+    //         drawingContextRef.current.drawingManager,
+    //         drawingContextRef.current.drawingStateManager,
+    //         drawingContextRef.current.hitTestManager,
+    //         transformer,
+    //     )
+
+    //     const editController = new EditController(
+    //         drawingContextRef.current.hitTestManager,
+    //         transformer,
+    //         drawingContextRef.current.editingSession,
+    //         drawingContextRef.current.editorManager,
+    //         renderLoopRef.current!,
+    //     )
+
+    //     pointerControllerRef.current = new PointerController(
+    //         drawingContextRef.current.toolManager,
+    //         hoverController,
+    //         selectionController,
+    //         editController,
+    //         transformer,
+    //     )
+
+    //     toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
+    //     toolControllerRef.current.syncChartInteraction()
+
+    //     drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
+    //         drawingContextRef.current.drawingManager,
+    //         drawingContextRef.current.previewDrawingManager,
+    //         drawingContextRef.current.rendererManager,
+    //         drawingContextRef.current.drawingStateManager,
+    //         canvas,
+    //         chart,
+    //         series,
+    //     )
+
+    //     const snapshot = new ChartSnapshot(chart, series, container)
+
+    //     renderLoopRef.current = new RenderLoop(snapshot, () => {
+    //         drawingCanvasRendererRef.current?.render()
+    //     })
+
+    //     renderLoopRef.current.start()
+
+    //     const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
+    //         renderLoopRef.current?.invalidate()
+    //     })
+
+    //     const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
+    //         renderLoopRef.current?.invalidate()
+    //     })
+
+    //     return () => {
+    //         unsubscribeDrawings()
+    //         unsubscribePreview()
+
+    //         renderLoopRef.current?.stop()
+
+    //         pointerControllerRef.current = null
+    //         toolControllerRef.current = null
+    //         drawingCanvasRendererRef.current = null
+    //         renderLoopRef.current = null
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [chartReady])
+
     useEffect(() => {
         const chart = chartRef.current
         const series = seriesRef.current
@@ -224,54 +315,22 @@ function Chart({ id, ticker, timeframe }: Props) {
         const container = containerRef.current
 
         if (!chart || !series || !canvas) return
-
         if (!container) return
-
         if (pointerControllerRef.current) return
 
         if (!drawingContextRef.current) {
             drawingContextRef.current = new DrawingContext()
         }
 
+        const drawingContext = drawingContextRef.current
+
         const transformer = new CoordinateTransformer(chart, series)
 
-        const hoverController = new HoverController(
-            drawingContextRef.current.drawingManager,
-            drawingContextRef.current.drawingStateManager,
-            drawingContextRef.current.hitTestManager,
-            transformer,
-        )
-
-        const selectionController = new SelectionController(
-            drawingContextRef.current.drawingManager,
-            drawingContextRef.current.drawingStateManager,
-            drawingContextRef.current.hitTestManager,
-            transformer,
-        )
-
-        const editController = new EditController(
-            drawingContextRef.current.drawingManager,
-            drawingContextRef.current.hitTestManager,
-            transformer,
-            drawingContextRef.current.editingSession,
-            drawingContextRef.current.editorManager,
-        )
-        pointerControllerRef.current = new PointerController(
-            drawingContextRef.current.toolManager,
-            hoverController,
-            selectionController,
-            editController,
-            transformer,
-        )
-
-        toolControllerRef.current = new ToolController(drawingContextRef.current.toolManager, chart)
-        toolControllerRef.current.syncChartInteraction()
-
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
-            drawingContextRef.current.drawingManager,
-            drawingContextRef.current.previewDrawingManager,
-            drawingContextRef.current.rendererManager,
-            drawingContextRef.current.drawingStateManager,
+            drawingContext.drawingManager,
+            drawingContext.previewDrawingManager,
+            drawingContext.rendererManager,
+            drawingContext.drawingStateManager,
             canvas,
             chart,
             series,
@@ -285,11 +344,43 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         renderLoopRef.current.start()
 
-        const unsubscribeDrawings = drawingContextRef.current.drawingManager.subscribeChanged(() => {
+        const hoverController = new HoverController(
+            drawingContext.drawingStateManager,
+            drawingContext.hitTestManager,
+            transformer,
+        )
+
+        const selectionController = new SelectionController(
+            drawingContext.drawingStateManager,
+            drawingContext.hitTestManager,
+            transformer,
+        )
+
+        const editController = new EditController(
+            drawingContext.hitTestManager,
+            transformer,
+            drawingContext.editingSession,
+            drawingContext.editorManager,
+            renderLoopRef.current,
+        )
+
+        pointerControllerRef.current = new PointerController(
+            drawingContext.toolManager,
+            hoverController,
+            selectionController,
+            editController,
+            transformer,
+        )
+
+        toolControllerRef.current = new ToolController(drawingContext.toolManager, chart)
+
+        toolControllerRef.current.syncChartInteraction()
+
+        const unsubscribeDrawings = drawingContext.drawingManager.subscribeChanged(() => {
             renderLoopRef.current?.invalidate()
         })
 
-        const unsubscribePreview = drawingContextRef.current.previewDrawingManager.subscribeChanged(() => {
+        const unsubscribePreview = drawingContext.previewDrawingManager.subscribeChanged(() => {
             renderLoopRef.current?.invalidate()
         })
 

@@ -18,9 +18,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
 
     public hitTest(drawing: TrendLineDrawing, point: ChartPoint, transformer: CoordinateTransformer) {
         const start = transformer.toPoint(drawing.start.time, drawing.start.price)
-
         const end = transformer.toPoint(drawing.end.time, drawing.end.price)
-
         const mouse = transformer.toPoint(point.time, point.price)
 
         if (!start || !end || !mouse) {

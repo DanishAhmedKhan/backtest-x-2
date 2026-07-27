@@ -21,15 +21,15 @@ export class PanTool implements Tool {
     }
 
     public handlePointerDown(event: ChartPointerEvent): void {
-        console.log('Pointer Down', event)
+        // console.log('Pointer Down', event)
     }
 
     public handlePointerMove(event: ChartPointerEvent): void {
-        console.log('Pointer Move', event)
+        // console.log('Pointer Move', event)
     }
 
     public handlePointerUp(event: ChartPointerEvent): void {
-        console.log('Pointer Up', event)
+        // console.log('Pointer Up', event)
     }
 
     public handlePointerLeave(): void {}

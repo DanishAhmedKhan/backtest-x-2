@@ -1,22 +1,17 @@
-import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-
-import { DrawingManager } from '../managers/DrawingManager'
 import { DrawingStateManager } from '../managers/DrawingStateManager'
-
 import { HitTestManager } from '../hitTest/HitTestManager'
-
+import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class HoverController {
     constructor(
-        private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly hitTestManager: HitTestManager,
         private readonly transformer: CoordinateTransformer,
     ) {}
 
     public handlePointerMove(event: ChartPointerEvent) {
-        const result = this.hitTestManager.hitTest(this.drawingManager.getDrawings(), event.point, this.transformer)
+        const result = this.hitTestManager.hitTest(event.point, this.transformer)
 
         this.drawingStateManager.setHovered(result?.drawing ?? null)
     }

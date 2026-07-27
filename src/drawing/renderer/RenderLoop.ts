@@ -1,6 +1,7 @@
+import type { RenderInvalidator } from './RenderInvalidator'
 import { ChartSnapshot, type ChartSnapshotState } from './ChartSnapshot'
 
-export class RenderLoop {
+export class RenderLoop implements RenderInvalidator {
     private animationFrameId: number | null = null
 
     private previousSnapshot: ChartSnapshotState | null = null

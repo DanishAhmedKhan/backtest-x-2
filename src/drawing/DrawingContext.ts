@@ -26,7 +26,7 @@ export class DrawingContext {
 
     public readonly drawingStateManager = new DrawingStateManager()
 
-    public readonly hitTestManager = new HitTestManager()
+    public readonly hitTestManager = new HitTestManager(this.drawingManager)
 
     public readonly editingSession = new EditingSession()
 

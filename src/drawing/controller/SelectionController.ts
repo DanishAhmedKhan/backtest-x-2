@@ -1,27 +1,30 @@
-import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-
-import { DrawingManager } from '../managers/DrawingManager'
 import { DrawingStateManager } from '../managers/DrawingStateManager'
-
 import { HitTestManager } from '../hitTest/HitTestManager'
-
+import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class SelectionController {
     constructor(
-        private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly hitTestManager: HitTestManager,
         private readonly transformer: CoordinateTransformer,
     ) {}
 
-    public handlePointerDown(event: ChartPointerEvent) {
-        const result = this.hitTestManager.hitTest(this.drawingManager.getDrawings(), event.point, this.transformer)
+    public handlePointerDown(event: ChartPointerEvent): boolean {
+        const result = this.hitTestManager.hitTest(event.point, this.transformer)
 
-        const selected = this.drawingStateManager.getSelected()
+        if (!result) {
+            this.drawingStateManager.clearSelection()
 
-        if (selected !== (result?.drawing ?? null)) {
-            this.drawingStateManager.setSelected(result?.drawing ?? null)
+            return false
         }
+
+        if (this.drawingStateManager.isSelected(result.drawing)) {
+            return true
+        }
+
+        this.drawingStateManager.setSelected(result.drawing)
+
+        return false
     }
 }
