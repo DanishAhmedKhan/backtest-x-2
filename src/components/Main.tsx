@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import Topbar from './TopBar'
+import Topbar from './Topbar'
 import ChartWindow from './ChartWindow'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
@@ -19,6 +19,8 @@ import { STORAGE_KEYS } from '../storage/key'
 import type { AppConfig, ChartConfig } from '../types/AppConfig'
 import { eventBus } from '../event/EventBus'
 import { useReplayController } from '../hooks/charts/useReplayController'
+import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
+import { DrawingPropertiesToolbar } from './drawingToolbar/DrawingPropertiesToolbar'
 
 const storage = new LocalStorageProvider()
 
@@ -65,6 +67,8 @@ export default function Main() {
     const [activeChartId, setActiveChartId] = useState(initialCharts[0]?.id ?? '')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
     const [jumpOpen, setJumpOpen] = useState(false)
+
+    const [drawingToolbarManager, setDrawingToolbarManager] = useState<DrawingToolbarManager | null>(null)
 
     const activeChart = charts.find((c) => c.id === activeChartId) ?? charts[0]
 
@@ -162,9 +166,12 @@ export default function Main() {
                 activeChartId={activeChartId}
                 onSelectChart={setActiveChartId}
                 layout={layout}
+                onDrawingToolbarManagerReady={setDrawingToolbarManager}
             />
 
             {showReplayToolbar && <ReplayToolbar />}
+
+            {drawingToolbarManager && <DrawingPropertiesToolbar manager={drawingToolbarManager} />}
         </div>
     )
 }

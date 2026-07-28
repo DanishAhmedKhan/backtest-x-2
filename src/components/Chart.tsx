@@ -34,6 +34,7 @@ import { PointerController } from '../drawing/controller/PointerController'
 import { HoverController } from '../drawing/controller/HoverController'
 import { SelectionController } from '../drawing/controller/SelectionController'
 import { EditController } from '../drawing/controller/EditController'
+import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 import { toolStore } from '../drawing/ToolStore'
 
 import { eventBus } from '../event/EventBus'
@@ -48,9 +49,10 @@ type Props = {
     id: string
     ticker: Ticker
     timeframe: Timeframe
+    onDrawingToolbarManagerReady?: (manager: DrawingToolbarManager) => void
 }
 
-function Chart({ id, ticker, timeframe }: Props) {
+function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -232,6 +234,10 @@ function Chart({ id, ticker, timeframe }: Props) {
 
         const drawingContext = drawingContextRef.current
 
+        onDrawingToolbarManagerReady?.(drawingContext.drawingToolbarManager)
+
+        console.log('Chart exported manager', drawingContext.drawingToolbarManager)
+
         const transformer = new CoordinateTransformer(chart, series)
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
@@ -251,6 +257,8 @@ function Chart({ id, ticker, timeframe }: Props) {
         })
 
         renderLoopRef.current.start()
+
+        drawingContext.registerActionProviders(renderLoopRef.current!)
 
         const hoverController = new HoverController(
             drawingContext.drawingStateManager,

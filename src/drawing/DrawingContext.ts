@@ -8,12 +8,16 @@ import { DrawingStateManager } from './managers/DrawingStateManager'
 import { HitTestManager } from './hitTest/HitTestManager'
 import { EditingSession } from './editor/EditingSession'
 import { EditorManager } from './editor/EditorManager'
+import { DrawingActionManager } from './actions/DrawingActionManager'
+import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
+import type { RenderInvalidator } from './renderer/RenderInvalidator'
 
 import { registerTools } from './utils/registerTools'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { TrendLineEditor } from './editor/TrendLineEditor'
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
+import { TrendLineActionProvider } from './actions/TrendLineActionProvider'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -32,6 +36,13 @@ export class DrawingContext {
 
     public readonly editorManager = new EditorManager()
 
+    public readonly drawingActionManager = new DrawingActionManager()
+
+    public readonly drawingToolbarManager = new DrawingToolbarManager(
+        this.drawingStateManager,
+        this.drawingActionManager,
+    )
+
     constructor() {
         this.initialize()
     }
@@ -45,6 +56,12 @@ export class DrawingContext {
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 
+        // this.drawingActionManager.register(new TrendLineActionProvider(this.drawingManager, this.drawingStateManager))
+
         this.toolManager.selectByType(ToolType.Pan)
+    }
+
+    public registerActionProviders(renderInvalidator: RenderInvalidator) {
+        this.drawingActionManager.register(new TrendLineActionProvider(this.drawingManager, renderInvalidator))
     }
 }

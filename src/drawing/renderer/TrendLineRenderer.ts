@@ -30,9 +30,15 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         ctx.lineTo(end.x, end.y)
 
-        ctx.strokeStyle = hovered || selected ? '#42A5F5' : '#2196F3'
+        // ctx.strokeStyle = hovered || selected ? '#42A5F5' : '#2196F3'
+        ctx.strokeStyle = drawing.color
 
-        ctx.lineWidth = hovered || selected ? 3 : 2
+        // ctx.lineWidth = hovered || selected ? 3 : 2
+        ctx.lineWidth = drawing.width
+
+        if (hovered || selected) {
+            ctx.lineWidth += 1
+        }
 
         ctx.stroke()
 

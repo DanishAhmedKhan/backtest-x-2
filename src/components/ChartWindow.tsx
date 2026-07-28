@@ -5,15 +5,23 @@ import type { LayoutType } from '../types/Layout'
 import { createLayout } from '../layout/layoutTemplates'
 import { computeLayoutRects, HANDLE_SIZE } from '../layout/layoutEngine'
 import { useLayoutResize } from '../hooks/useLayoutResize'
+import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 
 type Props = {
     charts: ChartState[]
     activeChartId: string
     onSelectChart: (id: string) => void
     layout: LayoutType
+    onDrawingToolbarManagerReady?: (manager: DrawingToolbarManager) => void
 }
 
-export default function ChartWindow({ charts, activeChartId, onSelectChart, layout }: Props) {
+export default function ChartWindow({
+    charts,
+    activeChartId,
+    onSelectChart,
+    layout,
+    onDrawingToolbarManagerReady,
+}: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     const [size, setSize] = useState({
@@ -82,6 +90,7 @@ export default function ChartWindow({ charts, activeChartId, onSelectChart, layo
                             chart={chart}
                             isActive={chart.id === activeChartId}
                             onSelect={() => onSelectChart(chart.id)}
+                            onDrawingToolbarManagerReady={onDrawingToolbarManagerReady}
                         />
                     </div>
                 )
