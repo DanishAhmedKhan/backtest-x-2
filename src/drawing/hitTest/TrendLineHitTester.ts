@@ -7,6 +7,7 @@ import { HitTarget } from './HitTestResult'
 import type { ChartPoint } from '../models/ChartPoint'
 import { Geometry } from '../geometry/Geometry'
 import { HitTestConstants } from './HitTestConstant'
+import { CursorType } from '../CursorType'
 
 export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
     public canHitTest(drawing: Drawing): drawing is TrendLineDrawing {
@@ -31,6 +32,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             return {
                 drawing,
                 target: HitTarget.StartHandle,
+                cursor: CursorType.Move,
             }
         }
 
@@ -38,6 +40,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             return {
                 drawing,
                 target: HitTarget.EndHandle,
+                cursor: CursorType.Move,
             }
         }
 
@@ -45,6 +48,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             return {
                 drawing,
                 target: HitTarget.Body,
+                cursor: CursorType.Move,
             }
         }
 

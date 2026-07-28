@@ -1,16 +1,18 @@
 import type { DrawingAction } from './DrawingAction'
 import type { DrawingActionProvider } from './DrawingActionProvider'
 
-import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../DrawingType'
+import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 
 import { DrawingManager } from '../managers/DrawingManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+import type { DrawingStateManager } from '../managers/DrawingStateManager'
 
 export class TrendLineActionProvider implements DrawingActionProvider<TrendLineDrawing> {
     constructor(
         private readonly drawingManager: DrawingManager,
+        private readonly drawingStateManager: DrawingStateManager,
         private readonly renderInvalidator: RenderInvalidator,
     ) {}
 
@@ -26,6 +28,8 @@ export class TrendLineActionProvider implements DrawingActionProvider<TrendLineD
                 value: drawing.color,
                 execute: (color) => {
                     drawing.color = color
+
+                    this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },
             },
@@ -35,6 +39,8 @@ export class TrendLineActionProvider implements DrawingActionProvider<TrendLineD
                 value: drawing.width,
                 execute: (width) => {
                     drawing.width = width
+
+                    this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },
             },
@@ -43,6 +49,9 @@ export class TrendLineActionProvider implements DrawingActionProvider<TrendLineD
                 label: 'Delete',
                 execute: () => {
                     this.drawingManager.removeDrawing(drawing.id)
+
+                    this.drawingStateManager.clearSelection()
+                    this.renderInvalidator.invalidate()
                 },
             },
             {

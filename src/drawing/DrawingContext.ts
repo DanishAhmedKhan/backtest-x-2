@@ -63,6 +63,8 @@ export class DrawingContext {
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
-        this.drawingActionManager.register(new TrendLineActionProvider(this.drawingManager, renderInvalidator))
+        this.drawingActionManager.register(
+            new TrendLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+        )
     }
 }

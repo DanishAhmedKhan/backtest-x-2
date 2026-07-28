@@ -44,6 +44,7 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { CursorManager } from '../drawing/CursorManager'
 
 type Props = {
     id: string
@@ -258,11 +259,14 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         drawingContext.registerActionProviders(renderLoopRef.current!)
 
+        const cursorManager = new CursorManager(container)
+
         const hoverController = new HoverController(
             drawingContext.drawingStateManager,
             drawingContext.hitTestManager,
             transformer,
             renderLoopRef.current,
+            cursorManager,
         )
 
         const selectionController = new SelectionController(

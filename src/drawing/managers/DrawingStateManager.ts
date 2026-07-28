@@ -14,6 +14,10 @@ export class DrawingStateManager {
         }
     }
 
+    public refresh() {
+        this.notify()
+    }
+
     public subscribeChanged(listener: Listener) {
         this.listeners.add(listener)
 
