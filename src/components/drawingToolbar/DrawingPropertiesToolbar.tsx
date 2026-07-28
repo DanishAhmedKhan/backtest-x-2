@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 
+import { useDraggable } from '../../hooks/useDraggable'
+
 import './DrawingPropertiesToolbar.css'
+
 import type { DrawingToolbarManager } from '../../drawing/toolbar/DrawingToolbarManager'
-import { ToolbarItemType } from '../../drawing/toolbar/ToolbarItem'
+import { ToolbarControlRenderer } from './ToolbarControlRenderer'
 
 type Props = {
     manager: DrawingToolbarManager
@@ -10,6 +13,11 @@ type Props = {
 
 export function DrawingPropertiesToolbar({ manager }: Props) {
     const [items, setItems] = useState(() => manager.getToolbarItems())
+
+    const { position, onMouseDown } = useDraggable({
+        x: window.innerWidth / 2 - 180,
+        y: 120,
+    })
 
     useEffect(() => {
         return manager.subscribe(() => {
@@ -25,48 +33,36 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
         <div
             className="drawing-toolbar"
             style={{
-                position: 'absolute',
-                top: 20,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                pointerEvents: 'auto',
+                position: 'fixed',
+                left: position.x,
+                top: position.y,
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                background: '#1b1b1b',
+                border: '1px solid #333',
+                borderRadius: 8,
+                padding: '6px 8px',
+                gap: 6,
+                boxShadow: '0 4px 12px rgba(0,0,0,.4)',
+                userSelect: 'none',
             }}
         >
-            {items.map((item) => {
-                switch (item.type) {
-                    case ToolbarItemType.Button:
-                        return (
-                            <button key={item.id} onClick={item.action}>
-                                {item.label}
-                            </button>
-                        )
+            <div
+                onMouseDown={onMouseDown}
+                style={{
+                    cursor: 'move',
+                    color: '#888',
+                    padding: '0 6px',
+                    fontSize: 18,
+                }}
+            >
+                ⋮⋮
+            </div>
 
-                    case ToolbarItemType.ColorPicker:
-                        return (
-                            <input
-                                key={item.id}
-                                type="color"
-                                value={item.value as string}
-                                onChange={(e) => item.onChange?.(e.target.value)}
-                            />
-                        )
-
-                    case ToolbarItemType.NumberInput:
-                        return (
-                            <input
-                                key={item.id}
-                                type="number"
-                                min={1}
-                                max={10}
-                                value={item.value as number}
-                                onChange={(e) => item.onChange?.(Number(e.target.value))}
-                            />
-                        )
-
-                    case ToolbarItemType.Separator:
-                        return <div key={item.id} className="toolbar-separator" />
-                }
-            })}
+            {items.map((item) => (
+                <ToolbarControlRenderer key={item.id} item={item} popupController={manager.getPopupController()} />
+            ))}
         </div>
     )
 }

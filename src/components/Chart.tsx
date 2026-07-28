@@ -236,8 +236,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         onDrawingToolbarManagerReady?.(drawingContext.drawingToolbarManager)
 
-        console.log('Chart exported manager', drawingContext.drawingToolbarManager)
-
         const transformer = new CoordinateTransformer(chart, series)
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(

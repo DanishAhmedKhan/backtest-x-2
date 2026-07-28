@@ -18,6 +18,7 @@ import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { TrendLineEditor } from './editor/TrendLineEditor'
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { TrendLineActionProvider } from './actions/TrendLineActionProvider'
+import { PopupController } from './PopupController'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -38,11 +39,13 @@ export class DrawingContext {
 
     public readonly drawingActionManager = new DrawingActionManager()
 
+    public readonly popupController = new PopupController()
+
     public readonly drawingToolbarManager = new DrawingToolbarManager(
         this.drawingStateManager,
         this.drawingActionManager,
+        this.popupController,
     )
-
     constructor() {
         this.initialize()
     }
@@ -55,8 +58,6 @@ export class DrawingContext {
         this.editorManager.register(new TrendLineEditor())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
-
-        // this.drawingActionManager.register(new TrendLineActionProvider(this.drawingManager, this.drawingStateManager))
 
         this.toolManager.selectByType(ToolType.Pan)
     }

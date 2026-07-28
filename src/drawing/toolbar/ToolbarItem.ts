@@ -1,7 +1,9 @@
+import type { PopupController } from '../PopupController'
+
 export enum ToolbarItemType {
     Button = 'button',
-    ColorPicker = 'color-picker',
-    NumberInput = 'number-input',
+    Color = 'color',
+    Width = 'width',
     Toggle = 'toggle',
     Separator = 'separator',
 }
@@ -9,8 +11,9 @@ export enum ToolbarItemType {
 export interface ToolbarItem {
     id: string
     type: ToolbarItemType
-    label: string
+    tooltip?: string
     value?: unknown
-    action: () => void
+    popupController: PopupController
+    execute: () => void
     onChange?: (value: unknown) => void
 }

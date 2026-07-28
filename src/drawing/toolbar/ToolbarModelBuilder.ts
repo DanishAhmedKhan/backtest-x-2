@@ -1,5 +1,6 @@
 import type { DrawingAction } from '../actions/DrawingAction'
-import type { ToolbarItem } from './ToolbarItem'
+
+import { ToolbarItemType, type ToolbarItem } from './ToolbarItem'
 
 export class ToolbarModelBuilder {
     public build(actions: DrawingAction[]): ToolbarItem[] {
@@ -8,36 +9,36 @@ export class ToolbarModelBuilder {
                 case 'delete':
                     return {
                         id: action.id,
-                        type: 'button',
-                        label: action.label,
-                        action: action.execute,
+                        type: ToolbarItemType.Button,
+                        tooltip: action.label,
+                        execute: action.execute,
                     }
 
                 case 'settings':
                     return {
                         id: action.id,
-                        type: 'button',
-                        label: action.label,
-                        action: action.execute,
+                        type: ToolbarItemType.Button,
+                        tooltip: action.label,
+                        execute: action.execute,
                     }
 
                 case 'color':
                     return {
                         id: action.id,
-                        type: 'color',
-                        label: action.label,
+                        type: ToolbarItemType.Color,
+                        tooltip: action.label,
                         value: action.value,
-                        action: () => {},
+                        execute: () => {},
                         onChange: (value) => action.execute(value as string),
                     }
 
                 case 'line-width':
                     return {
                         id: action.id,
-                        type: 'line-width',
-                        label: action.label,
+                        type: ToolbarItemType.Width,
+                        tooltip: action.label,
                         value: action.value,
-                        action: () => {},
+                        execute: () => {},
                         onChange: (value) => action.execute(value as number),
                     }
             }
