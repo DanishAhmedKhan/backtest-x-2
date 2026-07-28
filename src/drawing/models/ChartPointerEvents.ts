@@ -5,9 +5,7 @@ export type ChartPointerEvent = {
         x: number
         y: number
     }
-
     point: ChartPoint
-
     shiftKey: boolean
     ctrlKey: boolean
     altKey: boolean

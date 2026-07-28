@@ -2,22 +2,22 @@ import type { DrawingAction } from './DrawingAction'
 import type { DrawingActionProvider } from './DrawingActionProvider'
 
 import type { Drawing } from '../drawings/Drawing'
-import { DrawingType } from '../DrawingType'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 
 import { DrawingManager } from '../managers/DrawingManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
+import { LineDrawing } from '../drawings/LineDrawing'
 
-export class TrendLineActionProvider implements DrawingActionProvider<TrendLineDrawing> {
+export class LineActionProvider implements DrawingActionProvider<LineDrawing> {
     constructor(
         private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly renderInvalidator: RenderInvalidator,
     ) {}
 
-    public canProvideActions(drawing: Drawing): drawing is TrendLineDrawing {
-        return drawing.type === DrawingType.TrendLine
+    public canProvideActions(drawing: Drawing): drawing is LineDrawing {
+        return drawing instanceof LineDrawing
     }
 
     public getActions(drawing: TrendLineDrawing): DrawingAction[] {

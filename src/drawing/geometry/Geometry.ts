@@ -1,28 +1,35 @@
+import type { Point } from './Point'
+import type { LineSegment } from './LineSegment'
+
 export class Geometry {
-    public static distanceSquared(x1: number, y1: number, x2: number, y2: number) {
-        const dx = x2 - x1
-        const dy = y2 - y1
+    public static distanceSquared(a: Point, b: Point) {
+        const dx = b.x - a.x
+        const dy = b.y - a.y
 
         return dx * dx + dy * dy
     }
 
-    public static distance(x1: number, y1: number, x2: number, y2: number) {
-        return Math.sqrt(Geometry.distanceSquared(x1, y1, x2, y2))
+    public static distance(a: Point, b: Point) {
+        return Math.sqrt(this.distanceSquared(a, b))
     }
 
-    public static distanceToSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number) {
-        const dx = x2 - x1
-        const dy = y2 - y1
+    public static distanceToSegment(point: Point, segment: LineSegment) {
+        const { start, end } = segment
+
+        const dx = end.x - start.x
+        const dy = end.y - start.y
 
         if (dx === 0 && dy === 0) {
-            return Geometry.distance(px, py, x1, y1)
+            return Geometry.distance(point, start)
         }
 
-        const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
+        const t = Math.max(0, Math.min(1, ((point.x - start.x) * dx + (point.y - start.y) * dy) / (dx * dx + dy * dy)))
 
-        const sx = x1 + t * dx
-        const sy = y1 + t * dy
+        const projection: Point = {
+            x: start.x + t * dx,
+            y: start.y + t * dy,
+        }
 
-        return Geometry.distance(px, py, sx, sy)
+        return Geometry.distance(point, projection)
     }
 }

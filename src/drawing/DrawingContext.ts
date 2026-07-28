@@ -17,7 +17,7 @@ import { registerTools } from './utils/registerTools'
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { TrendLineEditor } from './editor/TrendLineEditor'
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
-import { TrendLineActionProvider } from './actions/TrendLineActionProvider'
+import { LineActionProvider } from './actions/LineActionProvider'
 import { PopupController } from './PopupController'
 
 export class DrawingContext {
@@ -46,6 +46,7 @@ export class DrawingContext {
         this.drawingActionManager,
         this.popupController,
     )
+
     constructor() {
         this.initialize()
     }
@@ -64,7 +65,7 @@ export class DrawingContext {
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
         this.drawingActionManager.register(
-            new TrendLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+            new LineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
         )
     }
 }

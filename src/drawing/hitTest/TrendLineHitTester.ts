@@ -5,9 +5,9 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTestResult'
 import type { ChartPoint } from '../models/ChartPoint'
-import { Geometry } from '../geometry/Geometry'
 import { HitTestConstants } from './HitTestConstant'
 import { CursorType } from '../CursorType'
+import { LineGeometry } from '../geometry/LineGeometry'
 
 export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
     public canHitTest(drawing: Drawing): drawing is TrendLineDrawing {
@@ -28,7 +28,12 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             return null
         }
 
-        if (Geometry.distance(mouse.x, mouse.y, start.x, start.y) <= HitTestConstants.HANDLE_RADIUS) {
+        const segment = {
+            start,
+            end,
+        }
+
+        if (LineGeometry.isNearHandle(mouse, start, HitTestConstants.HANDLE_RADIUS)) {
             return {
                 drawing,
                 target: HitTarget.StartHandle,
@@ -36,7 +41,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             }
         }
 
-        if (Geometry.distance(mouse.x, mouse.y, end.x, end.y) <= HitTestConstants.HANDLE_RADIUS) {
+        if (LineGeometry.isNearHandle(mouse, end, HitTestConstants.HANDLE_RADIUS)) {
             return {
                 drawing,
                 target: HitTarget.EndHandle,
@@ -44,7 +49,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             }
         }
 
-        if (Geometry.distanceToSegment(mouse.x, mouse.y, start.x, start.y, end.x, end.y) <= tolerance) {
+        if (LineGeometry.isNearBody(mouse, segment, tolerance)) {
             return {
                 drawing,
                 target: HitTarget.Body,

@@ -4,6 +4,7 @@ import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { DrawingRenderer } from './DrawingRenderer'
 import { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderState } from './DrawingrendererState'
+import { DrawingPrimitives } from './DrawingPrimitives'
 
 export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
     public canRender(drawing: Drawing): drawing is TrendLineDrawing {
@@ -24,39 +25,13 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         if (!start || !end) return
 
-        ctx.beginPath()
-
-        ctx.moveTo(start.x, start.y)
-
-        ctx.lineTo(end.x, end.y)
-
-        ctx.strokeStyle = drawing.color
-
-        ctx.lineWidth = drawing.width
-
-        ctx.stroke()
+        DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width)
 
         if (hovered || selected) {
-            this.drawHandle(ctx, start.x, start.y)
+            DrawingPrimitives.circle(ctx, start, 5, '#fff', drawing.color)
 
-            this.drawHandle(ctx, end.x, end.y)
+            DrawingPrimitives.circle(ctx, end, 5, '#fff', drawing.color)
         }
-    }
-
-    private drawHandle(ctx: CanvasRenderingContext2D, x: number, y: number) {
-        ctx.beginPath()
-
-        ctx.arc(x, y, 5, 0, Math.PI * 2)
-
-        ctx.fillStyle = '#2196F3'
-
-        ctx.fill()
-
-        ctx.strokeStyle = '#ffffff'
-
-        ctx.lineWidth = 2
-
-        ctx.stroke()
     }
 
     public destroy(drawing: TrendLineDrawing) {
