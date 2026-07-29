@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import Topbar from './Topbar'
+import TopToolbar from './TopToolbar'
 import ChartWindow from './ChartWindow'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
 import JumpToDialog from './JumpToDialog'
-import TopToolbar from './TopToolbar'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -123,12 +122,12 @@ export default function Main() {
         <div
             style={{
                 display: 'grid',
-                gridTemplateRows: '50px 1fr',
-                gridTemplateColumns: '60px 1fr',
-                gap: '10px',
+                gridTemplateRows: '38px 1fr',
+                gridTemplateColumns: '52px 1fr',
+                gap: '5px',
                 height: '100vh',
                 overflow: 'hidden',
-                backgroundColor: '#aaa',
+                backgroundColor: '#ebebeb',
             }}
         >
             <div style={{ gridColumn: '1 / span 2' }}>
@@ -137,6 +136,7 @@ export default function Main() {
                         display: 'block',
                         padding: '0px 2px',
                         backgroundColor: 'white',
+                        height: '100%',
                     }}
                 >
                     <TopToolbar
@@ -155,21 +155,6 @@ export default function Main() {
                     />
                 </div>
 
-                <Topbar
-                    ticker={activeChart.ticker}
-                    timeframe={activeChart.timeframe}
-                    layout={layout}
-                    onTickerChange={(t) => updateActiveChart({ ticker: t })}
-                    onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
-                    onLayoutChange={handleLayoutChange}
-                    onReplayClick={() => {
-                        replayStore.isSelecting = true
-                        replayStore.openToolbar()
-                        setShowReplayToolbar(true)
-                    }}
-                    onJumpToClick={() => setJumpOpen(true)}
-                />
-
                 <JumpToDialog
                     open={jumpOpen}
                     onClose={() => setJumpOpen(false)}
@@ -183,7 +168,16 @@ export default function Main() {
                 />
             </div>
 
-            <DrawingToolbar />
+            <div
+                style={{
+                    display: 'block',
+                    padding: '2px 0px',
+                    backgroundColor: 'white',
+                    width: '100%',
+                }}
+            >
+                <DrawingToolbar />
+            </div>
 
             <ChartWindow
                 charts={charts}

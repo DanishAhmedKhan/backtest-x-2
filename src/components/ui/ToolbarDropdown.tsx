@@ -3,7 +3,7 @@ import type { ToolbarDropdownItem } from './types'
 
 export function ToolbarDropdown({
     selectedId,
-    render,
+    renderValue,
     options,
     tooltip,
     width,
@@ -13,6 +13,12 @@ export function ToolbarDropdown({
     const [open, setOpen] = useState(false)
 
     const ref = useRef<HTMLDivElement>(null)
+    const popupRef = useRef<HTMLDivElement>(null)
+
+    const [position, setPosition] = useState({
+        left: 0,
+        top: 0,
+    })
 
     const selected = options?.find((o) => o.id === selectedId)
 
@@ -30,6 +36,52 @@ export function ToolbarDropdown({
         }
     }, [])
 
+    useEffect(() => {
+        if (!open) return
+
+        const trigger = ref.current
+        const popup = popupRef.current
+
+        if (!trigger || !popup) return
+
+        const triggerRect = trigger.getBoundingClientRect()
+        const popupRect = popup.getBoundingClientRect()
+
+        const margin = 8
+
+        let left = triggerRect.left
+        let top = triggerRect.bottom + 4
+
+        //
+        // Horizontal
+        //
+
+        if (left + popupRect.width > window.innerWidth - margin) {
+            left = window.innerWidth - popupRect.width - margin
+        }
+
+        if (left < margin) {
+            left = margin
+        }
+
+        //
+        // Vertical
+        //
+
+        if (top + popupRect.height > window.innerHeight - margin) {
+            top = triggerRect.top - popupRect.height - 4
+        }
+
+        if (top < margin) {
+            top = margin
+        }
+
+        setPosition({
+            left,
+            top,
+        })
+    }, [open])
+
     return (
         <div ref={ref} className="toolbar-dropdown" style={{ width }}>
             <button
@@ -37,8 +89,8 @@ export function ToolbarDropdown({
                 title={tooltip}
                 onClick={() => setOpen((v) => !v)}
             >
-                {render ? (
-                    render(selected)
+                {renderValue ? (
+                    renderValue(selected)
                 ) : (
                     <>
                         {selected?.icon}
@@ -47,41 +99,48 @@ export function ToolbarDropdown({
                 )}
             </button>
 
-            {open &&
-                (dropdown ? (
-                    dropdown({
-                        selectedId,
-                        close: () => setOpen(false),
-                        select: (option) => {
-                            onChange?.(option)
-                            setOpen(false)
-                        },
-                    })
-                ) : (
-                    <div className="toolbar-dropdown-menu">
-                        {options?.map((option) => (
-                            <button
-                                key={option.id}
-                                className={`toolbar-dropdown-option ${option.id === selected.id ? 'selected' : ''}`}
-                                disabled={option.disabled}
-                                onClick={() => {
-                                    onChange?.(option)
-                                    setOpen(false)
-                                }}
-                            >
-                                {option.icon}
+            {open && (
+                <div
+                    ref={popupRef}
+                    className="toolbar-dropdown-menu"
+                    style={{
+                        position: 'fixed',
+                        left: position.left,
+                        top: position.top,
+                    }}
+                >
+                    {dropdown
+                        ? dropdown({
+                              selectedId,
+                              close: () => setOpen(false),
+                              select: (option) => {
+                                  onChange?.(option)
+                                  setOpen(false)
+                              },
+                          })
+                        : options?.map((option) => (
+                              <button
+                                  key={option.id}
+                                  className={`toolbar-dropdown-option ${option.id === selected?.id ? 'selected' : ''}`}
+                                  disabled={option.disabled}
+                                  onClick={() => {
+                                      onChange?.(option)
+                                      setOpen(false)
+                                  }}
+                              >
+                                  {option.icon}
 
-                                <div className="toolbar-dropdown-text">
-                                    <div>{option.label}</div>
+                                  <div className="toolbar-dropdown-text">
+                                      <div>{option.label}</div>
 
-                                    {option.subLabel && (
-                                        <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>
-                                    )}
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                ))}
+                                      {option.subLabel && (
+                                          <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>
+                                      )}
+                                  </div>
+                              </button>
+                          ))}
+                </div>
+            )}
         </div>
     )
 }

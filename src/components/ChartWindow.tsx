@@ -111,7 +111,7 @@ export default function ChartWindow({
                                 top: rect.top,
                                 width: HANDLE_SIZE,
                                 height: rect.height,
-                                background: '#3a3a3a',
+                                background: 'white',
                                 cursor: 'col-resize',
                                 zIndex: 100,
                             }}
@@ -132,7 +132,7 @@ export default function ChartWindow({
                             top: rect.top + firstHeight,
                             width: rect.width,
                             height: HANDLE_SIZE,
-                            background: '#3a3a3a',
+                            background: 'white',
                             cursor: 'row-resize',
                             zIndex: 100,
                         }}

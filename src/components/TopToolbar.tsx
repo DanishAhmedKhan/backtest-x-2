@@ -8,7 +8,6 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import type { ToolbarButtonItem, ToolbarDropdownContent } from './ui/types'
 import svg from '../svg/svg'
 import LayoutPicker from './ui/LayoutPicker'
-import { ToolbarGroup } from './ui/ToolbarGroup'
 
 type Props = {
     ticker: Ticker
@@ -137,7 +136,7 @@ export default function TopToolbar({
                             id: 'asa',
                             selectedId: `tf-${timeframe.toKey()}`,
                             options: timeframeOptions,
-                            render: () => (
+                            renderValue: () => (
                                 <div
                                     style={{ width: 10, height: 5 }}
                                     dangerouslySetInnerHTML={{ __html: svg.dropdown }}
@@ -191,10 +190,15 @@ export default function TopToolbar({
                             id: 'layout',
                             selectedId: `l-${layout}`,
                             options: [],
+                            renderValue: () => (
+                                <div
+                                    style={{ width: 21, height: 19 }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: svg.layout[layout],
+                                    }}
+                                />
+                            ),
                             dropdown,
-                            onChange: (option) => {
-                                // onLayoutChange(layoutType as LayoutType)
-                            },
                         },
                         {
                             type: 'button',

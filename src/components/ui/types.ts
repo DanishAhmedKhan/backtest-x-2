@@ -7,10 +7,13 @@ export type ToolbarItem =
     | ToolbarSeparatorItem
     | ToolbarFillItem
 
+export type ToolbarDirection = 'horizontal' | 'vertical'
+
 export interface ToolbarGroupItem {
     type: 'group'
     id: string
     items: ToolbarItem[]
+    direction?: ToolbarDirection
 }
 
 export interface ToolbarButtonItem {
@@ -37,7 +40,7 @@ export interface ToolbarDropdownItem {
     id: string
     selectedId: string
     options?: ToolbarDropdownOption[]
-    render?: (selected: ToolbarDropdownOption | undefined) => React.ReactNode
+    renderValue?: (selected: ToolbarDropdownOption | undefined) => React.ReactNode
     width?: number | string
     searchable?: boolean
     tooltip?: string

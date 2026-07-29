@@ -21,7 +21,8 @@ export default function ChartFrame({ chart, isActive, onSelect, onDrawingToolbar
                 overflow: 'hidden',
                 minWidth: 0,
                 minHeight: 0,
-                border: isActive ? '3px solid #0051ff' : '3px solid black',
+                borderRadius: 6,
+                border: isActive ? '2px solid #0051ff' : '2px solid white',
             }}
         >
             <Chart
