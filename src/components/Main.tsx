@@ -134,7 +134,7 @@ export default function Main() {
             <div style={{ gridColumn: '1 / span 2' }}>
                 <div
                     style={{
-                        display: 'none',
+                        display: 'block',
                         padding: '0px 2px',
                         backgroundColor: 'white',
                     }}

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-// import { ChevronDown } from 'lucide-react'
 import type { ToolbarDropdownItem } from './types'
 
-export function ToolbarDropdown({ selectedId, options, tooltip, width, onChange }: ToolbarDropdownItem) {
+export function ToolbarDropdown({ selectedId, render, options, tooltip, width, onChange }: ToolbarDropdownItem) {
     const [open, setOpen] = useState(false)
 
     const ref = useRef<HTMLDivElement>(null)
@@ -26,15 +25,19 @@ export function ToolbarDropdown({ selectedId, options, tooltip, width, onChange 
     return (
         <div ref={ref} className="toolbar-dropdown" style={{ width }}>
             <button
-                className={`toolbar-btn ${open ? 'active' : ''}`}
+                className={`toolbar-main ${open ? 'active' : ''}`}
                 title={tooltip}
                 onClick={() => setOpen((v) => !v)}
             >
-                {selected?.icon}
+                {render ? (
+                    render(selected)
+                ) : (
+                    <>
+                        {selected?.icon}
 
-                <span className="toolbar-dropdown-label">{selected?.label}</span>
-
-                {/* <ChevronDown size={14} /> */}
+                        <span className="toolbar-dropdown-label">{selected?.label}</span>
+                    </>
+                )}
             </button>
 
             {open && (

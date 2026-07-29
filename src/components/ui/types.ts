@@ -1,3 +1,5 @@
+import type React from 'react'
+
 export type ToolbarItem =
     | ToolbarGroupItem
     | ToolbarButtonItem
@@ -35,6 +37,7 @@ export interface ToolbarDropdownItem {
     id: string
     selectedId: string
     options: ToolbarDropdownOption[]
+    render?: (selected: ToolbarDropdownOption | undefined) => React.ReactNode
     width?: number | string
     searchable?: boolean
     tooltip?: string

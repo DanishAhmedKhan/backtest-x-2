@@ -1,11 +1,12 @@
 import { Toolbar } from './ui/Toolbar'
 
 import type { Ticker } from '../core/Ticker'
-import type { Timeframe } from '../core/Timeframe'
-import type { LayoutType } from '../types/Layout'
+import { Timeframe } from '../core/Timeframe'
+import { LAYOUT_TYPES, type LayoutType } from '../types/Layout'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import type { ToolbarButtonItem } from './ui/types'
+import svg from '../svg/svg'
 
 type Props = {
     ticker: Ticker
@@ -30,7 +31,7 @@ export default function TopToolbar({
 }: Props) {
     const tickerOptions = TickerRegistry.getAll().map((t) => {
         return {
-            id: `tkr-op-${t.value}`,
+            id: `tkr-${t.value}`,
             label: t.value,
         }
     })
@@ -38,8 +39,12 @@ export default function TopToolbar({
     const timeframeDisplay = TimeframeRegistry.getAll().map((tf) => {
         return {
             type: 'button',
-            id: `tf-${tf.toKey()}`,
+            id: `tf-d-${tf.toKey()}`,
             label: tf.toKey(),
+            active: tf.equals(timeframe),
+            onClick: () => {
+                onTimeframeChange(tf)
+            },
         } as ToolbarButtonItem
     })
 
@@ -60,7 +65,7 @@ export default function TopToolbar({
                         {
                             type: 'dropdown',
                             id: 'ticker',
-                            selectedId: `tkr-op-${ticker.value}`,
+                            selectedId: `tkr-${ticker.value}`,
                             options: tickerOptions,
                             onChange: (option) => {
                                 onTickerChange(TickerRegistry.getByValue(option.label)!)
@@ -75,7 +80,24 @@ export default function TopToolbar({
                 {
                     type: 'group',
                     id: 'tf',
-                    items: timeframeDisplay,
+                    items: [
+                        ...timeframeDisplay,
+                        {
+                            type: 'dropdown',
+                            id: 'asa',
+                            selectedId: `tf-${timeframe.toKey()}`,
+                            options: timeframeOptions,
+                            render: () => (
+                                <div
+                                    style={{ width: 10, height: 5 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.dropdown }}
+                                />
+                            ),
+                            onChange: (option) => {
+                                onTimeframeChange(Timeframe.parse(option.label))
+                            },
+                        },
+                    ],
                 },
                 {
                     type: 'separator',
@@ -83,27 +105,67 @@ export default function TopToolbar({
                 },
                 {
                     type: 'group',
-                    id: 'replay',
+                    id: 'function',
                     items: [
                         {
                             type: 'button',
                             id: 'replay',
-                            label: 'Replay',
+                            icon: (
+                                <div
+                                    style={{ width: 28, height: 28 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.replay }}
+                                />
+                            ),
+                            onClick: onReplayClick,
+                        },
+                        {
+                            type: 'button',
+                            id: 'go-to',
+                            icon: (
+                                <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.goTo }} />
+                            ),
+                            onClick: onJumpToClick,
                         },
                     ],
                 },
                 {
-                    type: 'separator',
-                    id: 's-3',
+                    type: 'fill',
+                    id: 'center-gap',
                 },
                 {
                     type: 'group',
-                    id: 'go-to',
+                    id: 'right-side',
                     items: [
                         {
                             type: 'button',
                             id: 'go-to',
-                            label: 'Go To',
+                            icon: (
+                                <div
+                                    style={{ width: 21, height: 19 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.layout['1x1'] }}
+                                />
+                            ),
+                            onClick: () => {},
+                        },
+                        {
+                            type: 'button',
+                            id: 'settings',
+                            icon: (
+                                <div
+                                    style={{ width: 28, height: 28 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.settings }}
+                                />
+                            ),
+                        },
+                        {
+                            type: 'button',
+                            id: 'snapshot',
+                            icon: (
+                                <div
+                                    style={{ width: 28, height: 28 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.snapshot }}
+                                />
+                            ),
                         },
                     ],
                 },

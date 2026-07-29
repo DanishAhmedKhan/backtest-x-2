@@ -33,6 +33,36 @@
     z-index: 0;
 }
 
+toolbar-btn-popover {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 180px;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 6px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px #0003;
+}
+
+.toolbar-btn.active::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    inset-inline-start: 2px;
+    inset-inline-end: 2px;
+    background: #ebebeb;
+    border-radius: 6px;
+    z-index: -1;
+}
+
+.toolbar-btn.active:hover::before {
+    background-color: #dbdbdb;
+}
+
 .toolbar-btn span {
     color: #0f0f0f;
     font-size: 14px;
@@ -43,8 +73,8 @@
 
 .toolbar-btn svg {
     display: block;
-    width: 16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
 }
 
 .toolbar-btn svg + span,
@@ -60,7 +90,7 @@
     bottom: 2px;
     inset-inline-start: 2px;
     inset-inline-end: 2px;
-    background: #ebebeb;
+    background: #f2f2f2;
     border-radius: 6px;
     z-index: -1;
 }
@@ -68,12 +98,6 @@
 .toolbar-dropdown {
     position: relative;
     height: 100%;
-}
-
-.toolbar-dropdown .toolbar-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
 .toolbar-dropdown-menu {
@@ -117,16 +141,27 @@
     cursor: not-allowed;
 }
 
-.toolbar-dropdown .toolbar-btn {
+.toolbar-dropdown .toolbar-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    font-family: 'Roboto', sans-serif;
+    height: 100%;
+    min-width: 32px;
+    padding: 0 6px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #0f0f0f;
+    transition: background-color 60ms ease, opacity 60ms ease, color 60ms ease;
+    z-index: 0;
 }
 
-.toolbar-dropdown .toolbar-btn.active {
+.toolbar-dropdown .toolbar-main.active {
     height: 100%;
 }
 
-.toolbar-dropdown .toolbar-btn:hover::before {
+.toolbar-dropdown .toolbar-main:hover::before {
     content: '';
     display: block;
     position: absolute;
@@ -137,6 +172,12 @@
     background: #ebebeb;
     border-radius: 6px;
     z-index: -1;
+}
+
+.toolbar-dropdown .toolbar-main svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .toolbar-dropdown-text {
