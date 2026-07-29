@@ -11,6 +11,7 @@
     display: flex;
     align-items: center;
     min-width: 37px;
+    height: 100%;
 }
 
 .toolbar-group:only-child {
@@ -33,7 +34,7 @@
     z-index: 0;
 }
 
-toolbar-btn-popover {
+.toolbar-btn-popover {
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -207,4 +208,95 @@ toolbar-btn-popover {
 
 .toolbar-fill {
     flex: 1;
+}
+
+/* layout picker */
+/* .layout-picker {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 180px;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 6px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px #0003;
+}
+
+.layout-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.layout-picker-row:not(:last-child) {
+    border-bottom: 1px solid #ebebeb;
+}
+
+.layout-picker-number {
+    width: 18px;
+    color: #999;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.layout-picker-icons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.layout-picker-item {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.layout-picker-item:hover {
+    background: #f2f2f2;
+}
+
+.layout-picker-item.selected {
+    background: #2e2e2e;
+}
+
+.layout-picker-item.selected svg {
+    fill: white;
+} */
+
+.layout-picker {
+    min-width: 250px;
+
+    padding: 6px 0;
+}
+
+.layout-picker-row {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 8px 12px;
+}
+
+.layout-picker-row:not(:last-child) {
+    border-bottom: 1px solid var(--toolbar-border);
+}
+
+.layout-picker-number {
+    width: 18px;
+
+    font-size: 12px;
+
+    color: var(--toolbar-muted);
+
+    flex-shrink: 0;
 }

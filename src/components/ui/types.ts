@@ -36,13 +36,22 @@ export interface ToolbarDropdownItem {
     type: 'dropdown'
     id: string
     selectedId: string
-    options: ToolbarDropdownOption[]
+    options?: ToolbarDropdownOption[]
     render?: (selected: ToolbarDropdownOption | undefined) => React.ReactNode
     width?: number | string
     searchable?: boolean
     tooltip?: string
+    dropdown?: ToolbarDropdownContent
     onChange?: (option: ToolbarDropdownOption) => void
 }
+
+export interface ToolbarDropdownContext {
+    selectedId: string
+    close(): void
+    select(option: ToolbarDropdownOption): void
+}
+
+export type ToolbarDropdownContent = (context: ToolbarDropdownContext) => React.ReactNode
 
 export interface ToolbarPopover {
     content: React.ReactNode

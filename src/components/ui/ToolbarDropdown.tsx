@@ -1,12 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ToolbarDropdownItem } from './types'
 
-export function ToolbarDropdown({ selectedId, render, options, tooltip, width, onChange }: ToolbarDropdownItem) {
+export function ToolbarDropdown({
+    selectedId,
+    render,
+    options,
+    tooltip,
+    width,
+    dropdown,
+    onChange,
+}: ToolbarDropdownItem) {
     const [open, setOpen] = useState(false)
 
     const ref = useRef<HTMLDivElement>(null)
 
-    const selected = options.find((o) => o.id === selectedId)
+    const selected = options?.find((o) => o.id === selectedId)
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -34,35 +42,46 @@ export function ToolbarDropdown({ selectedId, render, options, tooltip, width, o
                 ) : (
                     <>
                         {selected?.icon}
-
                         <span className="toolbar-dropdown-label">{selected?.label}</span>
                     </>
                 )}
             </button>
 
-            {open && (
-                <div className="toolbar-dropdown-menu">
-                    {options.map((option) => (
-                        <button
-                            key={option.id}
-                            className={`toolbar-dropdown-option ${option.id === selectedId ? 'selected' : ''}`}
-                            disabled={option.disabled}
-                            onClick={() => {
-                                onChange?.(option)
-                                setOpen(false)
-                            }}
-                        >
-                            {option.icon}
+            {open &&
+                (dropdown ? (
+                    dropdown({
+                        selectedId,
+                        close: () => setOpen(false),
+                        select: (option) => {
+                            onChange?.(option)
+                            setOpen(false)
+                        },
+                    })
+                ) : (
+                    <div className="toolbar-dropdown-menu">
+                        {options?.map((option) => (
+                            <button
+                                key={option.id}
+                                className={`toolbar-dropdown-option ${option.id === selected.id ? 'selected' : ''}`}
+                                disabled={option.disabled}
+                                onClick={() => {
+                                    onChange?.(option)
+                                    setOpen(false)
+                                }}
+                            >
+                                {option.icon}
 
-                            <div className="toolbar-dropdown-text">
-                                <div>{option.label}</div>
+                                <div className="toolbar-dropdown-text">
+                                    <div>{option.label}</div>
 
-                                {option.subLabel && <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            )}
+                                    {option.subLabel && (
+                                        <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>
+                                    )}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                ))}
         </div>
     )
 }

@@ -2,11 +2,13 @@ import { Toolbar } from './ui/Toolbar'
 
 import type { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
-import { LAYOUT_TYPES, type LayoutType } from '../types/Layout'
+import { LAYOUT_TYPES, LAYOUTS, type LayoutType } from '../types/Layout'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
-import type { ToolbarButtonItem } from './ui/types'
+import type { ToolbarButtonItem, ToolbarDropdownContent } from './ui/types'
 import svg from '../svg/svg'
+import LayoutPicker from './ui/LayoutPicker'
+import { ToolbarGroup } from './ui/ToolbarGroup'
 
 type Props = {
     ticker: Ticker
@@ -54,6 +56,54 @@ export default function TopToolbar({
             label: tf.toKey(),
         }
     })
+
+    const layoutByNumber = []
+
+    const layoutButtons = LAYOUT_TYPES.map((layoutType) => {
+        return {
+            type: 'button',
+            id: `l-${layoutType}`,
+            icon: (
+                <div style={{ width: 21, height: 19 }} dangerouslySetInnerHTML={{ __html: svg.layout[layoutType] }} />
+            ),
+        } as ToolbarButtonItem
+    })
+
+    layoutButtons.forEach((layoutButton) => {
+        const layoutType = layoutButton.id.substring(2)
+        const chartCount = LAYOUTS[layoutType]
+        if (!layoutByNumber[chartCount]) layoutByNumber[chartCount] = []
+        layoutByNumber[chartCount].push(layoutButton)
+    })
+
+    const layoutGroups: ToolbarButtonItem[][] = [[], [], [], []]
+
+    layoutButtons.forEach((button) => {
+        const layoutType = button.id.substring(2)
+        const chartCount = LAYOUTS[layoutType]
+        layoutGroups[chartCount - 1].push(button)
+    })
+
+    console.log(layoutGroups)
+
+    const dropdown: ToolbarDropdownContent = ({ select, close }) => (
+        <LayoutPicker
+            selectedId={`l-${layout}`}
+            groups={layoutGroups}
+            onSelect={(id) => {
+                const layoutType = id.substring(2)
+
+                select({
+                    id,
+                    label: layoutType,
+                })
+
+                onLayoutChange(layoutType as LayoutType)
+
+                close()
+            }}
+        />
+    )
 
     return (
         <Toolbar
@@ -137,15 +187,14 @@ export default function TopToolbar({
                     id: 'right-side',
                     items: [
                         {
-                            type: 'button',
-                            id: 'go-to',
-                            icon: (
-                                <div
-                                    style={{ width: 21, height: 19 }}
-                                    dangerouslySetInnerHTML={{ __html: svg.layout['1x1'] }}
-                                />
-                            ),
-                            onClick: () => {},
+                            type: 'dropdown',
+                            id: 'layout',
+                            selectedId: `l-${layout}`,
+                            options: [],
+                            dropdown,
+                            onChange: (option) => {
+                                // onLayoutChange(layoutType as LayoutType)
+                            },
                         },
                         {
                             type: 'button',
