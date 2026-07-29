@@ -5,6 +5,7 @@ import ChartWindow from './ChartWindow'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
 import JumpToDialog from './JumpToDialog'
+import TopToolbar from './TopToolbar'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -131,6 +132,29 @@ export default function Main() {
             }}
         >
             <div style={{ gridColumn: '1 / span 2' }}>
+                <div
+                    style={{
+                        display: 'none',
+                        padding: '0px 2px',
+                        backgroundColor: 'white',
+                    }}
+                >
+                    <TopToolbar
+                        ticker={activeChart.ticker}
+                        timeframe={activeChart.timeframe}
+                        layout={layout}
+                        onTickerChange={(t) => updateActiveChart({ ticker: t })}
+                        onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
+                        onLayoutChange={handleLayoutChange}
+                        onReplayClick={() => {
+                            replayStore.isSelecting = true
+                            replayStore.openToolbar()
+                            setShowReplayToolbar(true)
+                        }}
+                        onJumpToClick={() => setJumpOpen(true)}
+                    />
+                </div>
+
                 <Topbar
                     ticker={activeChart.ticker}
                     timeframe={activeChart.timeframe}
