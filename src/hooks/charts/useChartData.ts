@@ -88,6 +88,10 @@ export function useChartData({
                 skipSeriesUpdate: replayStore.enabled,
             })
 
+            console.log('after applyChartData', timeframe.toString(), timesRef.current.length)
+
+            console.log('calling onChartDataChanged')
+
             runtimeRef.current?.onChartDataChanged()
 
             restoreViewport({

@@ -90,41 +90,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
     })
 
-    useEffect(() => {
-        const chart = chartRef.current
-        const series = seriesRef.current
-        const canvas = drawingCanvasRef.current
-        const container = containerRef.current
-
-        if (!chart || !series || !canvas) return
-        if (!container) return
-
-        if (!drawingContextRef.current) {
-            drawingContextRef.current = new DrawingContext()
-        }
-
-        const drawingContext = drawingContextRef.current
-
-        runtimeRef.current = new ChartRuntime({
-            chart,
-            series,
-            canvas,
-            container,
-            drawingContext,
-            timesRef,
-        })
-
-        runtimeRef.current.start()
-
-        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
-
-        return () => {
-            runtimeRef.current?.dispose()
-            runtimeRef.current = null
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chartReady])
-
     const ohlc = useOHLCOverlay({
         chartRef,
         seriesRef,
@@ -216,6 +181,41 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         canvasRef: drawingCanvasRef,
         containerRef,
     })
+
+    useEffect(() => {
+        const chart = chartRef.current
+        const series = seriesRef.current
+        const canvas = drawingCanvasRef.current
+        const container = containerRef.current
+
+        if (!chart || !series || !canvas) return
+        if (!container) return
+
+        if (!drawingContextRef.current) {
+            drawingContextRef.current = new DrawingContext()
+        }
+
+        const drawingContext = drawingContextRef.current
+
+        runtimeRef.current = new ChartRuntime({
+            chart,
+            series,
+            canvas,
+            container,
+            drawingContext,
+            timesRef,
+        })
+
+        runtimeRef.current.start()
+
+        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
+
+        return () => {
+            runtimeRef.current?.dispose()
+            runtimeRef.current = null
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chartReady])
 
     useDrawingTools({
         chartRef,

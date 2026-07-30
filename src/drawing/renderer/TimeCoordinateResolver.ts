@@ -100,6 +100,29 @@ export class TimeCoordinateResolver {
 
         const fraction = (time - leftTime) / (rightTime - leftTime)
 
+        console.log(
+            'timeToLogical',
+            time,
+            'times length:',
+            times.length,
+            'first:',
+            times[0],
+            'last:',
+            times[times.length - 1],
+        )
+
+        console.log({
+            target: time,
+            leftIndex: right,
+            rightIndex: left,
+            leftTime,
+            rightTime,
+            fraction,
+            logical: right + (left - right) * fraction,
+        })
+
+        console.log('times length', times.length)
+
         return right + (left - right) * fraction
     }
 

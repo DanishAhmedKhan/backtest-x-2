@@ -49,6 +49,8 @@ export class ChartRuntime {
 
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
+        // this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.logicalResolver)
+
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,
             drawingContext.previewDrawingManager,

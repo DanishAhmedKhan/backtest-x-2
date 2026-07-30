@@ -42,25 +42,6 @@ export class CandleService {
         }
     }
 
-    // private static getInitialFileCount(timeframe: Timeframe): number {
-    //     switch (timeframe.unit) {
-    //         case TimeframeUnit.Minute:
-    //             return 5
-
-    //         case TimeframeUnit.Hour:
-    //             return 20
-
-    //         case TimeframeUnit.Day:
-    //         case TimeframeUnit.Week:
-    //         case TimeframeUnit.Month:
-    //         case TimeframeUnit.Year:
-    //             return 20
-
-    //         default:
-    //             return 5
-    //     }
-    // }
-
     private static readonly loadingPolicy = {
         60: { initial: 5, adjacent: 2 },
         300: { initial: 8, adjacent: 3 },
