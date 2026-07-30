@@ -25,7 +25,7 @@ export default function ReplayOverlay({ x }: Props) {
                     right: 0,
                     top: 0,
                     bottom: 0,
-                    background: 'rgba(0,0,0,0.45)',
+                    background: 'rgba(255,255,255,0.45)',
                     pointerEvents: 'none',
                     zIndex: 999,
                 }}

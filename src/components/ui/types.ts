@@ -65,6 +65,7 @@ export interface ToolbarPopover {
 export interface ToolbarSeparatorItem {
     type: 'separator'
     id: string
+    direction?: ToolbarDirection
 }
 
 export interface ToolbarFillItem {

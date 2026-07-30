@@ -19,6 +19,7 @@ export const DEFAULT_CHART_CONFIG = {
     timeScale: {
         borderColor: 'rgba(0, 0, 0, .2)',
         timeVisible: true,
+        rightOffset: 20,
         rightBarStaysOnScroll: true,
         shiftVisibleRangeOnNewBar: false,
     },

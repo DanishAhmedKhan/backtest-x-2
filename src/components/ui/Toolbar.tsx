@@ -1,3 +1,4 @@
+import { ToolbarProvider } from './ToolbarProvider'
 import { ToolbarItems } from './ToolbarItems'
 import type { ToolbarDirection, ToolbarItem } from './types'
 
@@ -10,8 +11,10 @@ type Props = {
 
 export function Toolbar({ items, direction = 'horizontal' }: Props) {
     return (
-        <div className={`toolbar toolbar-${direction}`}>
-            <ToolbarItems items={items} />
-        </div>
+        <ToolbarProvider direction={direction}>
+            <div className={`toolbar toolbar-${direction}`}>
+                <ToolbarItems items={items} />
+            </div>
+        </ToolbarProvider>
     )
 }
