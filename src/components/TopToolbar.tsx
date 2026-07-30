@@ -8,6 +8,7 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import type { ToolbarButtonItem, ToolbarDropdownContent } from './ui/types'
 import svg from '../svg/svg'
 import LayoutPicker from './ui/LayoutPicker'
+import { DropdownArrow } from './ui/DropdownArrow'
 
 type Props = {
     ticker: Ticker
@@ -129,17 +130,30 @@ export default function TopToolbar({
                     id: 'tf',
                     items: [
                         ...timeframeDisplay,
+                        // {
+                        //     type: 'dropdown',
+                        //     id: 'asa',
+                        //     selectedId: `tf-${timeframe.toKey()}`,
+                        //     options: timeframeOptions,
+                        //     renderValue: () => (
+                        //         <div
+                        //             style={{ width: 10, height: 5 }}
+                        //             dangerouslySetInnerHTML={{ __html: svg.dropdown }}
+                        //         />
+                        //     ),
+                        //     onChange: (option) => {
+                        //         onTimeframeChange(Timeframe.parse(option.label))
+                        //     },
+                        // },
+
                         {
                             type: 'dropdown',
                             id: 'asa',
                             selectedId: `tf-${timeframe.toKey()}`,
                             options: timeframeOptions,
-                            renderValue: () => (
-                                <div
-                                    style={{ width: 10, height: 5 }}
-                                    dangerouslySetInnerHTML={{ __html: svg.dropdown }}
-                                />
-                            ),
+
+                            renderValue: ({ open }) => <DropdownArrow open={open} />,
+
                             onChange: (option) => {
                                 onTimeframeChange(Timeframe.parse(option.label))
                             },

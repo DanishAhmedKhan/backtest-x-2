@@ -52,10 +52,6 @@ export function ToolbarDropdown({
         let left = triggerRect.left
         let top = triggerRect.bottom + 4
 
-        //
-        // Horizontal
-        //
-
         if (left + popupRect.width > window.innerWidth - margin) {
             left = window.innerWidth - popupRect.width - margin
         }
@@ -63,10 +59,6 @@ export function ToolbarDropdown({
         if (left < margin) {
             left = margin
         }
-
-        //
-        // Vertical
-        //
 
         if (top + popupRect.height > window.innerHeight - margin) {
             top = triggerRect.top - popupRect.height - 4
@@ -90,7 +82,10 @@ export function ToolbarDropdown({
                 onClick={() => setOpen((v) => !v)}
             >
                 {renderValue ? (
-                    renderValue(selected)
+                    renderValue({
+                        selected,
+                        open,
+                    })
                 ) : (
                     <>
                         {selected?.icon}
