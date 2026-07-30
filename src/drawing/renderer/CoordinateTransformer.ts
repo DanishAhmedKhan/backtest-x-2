@@ -1,4 +1,5 @@
-import type { IChartApi, ISeriesApi, Time } from 'lightweight-charts'
+import type { ISeriesApi } from 'lightweight-charts'
+import type { TimeCoordinateResolver } from './TimeCoordinateResolver'
 
 export type ScreenPoint = {
     x: number
@@ -11,10 +12,13 @@ export type DomainPoint = {
 }
 
 export class CoordinateTransformer {
-    constructor(private readonly chart: IChartApi, private readonly series: ISeriesApi<'Candlestick'>) {}
+    constructor(
+        private readonly series: ISeriesApi<'Candlestick'>,
+        private readonly timeResolver: TimeCoordinateResolver,
+    ) {}
 
     public toPoint(time: number, price: number): ScreenPoint | null {
-        const x = this.chart.timeScale().timeToCoordinate(time as Time)
+        const x = this.timeResolver.timeToCoordinate(time)
         const y = this.series.priceToCoordinate(price)
 
         if (x == null || y == null) {
@@ -28,7 +32,7 @@ export class CoordinateTransformer {
     }
 
     public toTime(x: number): number | null {
-        const time = this.chart.timeScale().coordinateToTime(x)
+        const time = this.timeResolver.coordinateToTime(x)
 
         if (typeof time !== 'number') {
             return null

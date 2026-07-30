@@ -83,8 +83,6 @@ export default function TopToolbar({
         layoutGroups[chartCount - 1].push(button)
     })
 
-    console.log(layoutGroups)
-
     const dropdown: ToolbarDropdownContent = ({ select, close }) => (
         <LayoutPicker
             selectedId={`l-${layout}`}

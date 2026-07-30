@@ -26,6 +26,7 @@ import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import { ToolController } from '../drawing/ToolController'
+import { TimeCoordinateResolver } from '../drawing/renderer/TimeCoordinateResolver'
 import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer'
 import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
 import { RenderLoop } from '../drawing/renderer/RenderLoop'
@@ -237,16 +238,16 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         onDrawingToolbarManagerReady?.(drawingContext.drawingToolbarManager)
 
-        const transformer = new CoordinateTransformer(chart, series)
+        const timeResolver = new TimeCoordinateResolver(chart, timesRef)
+        const transformer = new CoordinateTransformer(series, timeResolver)
 
         drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
             drawingContext.drawingManager,
             drawingContext.previewDrawingManager,
             drawingContext.rendererManager,
             drawingContext.drawingStateManager,
+            transformer,
             canvas,
-            chart,
-            series,
         )
 
         const snapshot = new ChartSnapshot(chart, series, container)

@@ -1,5 +1,3 @@
-import type { IChartApi, ISeriesApi } from 'lightweight-charts'
-
 import type { DrawingManager } from '../managers/DrawingManager'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import { RendererManager } from './RendererManager'
@@ -9,16 +7,13 @@ import { CoordinateTransformer } from './CoordinateTransformer'
 export class DrawingCanvasRenderer {
     private readonly ctx: CanvasRenderingContext2D
 
-    private readonly transformer: CoordinateTransformer
-
     constructor(
         private readonly drawingManager: DrawingManager,
         private readonly previewDrawingManager: PreviewDrawingManager,
         private readonly rendererManager: RendererManager,
         private readonly drawingStateManager: DrawingStateManager,
+        private readonly transformer: CoordinateTransformer,
         private readonly canvas: HTMLCanvasElement,
-        chart: IChartApi,
-        series: ISeriesApi<'Candlestick'>,
     ) {
         const ctx = canvas.getContext('2d')
 
@@ -27,8 +22,6 @@ export class DrawingCanvasRenderer {
         }
 
         this.ctx = ctx
-
-        this.transformer = new CoordinateTransformer(chart, series)
     }
 
     public render() {
