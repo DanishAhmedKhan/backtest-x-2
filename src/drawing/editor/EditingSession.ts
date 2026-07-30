@@ -1,6 +1,6 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { HitTarget } from '../hitTest/HitTestResult'
-import type { ChartPoint } from '../models/ChartPoint'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
 
 import type { EditTarget } from './EditTarget'
 
@@ -9,11 +9,11 @@ export class EditingSession {
 
     private hitTarget: HitTarget | null = null
 
-    private startPointer: ChartPoint | null = null
+    private startPointer: DrawingAnchor | null = null
 
     private originalDrawing: Drawing | null = null
 
-    public begin(target: EditTarget, startPointer: ChartPoint, originalDrawing: Drawing) {
+    public begin(target: EditTarget, startPointer: DrawingAnchor, originalDrawing: Drawing) {
         this.target = target
         this.hitTarget = target.target
         this.startPointer = startPointer

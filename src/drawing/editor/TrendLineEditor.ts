@@ -47,37 +47,38 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
 
     private moveStartHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
         drawing.start = {
-            ...event.point,
+            ...event.anchor,
         }
     }
 
     private moveEndHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
         drawing.end = {
-            ...event.point,
+            ...event.anchor,
         }
     }
 
     private moveBody(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
         const original = session.getOriginalDrawing() as TrendLineDrawing
-
         const startPointer = session.getStartPointer()
 
         if (!original || !startPointer) {
             return
         }
 
-        const dt = event.point.time - startPointer.time
+        const logicalDelta = event.anchor.logical - startPointer.logical
 
-        const dp = event.point.price - startPointer.price
+        const priceDelta = event.anchor.price - startPointer.price
 
         drawing.start = {
-            time: original.start.time + dt,
-            price: original.start.price + dp,
+            logical: original.start.logical + logicalDelta,
+            time: original.start.time,
+            price: original.start.price + priceDelta,
         }
 
         drawing.end = {
-            time: original.end.time + dt,
-            price: original.end.price + dp,
+            logical: original.end.logical + logicalDelta,
+            time: original.end.time,
+            price: original.end.price + priceDelta,
         }
     }
 }

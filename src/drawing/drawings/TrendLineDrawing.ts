@@ -1,9 +1,9 @@
-import { DrawingType } from '../DrawingType'
-import type { ChartPoint } from '../models/ChartPoint'
 import { LineDrawing } from './LineDrawing'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
+import { DrawingType } from '../DrawingType'
 
 export class TrendLineDrawing extends LineDrawing {
-    constructor(id: string, start: ChartPoint, end: ChartPoint) {
+    constructor(id: string, start: DrawingAnchor, end: DrawingAnchor) {
         super(id, DrawingType.TrendLine, start, end)
     }
 

@@ -23,7 +23,7 @@ export class EditController {
                 drawing: hit.drawing,
                 target: hit.target,
             },
-            event.point,
+            event.anchor,
             hit.drawing.clone(),
         )
 

@@ -73,9 +73,9 @@ export class PointerController {
     }
 
     private convert(event: RawPointerEvent): ChartPointerEvent | null {
-        const point = this.transformer.toDomain(event.x, event.y)
+        const anchor = this.transformer.toAnchor(event.x, event.y)
 
-        if (!point) {
+        if (!anchor) {
             return null
         }
 
@@ -84,7 +84,7 @@ export class PointerController {
                 x: event.x,
                 y: event.y,
             },
-            point,
+            anchor,
             shiftKey: event.shiftKey,
             ctrlKey: event.ctrlKey,
             altKey: event.altKey,

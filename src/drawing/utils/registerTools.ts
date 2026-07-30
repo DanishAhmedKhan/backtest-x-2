@@ -2,7 +2,7 @@ import type { ToolManager } from '../tools/ToolManager'
 import type { DrawingManager } from '../managers/DrawingManager'
 
 import { PanTool } from '../drawings/PanTool'
-import { TrendLineTool } from '../tools/TrendLineTools'
+import { TrendLineTool } from '../tools/TrendLineTool'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 

@@ -30,14 +30,14 @@ export class TrendLineTool implements Tool {
 
     public handlePointerDown(event: ChartPointerEvent) {
         if (!this.preview) {
-            this.preview = new TrendLineDrawing(crypto.randomUUID(), event.point, event.point)
+            this.preview = new TrendLineDrawing(crypto.randomUUID(), event.anchor, event.anchor)
 
             this.previewDrawingManager.set(this.preview)
 
             return
         }
 
-        this.preview.end = event.point
+        this.preview.end = event.anchor
 
         this.drawingManager.addDrawing(this.preview)
 
@@ -55,7 +55,7 @@ export class TrendLineTool implements Tool {
             return
         }
 
-        this.preview.end = event.point
+        this.preview.end = event.anchor
 
         this.previewDrawingManager.set(this.preview)
     }

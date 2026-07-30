@@ -1,14 +1,11 @@
 import type { ISeriesApi } from 'lightweight-charts'
-import type { TimeCoordinateResolver } from './TimeCoordinateResolver'
+
+import type { DrawingAnchor } from '../models/DrawingAnchor'
+import { TimeCoordinateResolver } from './TimeCoordinateResolver'
 
 export type ScreenPoint = {
     x: number
     y: number
-}
-
-export type DomainPoint = {
-    time: number
-    price: number
 }
 
 export class CoordinateTransformer {
@@ -17,9 +14,9 @@ export class CoordinateTransformer {
         private readonly timeResolver: TimeCoordinateResolver,
     ) {}
 
-    public toPoint(time: number, price: number): ScreenPoint | null {
-        const x = this.timeResolver.timeToCoordinate(time)
-        const y = this.series.priceToCoordinate(price)
+    public toPoint(anchor: DrawingAnchor): ScreenPoint | null {
+        const x = this.timeResolver.logicalToCoordinate(anchor.logical)
+        const y = this.series.priceToCoordinate(anchor.price)
 
         if (x == null || y == null) {
             return null
@@ -31,36 +28,21 @@ export class CoordinateTransformer {
         }
     }
 
-    public toTime(x: number): number | null {
-        const time = this.timeResolver.coordinateToTime(x)
+    public toAnchor(x: number, y: number): DrawingAnchor | null {
+        const anchor = this.timeResolver.coordinateToAnchor(x)
 
-        if (typeof time !== 'number') {
+        if (!anchor) {
             return null
         }
 
-        return time
-    }
-
-    public toPrice(y: number): number | null {
         const price = this.series.coordinateToPrice(y)
 
         if (price == null) {
             return null
         }
 
-        return price
-    }
-
-    public toDomain(x: number, y: number): DomainPoint | null {
-        const time = this.toTime(x)
-        const price = this.toPrice(y)
-
-        if (time == null || price == null) {
-            return null
-        }
-
         return {
-            time,
+            ...anchor,
             price,
         }
     }

@@ -15,7 +15,7 @@ export class SelectionController {
     ) {}
 
     public handlePointerDown(event: ChartPointerEvent): HitTestResult | null {
-        const result = this.hitTestManager.hitTest(event.point, this.transformer, HitTestConstants.EDIT_LINE_TOLERANCE)
+        const result = this.hitTestManager.hitTest(event.anchor, this.transformer, HitTestConstants.EDIT_LINE_TOLERANCE)
 
         if (!result) {
             this.drawingStateManager.clearSelection()

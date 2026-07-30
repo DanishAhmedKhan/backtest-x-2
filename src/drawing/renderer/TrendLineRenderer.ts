@@ -17,8 +17,8 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         transformer: CoordinateTransformer,
         state: DrawingRenderState,
     ) {
-        const start = transformer.toPoint(drawing.start.time, drawing.start.price)
-        const end = transformer.toPoint(drawing.end.time, drawing.end.price)
+        const start = transformer.toPoint(drawing.start)
+        const end = transformer.toPoint(drawing.end)
 
         const hovered = state.hovered === drawing
         const selected = state.selected === drawing
@@ -29,7 +29,6 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         if (hovered || selected) {
             DrawingPrimitives.circle(ctx, start, 5, '#fff', drawing.color)
-
             DrawingPrimitives.circle(ctx, end, 5, '#fff', drawing.color)
         }
     }

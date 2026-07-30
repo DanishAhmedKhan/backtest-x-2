@@ -13,6 +13,8 @@ import { HoverController } from '../controller/HoverController'
 import { SelectionController } from '../controller/SelectionController'
 import { EditController } from '../controller/EditController'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
+import { LogicalTimeCoordinateResolver } from '../renderer/LogicalTimeCoordinateResolver'
+import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
 
 type Params = {
     chart: IChartApi
@@ -24,12 +26,15 @@ type Params = {
 }
 
 export class ChartRuntime {
-    public readonly transformer: CoordinateTransformer
-    public readonly timeResolver: TimeCoordinateResolver
     public readonly renderLoop: RenderLoop
     public readonly pointerController: PointerController
     public readonly toolController: ToolController
     private readonly drawingCanvasRenderer: DrawingCanvasRenderer
+
+    public readonly transformer: CoordinateTransformer
+    public readonly timeResolver: TimeCoordinateResolver
+    public readonly logicalResolver: LogicalTimeCoordinateResolver
+    private readonly drawingLogicalUpdater: DrawingLogicalUpdater
 
     private readonly unsubscribers: (() => void)[] = []
 
@@ -38,7 +43,11 @@ export class ChartRuntime {
 
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef)
 
+        this.logicalResolver = new LogicalTimeCoordinateResolver(chart, timesRef)
+
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
+
+        this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,
@@ -120,6 +129,11 @@ export class ChartRuntime {
 
     public handlePointerLeave() {
         this.pointerController.handlePointerLeave()
+    }
+
+    public onChartDataChanged() {
+        this.drawingLogicalUpdater.update()
+        this.renderLoop.invalidate()
     }
 
     public start() {

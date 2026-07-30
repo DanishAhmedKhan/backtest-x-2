@@ -4,10 +4,10 @@ import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTestResult'
-import type { ChartPoint } from '../models/ChartPoint'
 import { HitTestConstants } from './HitTestConstant'
 import { CursorType } from '../CursorType'
 import { LineGeometry } from '../geometry/LineGeometry'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
 
 export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
     public canHitTest(drawing: Drawing): drawing is TrendLineDrawing {
@@ -16,13 +16,13 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
 
     public hitTest(
         drawing: TrendLineDrawing,
-        point: ChartPoint,
+        point: DrawingAnchor,
         transformer: CoordinateTransformer,
         tolerance = HitTestConstants.HOVER_LINE_TOLERANCE,
     ) {
-        const start = transformer.toPoint(drawing.start.time, drawing.start.price)
-        const end = transformer.toPoint(drawing.end.time, drawing.end.price)
-        const mouse = transformer.toPoint(point.time, point.price)
+        const start = transformer.toPoint(drawing.start)
+        const end = transformer.toPoint(drawing.end)
+        const mouse = transformer.toPoint(point)
 
         if (!start || !end || !mouse) {
             return null

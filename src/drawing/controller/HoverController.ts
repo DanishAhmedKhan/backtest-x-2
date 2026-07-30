@@ -16,7 +16,11 @@ export class HoverController {
     ) {}
 
     public handlePointerMove(event: ChartPointerEvent) {
-        const result = this.hitTestManager.hitTest(event.point, this.transformer, HitTestConstants.HOVER_LINE_TOLERANCE)
+        const result = this.hitTestManager.hitTest(
+            event.anchor,
+            this.transformer,
+            HitTestConstants.HOVER_LINE_TOLERANCE,
+        )
 
         const hovered = result?.drawing ?? null
 

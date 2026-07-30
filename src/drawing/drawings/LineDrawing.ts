@@ -1,14 +1,13 @@
-import { DrawingObject } from './DrawingObject'
-
-import type { ChartPoint } from '../models/ChartPoint'
 import type { DrawingType } from '../DrawingType'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
+import { DrawingObject } from './DrawingObject'
 
 export abstract class LineDrawing extends DrawingObject {
     public color = '#2962FF'
 
     public width = 2
 
-    constructor(id: string, type: DrawingType, public start: ChartPoint, public end: ChartPoint) {
+    constructor(id: string, type: DrawingType, public start: DrawingAnchor, public end: DrawingAnchor) {
         super(id, type)
     }
 }

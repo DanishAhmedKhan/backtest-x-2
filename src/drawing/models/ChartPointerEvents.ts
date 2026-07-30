@@ -1,11 +1,9 @@
-import type { ChartPoint } from './ChartPoint'
+import type { ScreenPoint } from '../renderer/CoordinateTransformer'
+import type { DrawingAnchor } from './DrawingAnchor'
 
 export type ChartPointerEvent = {
-    screen: {
-        x: number
-        y: number
-    }
-    point: ChartPoint
+    screen: ScreenPoint
+    anchor: DrawingAnchor
     shiftKey: boolean
     ctrlKey: boolean
     altKey: boolean

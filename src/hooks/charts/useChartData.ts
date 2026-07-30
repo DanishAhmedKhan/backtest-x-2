@@ -14,6 +14,7 @@ import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
 import { applyChartData } from '../utilities/applyChartData'
 import { restoreViewport } from '../utilities/viewport'
+import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 
 type Params = {
     ticker: Ticker
@@ -29,6 +30,7 @@ type Params = {
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     viewportRef: React.RefObject<ViewportState>
+    runtimeRef: React.RefObject<ChartRuntime | null>
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -46,6 +48,7 @@ export function useChartData({
     loadedWindowRef,
     totalFilesRef,
     viewportRef,
+    runtimeRef,
     setIsChangingTimeframe,
 }: Params) {
     useEffect(() => {
@@ -84,6 +87,8 @@ export function useChartData({
                 timesRef,
                 skipSeriesUpdate: replayStore.enabled,
             })
+
+            runtimeRef.current?.onChartDataChanged()
 
             restoreViewport({
                 chart,

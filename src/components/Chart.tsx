@@ -90,6 +90,41 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
     })
 
+    useEffect(() => {
+        const chart = chartRef.current
+        const series = seriesRef.current
+        const canvas = drawingCanvasRef.current
+        const container = containerRef.current
+
+        if (!chart || !series || !canvas) return
+        if (!container) return
+
+        if (!drawingContextRef.current) {
+            drawingContextRef.current = new DrawingContext()
+        }
+
+        const drawingContext = drawingContextRef.current
+
+        runtimeRef.current = new ChartRuntime({
+            chart,
+            series,
+            canvas,
+            container,
+            drawingContext,
+            timesRef,
+        })
+
+        runtimeRef.current.start()
+
+        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
+
+        return () => {
+            runtimeRef.current?.dispose()
+            runtimeRef.current = null
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chartReady])
+
     const ohlc = useOHLCOverlay({
         chartRef,
         seriesRef,
@@ -149,6 +184,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         loadedWindowRef,
         totalFilesRef,
         viewportRef,
+        runtimeRef,
         setIsChangingTimeframe: (value) => {
             isChangingTimeframeRef.current = value
         },
@@ -181,6 +217,16 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         containerRef,
     })
 
+    useDrawingTools({
+        chartRef,
+        containerRef,
+        runtimeRef,
+    })
+
+    useToolSync({
+        runtimeRef,
+    })
+
     useEffect(() => {
         chartRef.current?.applyOptions({
             crosshair: {
@@ -208,57 +254,12 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }, [])
 
     useEffect(() => {
-        const chart = chartRef.current
-        const series = seriesRef.current
-        const canvas = drawingCanvasRef.current
-        const container = containerRef.current
-
-        if (!chart || !series || !canvas) return
-        if (!container) return
-
-        if (!drawingContextRef.current) {
-            drawingContextRef.current = new DrawingContext()
-        }
-
-        const drawingContext = drawingContextRef.current
-
-        runtimeRef.current = new ChartRuntime({
-            chart,
-            series,
-            canvas,
-            container,
-            drawingContext,
-            timesRef,
-        })
-
-        runtimeRef.current.start()
-
-        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
-
-        return () => {
-            runtimeRef.current?.dispose()
-            runtimeRef.current = null
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chartReady])
-
-    useEffect(() => {
         const unsubscribe = eventBus.on('drawingCompleted', () => {
             toolStore.select(ToolType.Pan)
         })
 
         return unsubscribe
     }, [])
-
-    useDrawingTools({
-        chartRef,
-        containerRef,
-        runtimeRef,
-    })
-
-    useToolSync({
-        runtimeRef,
-    })
 
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
