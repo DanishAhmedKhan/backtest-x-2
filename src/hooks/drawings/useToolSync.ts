@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
 
 import { eventBus } from '../../event/EventBus'
-import { ToolController } from '../../drawing/ToolController'
+import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 
 type Params = {
-    controllerRef: React.RefObject<ToolController | null>
+    runtimeRef: React.RefObject<ChartRuntime | null>
 }
 
-export function useToolSync({ controllerRef }: Params) {
+export function useToolSync({ runtimeRef }: Params) {
     useEffect(() => {
         return eventBus.on('toolChanged', ({ tool }) => {
-            controllerRef.current?.setTool(tool)
+            runtimeRef?.current.toolController.setTool(tool)
         })
-    }, [controllerRef])
+    }, [runtimeRef])
 }

@@ -23,18 +23,10 @@ import { useDrawingTools } from '../hooks/charts/useDrawingTool'
 import { useToolSync } from '../hooks/drawings/useToolSync'
 import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 
+import { ChartRuntime } from '../drawing/runtime/ChartRuntime'
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import { ToolController } from '../drawing/ToolController'
-import { TimeCoordinateResolver } from '../drawing/renderer/TimeCoordinateResolver'
-import { CoordinateTransformer } from '../drawing/renderer/CoordinateTransformer'
-import { DrawingCanvasRenderer } from '../drawing/renderer/DrawingCanvasRenderer'
-import { RenderLoop } from '../drawing/renderer/RenderLoop'
-import { ChartSnapshot } from '../drawing/renderer/ChartSnapshot'
-import { PointerController } from '../drawing/controller/PointerController'
-import { HoverController } from '../drawing/controller/HoverController'
-import { SelectionController } from '../drawing/controller/SelectionController'
-import { EditController } from '../drawing/controller/EditController'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 import { toolStore } from '../drawing/ToolStore'
 
@@ -45,7 +37,6 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import { CursorManager } from '../drawing/CursorManager'
 
 type Props = {
     id: string
@@ -89,10 +80,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const isLoadingDataRef = useRef(false)
 
     const drawingContextRef = useRef<DrawingContext | null>(null)
-    const pointerControllerRef = useRef<PointerController | null>(null)
     const toolControllerRef = useRef<ToolController | null>(null)
-    const drawingCanvasRendererRef = useRef<DrawingCanvasRenderer | null>(null)
-    const renderLoopRef = useRef<RenderLoop | null>(null)
+
+    const runtimeRef = useRef<ChartRuntime | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -186,10 +176,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         viewportRef,
     })
 
-    useToolSync({
-        controllerRef: toolControllerRef,
-    })
-
     useDrawingCanvas({
         canvasRef: drawingCanvasRef,
         containerRef,
@@ -236,88 +222,22 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         const drawingContext = drawingContextRef.current
 
-        onDrawingToolbarManagerReady?.(drawingContext.drawingToolbarManager)
-
-        const timeResolver = new TimeCoordinateResolver(chart, timesRef)
-        const transformer = new CoordinateTransformer(series, timeResolver)
-
-        drawingCanvasRendererRef.current = new DrawingCanvasRenderer(
-            drawingContext.drawingManager,
-            drawingContext.previewDrawingManager,
-            drawingContext.rendererManager,
-            drawingContext.drawingStateManager,
-            transformer,
+        runtimeRef.current = new ChartRuntime({
+            chart,
+            series,
             canvas,
-        )
-
-        const snapshot = new ChartSnapshot(chart, series, container)
-
-        renderLoopRef.current = new RenderLoop(snapshot, () => {
-            drawingCanvasRendererRef.current?.render()
+            container,
+            drawingContext,
+            timesRef,
         })
 
-        renderLoopRef.current.start()
+        runtimeRef.current.start()
 
-        drawingContext.registerActionProviders(renderLoopRef.current!)
-
-        const cursorManager = new CursorManager(container)
-
-        const hoverController = new HoverController(
-            drawingContext.drawingStateManager,
-            drawingContext.hitTestManager,
-            transformer,
-            renderLoopRef.current,
-            cursorManager,
-        )
-
-        const selectionController = new SelectionController(
-            drawingContext.drawingStateManager,
-            drawingContext.hitTestManager,
-            transformer,
-            renderLoopRef.current,
-        )
-
-        toolControllerRef.current = new ToolController(drawingContext.toolManager, chart)
-        toolControllerRef.current.syncChartInteraction()
-
-        const editController = new EditController(
-            drawingContext.editingSession,
-            drawingContext.editorManager,
-            renderLoopRef.current,
-            toolControllerRef.current,
-        )
-
-        pointerControllerRef.current = new PointerController(
-            drawingContext.toolManager,
-            hoverController,
-            selectionController,
-            editController,
-            transformer,
-        )
-
-        const unsubscribeDrawings = drawingContext.drawingManager.subscribeChanged(() => {
-            renderLoopRef.current?.invalidate()
-        })
-
-        const unsubscribePreview = drawingContext.previewDrawingManager.subscribeChanged(() => {
-            renderLoopRef.current?.invalidate()
-        })
-
-        const unsubscribeDrawingState = drawingContextRef.current.drawingStateManager.subscribeChanged(() => {
-            renderLoopRef.current?.invalidate()
-        })
+        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
 
         return () => {
-            unsubscribeDrawings()
-            unsubscribePreview()
-            unsubscribeDrawingState()
-
-            renderLoopRef.current?.stop()
-
-            pointerControllerRef.current = null
-            toolControllerRef.current = null
-            drawingCanvasRendererRef.current = null
-            renderLoopRef.current = null
+            runtimeRef.current?.dispose()
+            runtimeRef.current = null
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chartReady])
@@ -333,7 +253,11 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     useDrawingTools({
         chartRef,
         containerRef,
-        pointerControllerRef,
+        runtimeRef,
+    })
+
+    useToolSync({
+        runtimeRef,
     })
 
     const handleReplaySelection = () => {

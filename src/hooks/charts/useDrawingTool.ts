@@ -1,15 +1,15 @@
 import { useEffect } from 'react'
 import type { IChartApi, MouseEventParams, Time } from 'lightweight-charts'
-import type { PointerController } from '../../drawing/controller/PointerController'
 import type { RawPointerEvent } from '../../drawing/models/RawPointerEvent'
+import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
     containerRef: React.RefObject<HTMLDivElement | null>
-    pointerControllerRef: React.RefObject<PointerController | null>
+    runtimeRef: React.RefObject<ChartRuntime | null>
 }
 
-export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }: Params) {
+export function useDrawingTools({ chartRef, containerRef, runtimeRef }: Params) {
     useEffect(() => {
         const chart = chartRef.current
         if (!chart) {
@@ -38,7 +38,7 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
         })
 
         const handlePointerMove = (param: MouseEventParams<Time>) => {
-            pointerControllerRef.current.handlePointerMove(
+            runtimeRef.current?.handlePointerMove(
                 createRawPointerEvent(
                     param.point?.x ?? 0,
                     param.point?.y ?? 0,
@@ -51,19 +51,19 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
         }
 
         const handlePointerDown = (e: PointerEvent) => {
-            pointerControllerRef.current.handlePointerDown(
+            runtimeRef.current?.handlePointerDown(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
         }
 
         const handlePointerUp = (e: PointerEvent) => {
-            pointerControllerRef.current.handlePointerUp(
+            runtimeRef.current?.handlePointerUp(
                 createRawPointerEvent(e.offsetX, e.offsetY, undefined, e.shiftKey, e.ctrlKey, e.altKey),
             )
         }
 
         const handlePointerLeave = () => {
-            pointerControllerRef.current.handlePointerLeave()
+            runtimeRef.current?.handlePointerLeave()
         }
 
         chart.subscribeCrosshairMove(handlePointerMove)
@@ -77,5 +77,5 @@ export function useDrawingTools({ chartRef, containerRef, pointerControllerRef }
             window.removeEventListener('pointerup', handlePointerUp)
             container.removeEventListener('pointerleave', handlePointerLeave)
         }
-    }, [chartRef, containerRef, pointerControllerRef])
+    }, [chartRef, containerRef, runtimeRef])
 }
