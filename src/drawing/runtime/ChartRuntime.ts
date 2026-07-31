@@ -13,7 +13,6 @@ import { HoverController } from '../controller/HoverController'
 import { SelectionController } from '../controller/SelectionController'
 import { EditController } from '../controller/EditController'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
-import { LogicalTimeCoordinateResolver } from '../renderer/LogicalTimeCoordinateResolver'
 import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
 
 type Params = {
@@ -33,7 +32,6 @@ export class ChartRuntime {
 
     public readonly transformer: CoordinateTransformer
     public readonly timeResolver: TimeCoordinateResolver
-    public readonly logicalResolver: LogicalTimeCoordinateResolver
     private readonly drawingLogicalUpdater: DrawingLogicalUpdater
 
     private readonly unsubscribers: (() => void)[] = []
@@ -42,14 +40,8 @@ export class ChartRuntime {
         const { chart, series, canvas, container, drawingContext, timesRef } = params
 
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef)
-
-        this.logicalResolver = new LogicalTimeCoordinateResolver(chart, timesRef)
-
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
-
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
-
-        // this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.logicalResolver)
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,

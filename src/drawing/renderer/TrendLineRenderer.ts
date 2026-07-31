@@ -20,13 +20,6 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         const start = transformer.toPoint(drawing.start)
         const end = transformer.toPoint(drawing.end)
 
-        console.log({
-            startAnchor: drawing.start,
-            endAnchor: drawing.end,
-            startPoint: start,
-            endPoint: end,
-        })
-
         const hovered = state.hovered === drawing
         const selected = state.selected === drawing
 
