@@ -38,10 +38,14 @@ export function useDrawingTools({ chartRef, containerRef, runtimeRef }: Params) 
         })
 
         const handlePointerMove = (param: MouseEventParams<Time>) => {
+            if (!param.point) {
+                return
+            }
+
             runtimeRef.current?.handlePointerMove(
                 createRawPointerEvent(
-                    param.point?.x ?? 0,
-                    param.point?.y ?? 0,
+                    param.point.x,
+                    param.point.y,
                     typeof param.time === 'number' ? param.time : undefined,
                     false,
                     false,

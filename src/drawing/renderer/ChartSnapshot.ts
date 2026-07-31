@@ -1,8 +1,12 @@
 import type { IChartApi, ISeriesApi } from 'lightweight-charts'
+import type { PaneLayoutCalculator } from './PaneLayoutCalculator'
 
 export interface ChartSnapshotState {
-    width: number
-    height: number
+    paneWidth: number
+    paneHeight: number
+
+    priceScaleWidth: number
+    timeScaleHeight: number
 
     logicalFrom: number | null
     logicalTo: number | null
@@ -15,7 +19,7 @@ export class ChartSnapshot {
     constructor(
         private readonly chart: IChartApi,
         private readonly series: ISeriesApi<'Candlestick'>,
-        private readonly container: HTMLElement,
+        private readonly paneLayoutCalculator: PaneLayoutCalculator,
     ) {}
 
     public capture(): ChartSnapshotState {
@@ -23,9 +27,14 @@ export class ChartSnapshot {
 
         const priceRange = this.series.priceScale().getVisibleRange()
 
+        const pane = this.paneLayoutCalculator.calculate()
+
         return {
-            width: this.container.clientWidth,
-            height: this.container.clientHeight,
+            paneWidth: pane.width,
+            paneHeight: pane.height,
+
+            priceScaleWidth: pane.priceScaleWidth,
+            timeScaleHeight: pane.timeScaleHeight,
 
             logicalFrom: logicalRange?.from ?? null,
             logicalTo: logicalRange?.to ?? null,
@@ -37,8 +46,10 @@ export class ChartSnapshot {
 
     public equals(a: ChartSnapshotState, b: ChartSnapshotState) {
         return (
-            a.width === b.width &&
-            a.height === b.height &&
+            a.paneWidth === b.paneWidth &&
+            a.paneHeight === b.paneHeight &&
+            a.priceScaleWidth === b.priceScaleWidth &&
+            a.timeScaleHeight === b.timeScaleHeight &&
             a.logicalFrom === b.logicalFrom &&
             a.logicalTo === b.logicalTo &&
             a.priceFrom === b.priceFrom &&

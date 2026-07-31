@@ -1,8 +1,17 @@
 import type { IChartApi, Logical } from 'lightweight-charts'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
+import type { Timeframe } from '../../core/Timeframe'
 
 export class TimeCoordinateResolver {
-    constructor(private readonly chart: IChartApi, private readonly timesRef: React.RefObject<number[]>) {}
+    private readonly timeframeSeconds: number
+
+    constructor(
+        private readonly chart: IChartApi,
+        private readonly timesRef: React.RefObject<number[]>,
+        timeframe: Timeframe,
+    ) {
+        this.timeframeSeconds = timeframe.toSeconds()
+    }
 
     public coordinateToAnchor(x: number): DrawingAnchor | null {
         const logical = this.chart.timeScale().coordinateToLogical(x)
@@ -11,17 +20,38 @@ export class TimeCoordinateResolver {
             return null
         }
 
-        const roundedLogical = Math.round(logical)
+        const rounded = Math.round(logical)
 
         const times = this.timesRef.current
 
-        if (roundedLogical < 0 || roundedLogical >= times.length) {
+        if (times.length === 0) {
             return null
+        }
+
+        if (rounded < 0) {
+            const delta = rounded
+
+            return {
+                logical,
+                time: times[0] + delta * this.timeframeSeconds,
+                price: 0,
+            }
+        }
+
+        if (rounded >= times.length) {
+            const lastLogical = times.length - 1
+            const delta = rounded - lastLogical
+
+            return {
+                logical,
+                time: times[lastLogical] + delta * this.timeframeSeconds,
+                price: 0,
+            }
         }
 
         return {
             logical,
-            time: times[roundedLogical],
+            time: times[rounded],
             price: 0,
         }
     }
@@ -60,20 +90,22 @@ export class TimeCoordinateResolver {
     public logicalToTime(logical: number): number | null {
         const times = this.timesRef.current
 
-        const left = Math.floor(logical)
-        const right = Math.ceil(logical)
-
-        if (left < 0 || right >= times.length) {
+        if (times.length === 0) {
             return null
         }
 
-        if (left === right) {
-            return times[left]
+        const rounded = Math.round(logical)
+
+        if (rounded < 0) {
+            return times[0] + rounded * this.timeframeSeconds
         }
 
-        const fraction = logical - left
+        if (rounded >= times.length) {
+            const lastLogical = times.length - 1
+            return times[lastLogical] + (rounded - lastLogical) * this.timeframeSeconds
+        }
 
-        return times[left] + (times[right] - times[left]) * fraction
+        return times[rounded]
     }
 
     public logicalToCoordinate(logical: number): number | null {

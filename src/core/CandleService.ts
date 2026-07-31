@@ -57,7 +57,6 @@ export class CandleService {
     }
 
     public static getAdjacentLoadFileCount(timeframe: Timeframe): number {
-        console.log(this.loadingPolicy[timeframe.toKey()]?.adjacent ?? 20)
         return this.loadingPolicy[timeframe.toKey()]?.adjacent ?? 10
     }
 

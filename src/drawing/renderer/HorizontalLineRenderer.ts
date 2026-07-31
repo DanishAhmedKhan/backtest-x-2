@@ -25,17 +25,13 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
             return
         }
 
-        DrawingPrimitives.line(
-            ctx,
-            { x: 0, y: anchor.y },
-            { x: ctx.canvas.width, y: anchor.y },
-            drawing.color,
-            drawing.width,
-        )
+        const width = ctx.canvas.clientWidth
+
+        DrawingPrimitives.line(ctx, { x: 0, y: anchor.y }, { x: width, y: anchor.y }, drawing.color, drawing.width)
 
         if (state.hovered === drawing || state.selected === drawing) {
             const handle = {
-                x: ctx.canvas.width - 12,
+                x: width - 12,
                 y: anchor.y,
             }
             DrawingPrimitives.circle(ctx, handle, 5, '#fff', drawing.color)

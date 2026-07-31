@@ -1,18 +1,26 @@
 import { forwardRef } from 'react'
 
-const DrawingCanvas = forwardRef<HTMLCanvasElement, React.CanvasHTMLAttributes<HTMLCanvasElement>>((props, ref) => {
+type Props = React.CanvasHTMLAttributes<HTMLCanvasElement> & {
+    paneWidth: number
+    paneHeight: number
+}
+
+const DrawingCanvas = forwardRef<HTMLCanvasElement, Props>(({ paneWidth, paneHeight, style, ...props }, ref) => {
     return (
         <canvas
             ref={ref}
             {...props}
             style={{
                 position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
+                left: 0,
+                top: 0,
+
+                width: paneWidth,
+                height: paneHeight,
+
                 pointerEvents: 'none',
                 zIndex: 99,
-                ...props.style,
+                ...style,
             }}
         />
     )

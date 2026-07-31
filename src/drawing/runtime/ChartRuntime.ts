@@ -16,6 +16,8 @@ import type { RawPointerEvent } from '../models/RawPointerEvent'
 import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
 import { TrendLineEditor } from '../editor/TrendLineEditor'
 import { HorizontalLineEditor } from '../editor/HorizontalLineEditor'
+import type { Timeframe } from '../../core/Timeframe'
+import { PaneLayoutCalculator } from '../renderer/PaneLayoutCalculator'
 
 type Params = {
     chart: IChartApi
@@ -24,6 +26,7 @@ type Params = {
     container: HTMLDivElement
     drawingContext: DrawingContext
     timesRef: React.RefObject<number[]>
+    timeframe: Timeframe
 }
 
 export class ChartRuntime {
@@ -36,12 +39,16 @@ export class ChartRuntime {
     public readonly timeResolver: TimeCoordinateResolver
     private readonly drawingLogicalUpdater: DrawingLogicalUpdater
 
+    private readonly paneLayoutCalculator: PaneLayoutCalculator
+
     private readonly unsubscribers: (() => void)[] = []
 
     constructor(private readonly params: Params) {
         const { chart, series, canvas, container, drawingContext, timesRef } = params
 
-        this.timeResolver = new TimeCoordinateResolver(chart, timesRef)
+        this.paneLayoutCalculator = new PaneLayoutCalculator(container)
+
+        this.timeResolver = new TimeCoordinateResolver(chart, timesRef, params.timeframe)
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
@@ -57,7 +64,7 @@ export class ChartRuntime {
             canvas,
         )
 
-        const snapshot = new ChartSnapshot(chart, series, container)
+        const snapshot = new ChartSnapshot(chart, series, this.paneLayoutCalculator)
 
         this.renderLoop = new RenderLoop(snapshot, () => {
             this.drawingCanvasRenderer.render()
@@ -112,6 +119,10 @@ export class ChartRuntime {
 
     public getTransformer() {
         return this.transformer
+    }
+
+    public getPaneLayoutCalculator() {
+        return this.paneLayoutCalculator
     }
 
     public handlePointerDown(event: RawPointerEvent) {

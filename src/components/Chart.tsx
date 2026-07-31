@@ -49,6 +49,11 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
+    const [paneLayout] = useState({
+        width: 0,
+        height: 0,
+    })
+
     const candlesRef = useRef<CandlestickData<Time>[]>([])
     const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
@@ -181,6 +186,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     useDrawingCanvas({
         canvasRef: drawingCanvasRef,
         containerRef,
+        runtimeRef,
     })
 
     useEffect(() => {
@@ -205,6 +211,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             container,
             drawingContext,
             timesRef,
+            timeframe,
         })
 
         runtimeRef.current.start()
@@ -330,7 +337,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                 style={{ width: '100%', height: '100%' }}
             />
 
-            <DrawingCanvas ref={drawingCanvasRef} />
+            <DrawingCanvas ref={drawingCanvasRef} paneWidth={paneLayout.width} paneHeight={paneLayout.height} />
 
             {showReplayOverlay && <ReplayOverlay x={previewX} />}
         </div>
