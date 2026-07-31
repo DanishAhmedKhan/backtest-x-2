@@ -49,7 +49,6 @@ export async function loadAdjacentWindow({
         startIndex = loadedWindowRef.current.oldestFile - actualFileCount
     } else {
         const remaining = totalFilesRef.current - loadedWindowRef.current.latestFile - 1
-
         if (remaining <= 0) {
             return { loaded: false, addedBars: 0 }
         }

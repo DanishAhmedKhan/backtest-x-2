@@ -12,6 +12,8 @@ import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
 import { CandleService } from '../../core/CandleService'
 
+import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
+
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
@@ -27,6 +29,7 @@ type Params = {
     isChangingTimeframeRef: React.RefObject<boolean>
     isViewportInteractionRef: React.RefObject<boolean>
     viewportRef: React.RefObject<ViewportState>
+    runtimeRef: React.RefObject<ChartRuntime | null>
 }
 
 export function useInfiniteScroll({
@@ -44,6 +47,7 @@ export function useInfiniteScroll({
     isChangingTimeframeRef,
     isViewportInteractionRef,
     viewportRef,
+    runtimeRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -92,6 +96,8 @@ export function useInfiniteScroll({
                     const result = await loadWindow('older')
 
                     if (result.loaded) {
+                        runtimeRef.current?.onChartDataChanged()
+
                         requestAnimationFrame(() => {
                             timeScale.setVisibleLogicalRange({
                                 from: currentRange.from + result.addedBars,
@@ -104,7 +110,11 @@ export function useInfiniteScroll({
                 }
 
                 if (range.to > candlesRef.current.length - threshold) {
-                    await loadWindow('newer')
+                    const result = await loadWindow('newer')
+
+                    if (result.loaded) {
+                        runtimeRef.current?.onChartDataChanged()
+                    }
                 }
             } catch (err) {
                 console.error(err)
@@ -140,5 +150,6 @@ export function useInfiniteScroll({
         isLoadingDataRef,
         isViewportInteractionRef,
         viewportRef,
+        runtimeRef,
     ])
 }

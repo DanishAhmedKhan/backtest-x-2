@@ -43,21 +43,22 @@ export class CandleService {
     }
 
     private static readonly loadingPolicy = {
-        60: { initial: 5, adjacent: 2 },
-        300: { initial: 8, adjacent: 3 },
-        900: { initial: 12, adjacent: 5 },
-        1800: { initial: 16, adjacent: 8 },
-        3600: { initial: 20, adjacent: 10 },
-        14400: { initial: 24, adjacent: 12 },
-        86400: { initial: 30, adjacent: 15 },
+        '1m': { initial: 5, adjacent: 2 },
+        '5m': { initial: 8, adjacent: 3 },
+        '15m': { initial: 12, adjacent: 5 },
+        '30m': { initial: 16, adjacent: 8 },
+        '1h': { initial: 20, adjacent: 10 },
+        '4h': { initial: 24, adjacent: 12 },
+        '1d': { initial: 30, adjacent: 15 },
     } as const
 
     private static getInitialFileCount(timeframe: Timeframe): number {
-        return this.loadingPolicy[timeframe.toSeconds() as keyof typeof this.loadingPolicy]?.initial ?? 20
+        return this.loadingPolicy[timeframe.toKey()]?.initial ?? 20
     }
 
     public static getAdjacentLoadFileCount(timeframe: Timeframe): number {
-        return this.loadingPolicy[timeframe.toSeconds() as keyof typeof this.loadingPolicy]?.adjacent ?? 10
+        console.log(this.loadingPolicy[timeframe.toKey()]?.adjacent ?? 20)
+        return this.loadingPolicy[timeframe.toKey()]?.adjacent ?? 10
     }
 
     public static async getCandlesWindow(ticker: Ticker, timeframe: Timeframe, startIndex: number, fileCount: number) {

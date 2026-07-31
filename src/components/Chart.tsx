@@ -120,6 +120,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         isChangingTimeframeRef,
         isViewportInteractionRef,
         viewportRef,
+        runtimeRef,
     })
 
     useChartResize({
