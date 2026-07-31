@@ -15,6 +15,8 @@
     width: 100%;
 }
 
+/* GROUP */
+
 .toolbar-group {
     display: flex;
 }
@@ -31,9 +33,7 @@
     width: 100%;
 }
 
-/* .toolbar-group:only-child {
-    padding: 0 5px;
-} */
+/* BUTTON */
 
 .toolbar-btn {
     display: flex;
@@ -50,7 +50,6 @@
 
 .toolbar-horizontal .toolbar-btn {
     height: 100%;
-    /* min-width: 32px; */
     padding: 0 6px;
 }
 
@@ -72,23 +71,26 @@
     box-shadow: 0 2px 4px #0003;
 }
 
-.toolbar-btn.active::before {
+.toolbar-btn::before {
     content: '';
     display: block;
     position: absolute;
-    background: #ebebeb;
     border-radius: 6px;
     z-index: -1;
 }
 
-.toolbar-horizontal .toolbar-btn.active::before {
+.toolbar-btn.active::before {
+    background: #ebebeb;
+}
+
+.toolbar-horizontal .toolbar-btn::before {
     top: 2px;
     bottom: 2px;
     inset-inline-start: 2px;
     inset-inline-end: 2px;
 }
 
-.toolbar-vertical .toolbar-btn.active::before {
+.toolbar-vertical .toolbar-btn::before {
     top: 2px;
     bottom: 2px;
     inset-inline-start: 9px;
@@ -97,6 +99,10 @@
 
 .toolbar-btn.active:hover::before {
     background-color: #dbdbdb;
+}
+
+.toolbar-btn:hover::before {
+    background: #f2f2f2;
 }
 
 .toolbar-btn span {
@@ -118,18 +124,7 @@
     margin-left: 6px;
 }
 
-.toolbar-btn:hover::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 2px;
-    bottom: 2px;
-    inset-inline-start: 2px;
-    inset-inline-end: 2px;
-    background: #f2f2f2;
-    border-radius: 6px;
-    z-index: -1;
-}
+/* DROPDOWN */
 
 .toolbar-dropdown {
     position: relative;
@@ -236,6 +231,8 @@
     white-space: nowrap;
 }
 
+/* SEPARATOR */
+
 .toolbar .toolbar-separator {
     background: #ebebeb;
 }
@@ -252,9 +249,13 @@
     margin: 4px 0;
 }
 
+/* FILL */
+
 .toolbar-fill {
     flex: 1;
 }
+
+/* LAYOUT PICKER */
 
 .layout-picker {
     min-width: 250px;
@@ -280,28 +281,28 @@
     color: #808080;
 }
 
-.dropdown-arrow {
+/* TOOLVAR ARROW */
+
+.toolbar-arrow {
     display: flex;
     align-items: center;
     justify-content: center;
-
     transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), translate 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
-
     transition-delay: 0ms;
 }
 
-.dropdown-arrow svg {
+.toolabr-arrow svg {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.toolbar-main:hover .dropdown-arrow {
+.toolbar-main:hover .toolbar-arrow {
     translate: 0 1px;
     transition-delay: 50ms;
 }
 
-.dropdown-arrow.open {
+.toolbar-arrow.open {
     transform: rotate(180deg);
     translate: 0 1px;
     transition-delay: 0ms;

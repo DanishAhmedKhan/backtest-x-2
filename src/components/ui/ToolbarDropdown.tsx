@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ToolbarDropdownItem } from './types'
+import type { ToolbarDropdownBaseProps } from './types'
 
 export function ToolbarDropdown({
     selectedId,
-    renderValue,
+    renderTrigger,
     options,
     tooltip,
     width,
     dropdown,
     onChange,
-}: ToolbarDropdownItem) {
+}: ToolbarDropdownBaseProps) {
     const [open, setOpen] = useState(false)
 
     const ref = useRef<HTMLDivElement>(null)
@@ -81,8 +81,8 @@ export function ToolbarDropdown({
                 title={tooltip}
                 onClick={() => setOpen((v) => !v)}
             >
-                {renderValue ? (
-                    renderValue({
+                {renderTrigger ? (
+                    renderTrigger({
                         selected,
                         open,
                     })

@@ -4,6 +4,7 @@ export type ToolbarItem =
     | ToolbarGroupItem
     | ToolbarButtonItem
     | ToolbarDropdownItem
+    | ToolbarArrowDropdownItem
     | ToolbarSeparatorItem
     | ToolbarFillItem
 
@@ -35,18 +36,25 @@ export interface ToolbarDropdownOption {
     disabled?: boolean
 }
 
-export interface ToolbarDropdownItem {
-    type: 'dropdown'
+export interface ToolbarDropdownBaseProps {
     id: string
     selectedId: string
     options?: ToolbarDropdownOption[]
-    // renderValue?: (selected: ToolbarDropdownOption | undefined) => React.ReactNode
-    renderValue?: (context: ToolbarDropdownRenderContext) => React.ReactNode
+    renderTrigger?: (context: ToolbarDropdownRenderContext) => React.ReactNode
     width?: number | string
     searchable?: boolean
     tooltip?: string
     dropdown?: ToolbarDropdownContent
     onChange?: (option: ToolbarDropdownOption) => void
+}
+
+export interface ToolbarDropdownItem extends ToolbarDropdownBaseProps {
+    type: 'dropdown'
+}
+
+export interface ToolbarArrowDropdownItem extends ToolbarDropdownBaseProps {
+    type: 'dropdown-arrow'
+    options: ToolbarDropdownOption[]
 }
 
 export interface ToolbarDropdownRenderContext {

@@ -6,9 +6,8 @@ import { LAYOUT_TYPES, LAYOUTS, type LayoutType } from '../types/Layout'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import type { ToolbarButtonItem, ToolbarDropdownContent } from './ui/types'
-import svg from '../svg/svg'
 import LayoutPicker from './ui/LayoutPicker'
-import { DropdownArrow } from './ui/DropdownArrow'
+import svg from '../svg/svg'
 
 type Props = {
     ticker: Ticker
@@ -130,30 +129,11 @@ export default function TopToolbar({
                     id: 'tf',
                     items: [
                         ...timeframeDisplay,
-                        // {
-                        //     type: 'dropdown',
-                        //     id: 'asa',
-                        //     selectedId: `tf-${timeframe.toKey()}`,
-                        //     options: timeframeOptions,
-                        //     renderValue: () => (
-                        //         <div
-                        //             style={{ width: 10, height: 5 }}
-                        //             dangerouslySetInnerHTML={{ __html: svg.dropdown }}
-                        //         />
-                        //     ),
-                        //     onChange: (option) => {
-                        //         onTimeframeChange(Timeframe.parse(option.label))
-                        //     },
-                        // },
-
                         {
-                            type: 'dropdown',
+                            type: 'dropdown-arrow',
                             id: 'asa',
                             selectedId: `tf-${timeframe.toKey()}`,
                             options: timeframeOptions,
-
-                            renderValue: ({ open }) => <DropdownArrow open={open} />,
-
                             onChange: (option) => {
                                 onTimeframeChange(Timeframe.parse(option.label))
                             },
@@ -202,7 +182,7 @@ export default function TopToolbar({
                             id: 'layout',
                             selectedId: `l-${layout}`,
                             options: [],
-                            renderValue: () => (
+                            renderTrigger: () => (
                                 <div
                                     style={{ width: 21, height: 19 }}
                                     dangerouslySetInnerHTML={{

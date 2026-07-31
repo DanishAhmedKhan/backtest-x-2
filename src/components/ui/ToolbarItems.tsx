@@ -1,3 +1,4 @@
+import { ToolbarArrowDropdown } from './ToolbarArrowDropdown'
 import { ToolbarButton } from './ToolbarButton'
 import { ToolbarDropdown } from './ToolbarDropdown'
 import { ToolbarFill } from './ToolbarFill'
@@ -19,7 +20,8 @@ export function ToolbarItems({ items }: Props) {
 
                     case 'dropdown':
                         return <ToolbarDropdown key={item.id} {...item} />
-
+                    case 'dropdown-arrow':
+                        return <ToolbarArrowDropdown key={item.id} {...item} />
                     case 'group':
                         return <ToolbarGroup key={item.id} {...item} />
 
