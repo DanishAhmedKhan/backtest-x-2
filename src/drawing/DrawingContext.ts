@@ -15,10 +15,11 @@ import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import { registerTools } from './utils/registerTools'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
-import { TrendLineEditor } from './editor/TrendLineEditor'
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { LineActionProvider } from './actions/LineActionProvider'
 import { PopupController } from './PopupController'
+import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
+import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -53,10 +54,10 @@ export class DrawingContext {
 
     private initialize() {
         this.rendererManager.register(new TrendLineRenderer())
+        this.rendererManager.register(new HorizontalLineRenderer())
 
         this.hitTestManager.register(new TrendLineHitTester())
-
-        this.editorManager.register(new TrendLineEditor())
+        this.hitTestManager.register(new HorizontalLineHitTester())
 
         registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
 

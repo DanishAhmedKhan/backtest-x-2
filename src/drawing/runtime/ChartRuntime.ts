@@ -14,6 +14,8 @@ import { SelectionController } from '../controller/SelectionController'
 import { EditController } from '../controller/EditController'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
 import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
+import { TrendLineEditor } from '../editor/TrendLineEditor'
+import { HorizontalLineEditor } from '../editor/HorizontalLineEditor'
 
 type Params = {
     chart: IChartApi
@@ -42,6 +44,9 @@ export class ChartRuntime {
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef)
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
+
+        drawingContext.editorManager.register(new TrendLineEditor(this.timeResolver))
+        drawingContext.editorManager.register(new HorizontalLineEditor())
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,

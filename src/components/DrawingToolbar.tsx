@@ -49,6 +49,20 @@ export default function DrawingToolbar() {
                                 toolStore.select(ToolType.TrendLine)
                             },
                         },
+                        {
+                            type: 'button',
+                            id: 'howizontal-line',
+                            icon: (
+                                <div
+                                    style={{ width: 28, height: 28 }}
+                                    dangerouslySetInnerHTML={{ __html: svg.tool.horizontalLine }}
+                                />
+                            ),
+                            active: selectedTool === ToolType.HorizontalLine,
+                            onClick: () => {
+                                toolStore.select(ToolType.HorizontalLine)
+                            },
+                        },
                     ],
                 },
             ]}

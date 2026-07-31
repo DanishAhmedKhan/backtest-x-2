@@ -7,8 +7,11 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { EditingSession } from './EditingSession'
 import { HitTarget } from '../hitTest/HitTestResult'
 import { DrawingType } from '../DrawingType'
+import type { TimeCoordinateResolver } from '../renderer/TimeCoordinateResolver'
 
 export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
+    constructor(private readonly timeResolver: TimeCoordinateResolver) {}
+
     public canEdit(drawing: Drawing): drawing is TrendLineDrawing {
         return drawing.type === DrawingType.TrendLine
     }
@@ -66,18 +69,27 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
         }
 
         const logicalDelta = event.anchor.logical - startPointer.logical
-
         const priceDelta = event.anchor.price - startPointer.price
 
+        const startLogical = original.start.logical + logicalDelta
+        const endLogical = original.end.logical + logicalDelta
+
+        const startTime = this.timeResolver.logicalToTime(startLogical)
+        const endTime = this.timeResolver.logicalToTime(endLogical)
+
+        if (startTime == null || endTime == null) {
+            return
+        }
+
         drawing.start = {
-            logical: original.start.logical + logicalDelta,
-            time: original.start.time,
+            logical: startLogical,
+            time: startTime,
             price: original.start.price + priceDelta,
         }
 
         drawing.end = {
-            logical: original.end.logical + logicalDelta,
-            time: original.end.time,
+            logical: endLogical,
+            time: endTime,
             price: original.end.price + priceDelta,
         }
     }

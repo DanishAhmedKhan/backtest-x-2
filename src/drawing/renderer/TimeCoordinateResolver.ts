@@ -57,6 +57,25 @@ export class TimeCoordinateResolver {
         return right
     }
 
+    public logicalToTime(logical: number): number | null {
+        const times = this.timesRef.current
+
+        const left = Math.floor(logical)
+        const right = Math.ceil(logical)
+
+        if (left < 0 || right >= times.length) {
+            return null
+        }
+
+        if (left === right) {
+            return times[left]
+        }
+
+        const fraction = logical - left
+
+        return times[left] + (times[right] - times[left]) * fraction
+    }
+
     public logicalToCoordinate(logical: number): number | null {
         return this.chart.timeScale().logicalToCoordinate(logical as Logical)
     }
