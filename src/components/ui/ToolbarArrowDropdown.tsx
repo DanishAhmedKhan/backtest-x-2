@@ -7,13 +7,15 @@ export function ToolbarArrowDropdown(props: ToolbarArrowDropdownItem) {
         <ToolbarDropdown
             {...props}
             renderTrigger={({ open }) => (
-                <div
-                    className={`toolbar-arrow ${open ? 'open' : ''}`}
-                    style={{ width: 8, height: 4 }}
-                    dangerouslySetInnerHTML={{
-                        __html: svg.dropdown,
-                    }}
-                />
+                <button className={`toolbar-trigger toolbar-arrow-trigger`}>
+                    <div
+                        className={`toolbar-arrow ${open ? 'open' : ''}`}
+                        style={{ width: 8, height: 4 }}
+                        dangerouslySetInnerHTML={{
+                            __html: svg.dropdown,
+                        }}
+                    />
+                </button>
             )}
         />
     )

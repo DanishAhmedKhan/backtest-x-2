@@ -8,6 +8,21 @@ import svg from '../svg/svg'
 export default function DrawingToolbar() {
     const [selectedTool, setSelectedTool] = useState(toolStore.getSelectedTool())
 
+    const tools = []
+    for (let i = 0; i < 10; i++) {
+        tools[i] = {
+            id: `tool-${i}`,
+            label: `tool${i}`,
+            icon: <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.tool.trendLine }} />,
+        }
+    }
+
+    tools.push({
+        id: `trend-line`,
+        label: `Trend Line`,
+        icon: <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.tool.trendLine }} />,
+    })
+
     useEffect(() => {
         return toolStore.subscribe(setSelectedTool)
     }, [])
@@ -61,6 +76,31 @@ export default function DrawingToolbar() {
                             active: selectedTool === ToolType.HorizontalLine,
                             onClick: () => {
                                 toolStore.select(ToolType.HorizontalLine)
+                            },
+                        },
+                        {
+                            type: 'dropdown',
+                            id: 'asdsa',
+                            selectedId: `trend-line`,
+                            options: tools,
+                            renderTrigger: ({ selected, open, toggleDropdown }) => {
+                                console.log(selected)
+                                return (
+                                    <button className="toolbar-trigger">
+                                        <div
+                                            className={`toolbar-arrow ${open ? 'open' : ''}`}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                padding: '0px 6px',
+                                                height: '100%',
+                                            }}
+                                            onClick={toggleDropdown}
+                                        >
+                                            {selected?.icon}
+                                        </div>
+                                    </button>
+                                )
                             },
                         },
                     ],

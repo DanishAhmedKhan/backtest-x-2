@@ -2,6 +2,7 @@
     display: flex;
     background-color: white;
     user-select: none;
+    font-family: 'Roboto', sans-serif;
 }
 
 .toolbar-horizontal {
@@ -175,6 +176,10 @@
 }
 
 .toolbar-dropdown .toolbar-main {
+    height: 100%;
+}
+
+.toolbar-dropdown .toolbar-trigger {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -190,11 +195,11 @@
     z-index: 0;
 }
 
-.toolbar-dropdown .toolbar-main.active {
+.toolbar-dropdown .toolbar-trigger.active {
     height: 100%;
 }
 
-.toolbar-dropdown .toolbar-main:hover::before {
+.toolbar-dropdown .toolbar-trigger:hover::before {
     content: '';
     display: block;
     position: absolute;
@@ -207,7 +212,7 @@
     z-index: -1;
 }
 
-.toolbar-dropdown .toolbar-main svg {
+.toolbar-dropdown .toolbar-trigger svg {
     display: block;
     width: 100%;
     height: 100%;
@@ -228,6 +233,7 @@
 }
 
 .toolbar-dropdown-label {
+    font-size: 13px;
     white-space: nowrap;
 }
 
@@ -281,28 +287,25 @@
     color: #808080;
 }
 
-/* TOOLVAR ARROW */
+/* TOOLBAR ARROW DOOPDOWN */
 
-.toolbar-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.toolbar-arrow-trigger {
     transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), translate 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
     transition-delay: 0ms;
 }
 
-.toolabr-arrow svg {
+.toolabr-arrow-trigger svg {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.toolbar-main:hover .toolbar-arrow {
+.toolbar-main:hover .toolbar-arrow-trigger {
     translate: 0 1px;
     transition-delay: 50ms;
 }
 
-.toolbar-arrow.open {
+.toolbar-main.active .toolbar-arrow-trigger {
     transform: rotate(180deg);
     translate: 0 1px;
     transition-delay: 0ms;

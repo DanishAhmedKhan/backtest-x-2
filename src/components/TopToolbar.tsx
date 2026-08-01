@@ -183,12 +183,14 @@ export default function TopToolbar({
                             selectedId: `l-${layout}`,
                             options: [],
                             renderTrigger: () => (
-                                <div
-                                    style={{ width: 21, height: 19 }}
-                                    dangerouslySetInnerHTML={{
-                                        __html: svg.layout[layout],
-                                    }}
-                                />
+                                <button className="toolbar-trigger">
+                                    <div
+                                        style={{ width: 21, height: 19 }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: svg.layout[layout],
+                                        }}
+                                    />
+                                </button>
                             ),
                             dropdown,
                         },

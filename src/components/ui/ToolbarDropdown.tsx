@@ -20,6 +20,10 @@ export function ToolbarDropdown({
         top: 0,
     })
 
+    const openDropdown = () => setOpen(true)
+    const closeDropdown = () => setOpen(false)
+    const toggleDropdown = () => setOpen((v) => !v)
+
     const selected = options?.find((o) => o.id === selectedId)
 
     useEffect(() => {
@@ -76,23 +80,22 @@ export function ToolbarDropdown({
 
     return (
         <div ref={ref} className="toolbar-dropdown" style={{ width }}>
-            <button
-                className={`toolbar-main ${open ? 'active' : ''}`}
-                title={tooltip}
-                onClick={() => setOpen((v) => !v)}
-            >
+            <div className={`toolbar-main ${open ? 'active' : ''}`} title={tooltip}>
                 {renderTrigger ? (
                     renderTrigger({
                         selected,
                         open,
+                        openDropdown,
+                        closeDropdown,
+                        toggleDropdown,
                     })
                 ) : (
-                    <>
+                    <button className="toolbar-trigger" onClick={toggleDropdown}>
                         {selected?.icon}
                         <span className="toolbar-dropdown-label">{selected?.label}</span>
-                    </>
+                    </button>
                 )}
-            </button>
+            </div>
 
             {open && (
                 <div

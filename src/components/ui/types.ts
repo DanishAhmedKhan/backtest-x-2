@@ -60,6 +60,9 @@ export interface ToolbarArrowDropdownItem extends ToolbarDropdownBaseProps {
 export interface ToolbarDropdownRenderContext {
     selected?: ToolbarDropdownOption
     open: boolean
+    openDropdown(): void
+    closeDropdown(): void
+    toggleDropdown(): void
 }
 
 export interface ToolbarDropdownContext {
@@ -85,4 +88,22 @@ export interface ToolbarSeparatorItem {
 export interface ToolbarFillItem {
     type: 'fill'
     id: string
+}
+
+export interface ToolbarToolButtonItem {
+    type: 'arrow-button'
+    id: string
+    selectedId: string
+    tools: ToolbarToolButtonOption[]
+    tooltip?: string
+    onToolChange?: (tool: ToolbarToolButtonOption) => void
+    onClick?: (tool: ToolbarToolButtonOption) => void
+}
+
+export interface ToolbarToolButtonOption {
+    id: string
+    icon: React.ReactNode
+    label: string
+    shortcut?: string
+    favorite?: boolean
 }
