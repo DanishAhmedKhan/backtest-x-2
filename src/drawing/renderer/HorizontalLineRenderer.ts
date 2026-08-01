@@ -21,9 +21,7 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
     ) {
         const anchor = transformer.toPoint(drawing.anchor)
 
-        if (!anchor) {
-            return
-        }
+        if (!anchor) return
 
         const width = ctx.canvas.clientWidth
 
@@ -31,7 +29,7 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
 
         if (state.hovered === drawing || state.selected === drawing) {
             const handle = {
-                x: width - 12,
+                x: width - 100,
                 y: anchor.y,
             }
             DrawingPrimitives.circle(ctx, handle, 5, '#fff', drawing.color)

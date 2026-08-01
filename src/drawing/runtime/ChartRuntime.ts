@@ -17,7 +17,7 @@ import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
 import { TrendLineEditor } from '../editor/TrendLineEditor'
 import { HorizontalLineEditor } from '../editor/HorizontalLineEditor'
 import type { Timeframe } from '../../core/Timeframe'
-import { PaneLayoutCalculator } from '../renderer/PaneLayoutCalculator'
+import { PaneGeometry } from '../renderer/PaneGeometry'
 
 type Params = {
     chart: IChartApi
@@ -39,14 +39,17 @@ export class ChartRuntime {
     public readonly timeResolver: TimeCoordinateResolver
     private readonly drawingLogicalUpdater: DrawingLogicalUpdater
 
-    private readonly paneLayoutCalculator: PaneLayoutCalculator
+    private readonly paneGeometry: PaneGeometry
+    private readonly canvas: HTMLCanvasElement
 
     private readonly unsubscribers: (() => void)[] = []
 
     constructor(private readonly params: Params) {
         const { chart, series, canvas, container, drawingContext, timesRef } = params
 
-        this.paneLayoutCalculator = new PaneLayoutCalculator(container)
+        this.canvas = canvas
+
+        this.paneGeometry = new PaneGeometry(container)
 
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef, params.timeframe)
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
@@ -64,9 +67,10 @@ export class ChartRuntime {
             canvas,
         )
 
-        const snapshot = new ChartSnapshot(chart, series, this.paneLayoutCalculator)
+        const snapshot = new ChartSnapshot(chart, series, this.paneGeometry)
 
         this.renderLoop = new RenderLoop(snapshot, () => {
+            this.updatePaneLayout()
             this.drawingCanvasRenderer.render()
         })
 
@@ -121,10 +125,6 @@ export class ChartRuntime {
         return this.transformer
     }
 
-    public getPaneLayoutCalculator() {
-        return this.paneLayoutCalculator
-    }
-
     public handlePointerDown(event: RawPointerEvent) {
         this.pointerController.handlePointerDown(event)
     }
@@ -144,6 +144,29 @@ export class ChartRuntime {
     public onChartDataChanged() {
         this.drawingLogicalUpdater.update()
         this.renderLoop.invalidate()
+    }
+
+    public updatePaneLayout() {
+        const pane = this.paneGeometry.calculate()
+
+        this.canvas.style.left = `${pane.left}px`
+        this.canvas.style.top = `${pane.top}px`
+
+        this.canvas.style.width = `${pane.width}px`
+        this.canvas.style.height = `${pane.height}px`
+
+        this.canvas.width = pane.backingWidth
+        this.canvas.height = pane.backingHeight
+
+        const ctx = this.canvas.getContext('2d')
+
+        if (!ctx) {
+            return
+        }
+
+        const dpr = window.devicePixelRatio || 1
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
     public start() {

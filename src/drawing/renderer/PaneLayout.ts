@@ -1,7 +1,10 @@
 export type PaneLayout = {
+    left: number
+    top: number
+
     width: number
     height: number
 
-    priceScaleWidth: number
-    timeScaleHeight: number
+    backingWidth: number
+    backingHeight: number
 }

@@ -16,9 +16,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
         return drawing.type === DrawingType.TrendLine
     }
 
-    public beginEdit(_session: EditingSession, _event: ChartPointerEvent) {
-        console.info(_session, _event)
-    }
+    public beginEdit(_session: EditingSession, _event: ChartPointerEvent) {}
 
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
@@ -44,9 +42,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
         }
     }
 
-    public endEdit(_session: EditingSession) {
-        console.info(_session)
-    }
+    public endEdit(_session: EditingSession) {}
 
     private moveStartHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
         drawing.start = {

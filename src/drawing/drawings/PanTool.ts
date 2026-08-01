@@ -12,25 +12,15 @@ export class PanTool implements Tool {
 
     constructor(protected readonly drawingManager: DrawingManager) {}
 
-    public activate(): void {
-        console.log('PanTool activated')
-    }
+    public activate(): void {}
 
-    public deactivate(): void {
-        console.log('PanTool deactivated')
-    }
+    public deactivate(): void {}
 
-    public handlePointerDown(event: ChartPointerEvent): void {
-        // console.log('Pointer Down', event)
-    }
+    public handlePointerDown(_event: ChartPointerEvent): void {}
 
-    public handlePointerMove(event: ChartPointerEvent): void {
-        // console.log('Pointer Move', event)
-    }
+    public handlePointerMove(_event: ChartPointerEvent): void {}
 
-    public handlePointerUp(event: ChartPointerEvent): void {
-        // console.log('Pointer Up', event)
-    }
+    public handlePointerUp(_event: ChartPointerEvent): void {}
 
     public handlePointerLeave(): void {}
 
