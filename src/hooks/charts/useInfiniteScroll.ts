@@ -91,19 +91,16 @@ export function useInfiniteScroll({
                     })
 
                 if (range.from < threshold) {
-                    const currentRange = range
+                    const beforeScroll = timeScale.scrollPosition()
 
                     const result = await loadWindow('older')
 
                     if (result.loaded) {
                         runtimeRef.current?.onChartDataChanged()
 
-                        requestAnimationFrame(() => {
-                            timeScale.setVisibleLogicalRange({
-                                from: currentRange.from + result.addedBars,
-                                to: currentRange.to + result.addedBars,
-                            })
-                        })
+                        timeScale.scrollPosition()
+
+                        timeScale.scrollToPosition(beforeScroll, false)
 
                         return
                     }

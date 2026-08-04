@@ -3,7 +3,6 @@ import type { CandlestickData, Time, IChartApi, ISeriesApi } from 'lightweight-c
 
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
-import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { CandleService } from '../../core/CandleService'
 import type { Raw1mData } from '../../components/Chart'
 
@@ -42,10 +41,8 @@ export function useChartData({
     chartRef,
     seriesRef,
     candlesRef,
-    // raw1mCandlesRef,
     candleMapRef,
     timesRef,
-    // raw1mTimesRef,
     raw1mRef,
     loadedWindowRef,
     totalFilesRef,
@@ -65,21 +62,38 @@ export function useChartData({
             const totalFiles = await CandleService.getTotalFiles(ticker)
             totalFilesRef.current = totalFiles
 
-            const chartResult = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
-            const candles = chartResult.candles
+            // const chartResult = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
+            // const candles = chartResult.candles
 
-            const rawResult = await CandleService.getInitialWindow(
-                ticker,
-                new Timeframe(1, TimeframeUnit.Minute),
-                totalFiles,
-            )
+            // // const rawResult = await CandleService.getInitialWindow(
+            // //     ticker,
+            // //     new Timeframe(1, TimeframeUnit.Minute),
+            // //     totalFiles,
+            // // )
 
-            setRaw1mData(raw1mRef, rawResult.candles)
+            // const rawResult = await CandleService.getCandlesWindow(
+            //     ticker,
+            //     new Timeframe(1, TimeframeUnit.Minute),
+            //     chartResult.oldestFile,
+            //     chartResult.latestFile - chartResult.oldestFile + 1,
+            // )
 
-            loadedWindowRef.current = {
-                oldestFile: chartResult.oldestFile,
-                latestFile: chartResult.latestFile,
-            }
+            // // setRaw1mData(raw1mRef, rawResult.candles)
+
+            // setRaw1mData(raw1mRef, rawResult)
+
+            // loadedWindowRef.current = {
+            //     oldestFile: chartResult.oldestFile,
+            //     latestFile: chartResult.latestFile,
+            // }
+
+            const result = await CandleService.getInitialChartAndRawWindow(ticker, timeframe, totalFiles)
+
+            const candles = result.chartCandles
+
+            setRaw1mData(raw1mRef, result.rawCandles)
+
+            loadedWindowRef.current = result.loadedWindow
 
             applyChartData({
                 candles,

@@ -1,9 +1,10 @@
 import type { Ticker } from './Ticker'
-import type { Timeframe } from './Timeframe'
+import { Timeframe } from './Timeframe'
 import type { Candle } from './Candle'
 
 import { CandleAggregator } from '../data/CandleAggregator'
 import { CsvCandleLoader } from '../data/CsvCandleLoader'
+import { TimeframeUnit } from './TimeframeUnit'
 
 export class CandleService {
     public static async getInitialWindow(
@@ -39,6 +40,38 @@ export class CandleService {
             candles: result,
             oldestFile: startIndex,
             latestFile: totalFiles - 1,
+        }
+    }
+
+    private static async loadMatchingRawWindow(
+        ticker: Ticker,
+        loadedWindow: {
+            oldestFile: number
+            latestFile: number
+        },
+    ) {
+        return this.getCandlesWindow(
+            ticker,
+            new Timeframe(1, TimeframeUnit.Minute),
+            loadedWindow.oldestFile,
+            loadedWindow.latestFile - loadedWindow.oldestFile + 1,
+        )
+    }
+
+    public static async getInitialChartAndRawWindow(ticker: Ticker, timeframe: Timeframe, totalFiles?: number) {
+        const chartResult = await this.getInitialWindow(ticker, timeframe, totalFiles)
+
+        const loadedWindow = {
+            oldestFile: chartResult.oldestFile,
+            latestFile: chartResult.latestFile,
+        }
+
+        const rawCandles = await this.loadMatchingRawWindow(ticker, loadedWindow)
+
+        return {
+            chartCandles: chartResult.candles,
+            rawCandles,
+            loadedWindow,
         }
     }
 
@@ -83,6 +116,12 @@ export class CandleService {
     ) {
         const centerFile = await CsvCandleLoader.findFileIndex(ticker.value, timestamp)
 
+        console.log({
+            timestamp,
+            date: new Date(timestamp * 1000).toISOString(),
+            centerFile,
+        })
+
         if (centerFile === -1) {
             throw new Error('Timestamp is outside available data.')
         }
@@ -99,6 +138,24 @@ export class CandleService {
                 oldestFile,
                 latestFile,
             },
+        }
+    }
+
+    public static async getChartAndRawCandlesAroundTime(
+        ticker: Ticker,
+        timeframe: Timeframe,
+        timestamp: number,
+        beforeFiles: number = 4,
+        afterFiles: number = 4,
+    ) {
+        const chartResult = await this.getCandlesAroundTime(ticker, timeframe, timestamp, beforeFiles, afterFiles)
+
+        const rawCandles = await this.loadMatchingRawWindow(ticker, chartResult.loadedWindow)
+
+        return {
+            chartCandles: chartResult.candles,
+            rawCandles,
+            loadedWindow: chartResult.loadedWindow,
         }
     }
 

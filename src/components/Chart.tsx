@@ -8,6 +8,7 @@ import DrawingCanvas from './DrawingCanvas'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import type { Candle } from '../core/Candle'
+import { CandleService } from '../core/CandleService'
 
 import { useChart } from '../hooks/charts/useChart'
 import { useChartData } from '../hooks/charts/useChartData'
@@ -34,8 +35,10 @@ import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
+import { setRaw1mData } from '../hooks/utilities/setRaw1mData'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { applyChartData } from '../hooks/utilities/applyChartData'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -266,7 +269,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         return unsubscribe
     }, [])
 
-    const handleReplaySelection = () => {
+    const handleReplaySelection = async () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
@@ -275,6 +278,10 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         const series = seriesRef.current
 
         if (!chart || !series) return
+
+        const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, previewTime)
+
+        setRaw1mData(raw1mRef, result.rawCandles)
 
         captureViewportAroundTime({
             chart,
@@ -286,16 +293,71 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         const { left: startIndex, exact } = binarySearch(raw1mRef.current.times, previewTime)
 
         if (!exact) {
-            console.error('Replay start candle not found.', {
-                previewTime,
-                firstLoaded: raw1mRef.current.times[0],
-                lastLoaded: raw1mRef.current.times.at(-1),
-            })
-
+            console.error('Replay start candle not found.')
             return
         }
 
         replayStore.start(startIndex, raw1mRef.current.candles, timeframe.toSeconds())
+
+        clearPreview()
+
+        eventBus.emit('replayUpdateIntervalChanged', {
+            seconds: timeframe.toSeconds(),
+        })
+
+        eventBus.emit('replayStart')
+    }
+
+    const handleReplaySelection2 = async () => {
+        if (!replayStore.isSelecting) return
+        if (!replayStore.showToolbar) return
+        if (previewTime === null) return
+
+        const chart = chartRef.current
+        const series = seriesRef.current
+
+        if (!chart || !series) return
+
+        let search = binarySearch(raw1mRef.current.times, previewTime)
+
+        console.log('search', search)
+
+        // Only load another window if the raw candle isn't already loaded.
+        if (!search.exact) {
+            console.log('2. before getChartAndRawCandlesAroundTime')
+
+            const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, previewTime)
+
+            console.log('3. after getChartAndRawCandlesAroundTime', result)
+
+            setRaw1mData(raw1mRef, result.rawCandles)
+
+            loadedWindowRef.current = result.loadedWindow
+
+            applyChartData({
+                candles: result.chartCandles,
+                series,
+                candlesRef,
+                candleMapRef,
+                timesRef,
+            })
+
+            search = binarySearch(raw1mRef.current.times, previewTime)
+
+            if (!search.exact) {
+                console.error('Replay start candle not found.')
+                return
+            }
+        }
+
+        captureViewportAroundTime({
+            chart,
+            candles: candlesRef.current,
+            viewport: replayViewportRef,
+            timestamp: previewTime,
+        })
+
+        replayStore.start(search.left, raw1mRef.current.candles, timeframe.toSeconds())
 
         clearPreview()
 
