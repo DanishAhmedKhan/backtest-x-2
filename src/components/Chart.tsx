@@ -38,6 +38,11 @@ import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
+export type Raw1mData = {
+    candles: Candle[]
+    times: number[]
+}
+
 type Props = {
     id: string
     ticker: Ticker
@@ -50,10 +55,13 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
-    const raw1mCandlesRef = useRef<Candle[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
-    const raw1mTimesRef = useRef<number[]>([])
+
+    const raw1mRef = useRef<Raw1mData>({
+        candles: [],
+        times: [],
+    })
 
     const defaultViewport = {
         visibleBars: DEFAULT_VISIBLE_CANDLE,
@@ -143,10 +151,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
-        raw1mCandlesRef,
         candleMapRef,
         timesRef,
-        raw1mTimesRef,
+        raw1mRef,
         loadedWindowRef,
         totalFilesRef,
         viewportRef,
@@ -171,7 +178,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
-        raw1mCandlesRef,
+        raw1mRef,
         candleMapRef,
         timesRef,
         loadedWindowRef,
@@ -270,9 +277,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         const chart = chartRef.current
         const series = seriesRef.current
 
-        if (!chart || !series) {
-            return
-        }
+        if (!chart || !series) return
 
         captureViewportAroundTime({
             chart,
@@ -281,9 +286,19 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             timestamp: previewTime,
         })
 
-        const { left: startIndex } = binarySearch(raw1mTimesRef.current, previewTime)
+        const { left: startIndex, exact } = binarySearch(raw1mRef.current.times, previewTime)
 
-        replayStore.start(startIndex, raw1mCandlesRef.current, timeframe.toSeconds())
+        if (!exact) {
+            console.error('Replay start candle not found.', {
+                previewTime,
+                firstLoaded: raw1mRef.current.times[0],
+                lastLoaded: raw1mRef.current.times.at(-1),
+            })
+
+            return
+        }
+
+        replayStore.start(startIndex, raw1mRef.current.candles, timeframe.toSeconds())
 
         clearPreview()
 

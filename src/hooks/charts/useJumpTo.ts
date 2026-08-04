@@ -5,7 +5,7 @@ import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { CandleService } from '../../core/CandleService'
-import type { Candle } from '../../core/Candle'
+import type { Raw1mData } from '../../components/Chart'
 
 import { eventBus } from '../../event/EventBus'
 import { applyChartData } from '../utilities/applyChartData'
@@ -13,6 +13,7 @@ import { applyChartData } from '../utilities/applyChartData'
 import type { ViewportState } from '../../types/Viewport'
 import type { LoadedWindow } from '../../types/LoadedWindow'
 import { scrollViewportToTime } from '../utilities/viewport'
+import { setRaw1mData } from '../utilities/setRaw1mData'
 
 type Params = {
     ticker: Ticker
@@ -20,7 +21,7 @@ type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
-    raw1mCandlesRef: React.RefObject<Candle[]>
+    raw1mRef: React.RefObject<Raw1mData>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     loadedWindowRef: React.RefObject<LoadedWindow>
@@ -33,7 +34,7 @@ export function useJumpTo({
     chartRef,
     seriesRef,
     candlesRef,
-    raw1mCandlesRef,
+    raw1mRef,
     candleMapRef,
     timesRef,
     loadedWindowRef,
@@ -54,7 +55,8 @@ export function useJumpTo({
                 timestamp,
             )
 
-            raw1mCandlesRef.current = rawResult.candles
+            setRaw1mData(raw1mRef, rawResult.candles)
+
             loadedWindowRef.current = chartResult.loadedWindow
 
             applyChartData({
@@ -87,10 +89,10 @@ export function useJumpTo({
         chartRef,
         seriesRef,
         candlesRef,
-        raw1mCandlesRef,
         candleMapRef,
         timesRef,
         loadedWindowRef,
         viewportRef,
+        raw1mRef,
     ])
 }

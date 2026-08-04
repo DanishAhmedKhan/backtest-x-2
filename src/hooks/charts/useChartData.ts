@@ -5,7 +5,7 @@ import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { CandleService } from '../../core/CandleService'
-import type { Candle } from '../../core/Candle'
+import type { Raw1mData } from '../../components/Chart'
 
 import { eventBus } from '../../event/EventBus'
 import { replayStore } from '../../replay/ReplayStore'
@@ -14,6 +14,8 @@ import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
 import { applyChartData } from '../utilities/applyChartData'
 import { restoreViewport } from '../utilities/viewport'
+import { setRaw1mData } from '../utilities/setRaw1mData'
+
 import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 
 type Params = {
@@ -23,10 +25,9 @@ type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
-    raw1mCandlesRef: React.RefObject<Candle[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
-    raw1mTimesRef: React.RefObject<number[]>
+    raw1mRef: React.RefObject<Raw1mData>
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     viewportRef: React.RefObject<ViewportState>
@@ -41,10 +42,11 @@ export function useChartData({
     chartRef,
     seriesRef,
     candlesRef,
-    raw1mCandlesRef,
+    // raw1mCandlesRef,
     candleMapRef,
     timesRef,
-    raw1mTimesRef,
+    // raw1mTimesRef,
+    raw1mRef,
     loadedWindowRef,
     totalFilesRef,
     viewportRef,
@@ -71,8 +73,8 @@ export function useChartData({
                 new Timeframe(1, TimeframeUnit.Minute),
                 totalFiles,
             )
-            raw1mCandlesRef.current = rawResult.candles
-            raw1mTimesRef.current = rawResult.candles.map((c) => c.time)
+
+            setRaw1mData(raw1mRef, rawResult.candles)
 
             loadedWindowRef.current = {
                 oldestFile: chartResult.oldestFile,
