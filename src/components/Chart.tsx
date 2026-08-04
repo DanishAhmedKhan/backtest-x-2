@@ -26,7 +26,6 @@ import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
 import { ChartRuntime } from '../drawing/runtime/ChartRuntime'
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
-import { ToolController } from '../drawing/ToolController'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 import { toolStore } from '../drawing/ToolStore'
 
@@ -88,8 +87,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const isLoadingDataRef = useRef(false)
 
     const drawingContextRef = useRef<DrawingContext | null>(null)
-    const toolControllerRef = useRef<ToolController | null>(null)
-
     const runtimeRef = useRef<ChartRuntime | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
@@ -332,7 +329,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                     }, 150)
                 }}
                 onMouseDown={() => {
-                    if (!toolControllerRef.current?.allowsViewportInteraction()) {
+                    if (!runtimeRef.current.getToolController()?.allowsViewportInteraction()) {
                         return
                     }
 

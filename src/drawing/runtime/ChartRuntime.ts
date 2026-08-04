@@ -117,6 +117,10 @@ export class ChartRuntime {
         return this.params.drawingContext.drawingToolbarManager
     }
 
+    public getToolController() {
+        return this.toolController
+    }
+
     public getTimeResolver() {
         return this.timeResolver
     }
