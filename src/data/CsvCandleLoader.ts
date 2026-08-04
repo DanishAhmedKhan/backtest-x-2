@@ -2,9 +2,51 @@ import { Candle } from '../core/Candle'
 
 type FolderName = 'M' | 'H' | 'D'
 
+interface FileRange {
+    file: string
+    firstTime: number
+    lastTime: number
+}
+
 const ROOT_DATA_FOLDER_NAME = 'ticker-data'
 
 export class CsvCandleLoader {
+    private static fileRangesCache = new Map<string, FileRange[]>()
+
+    private static async getFileRanges(ticker: string): Promise<FileRange[]> {
+        const cached = this.fileRangesCache.get(ticker)
+
+        if (cached) {
+            return cached
+        }
+
+        const files = await this.getSortedFiles(ticker)
+
+        const ranges: FileRange[] = []
+
+        for (const file of files) {
+            const url = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/M/${file}`
+
+            const text = await fetch(url).then((res) => res.text())
+
+            const candles = this.parseCsv(text)
+
+            if (candles.length === 0) {
+                continue
+            }
+
+            ranges.push({
+                file,
+                firstTime: candles[0].time,
+                lastTime: candles[candles.length - 1].time,
+            })
+        }
+
+        this.fileRangesCache.set(ticker, ranges)
+
+        return ranges
+    }
+
     private static async getSortedFiles(ticker: string): Promise<string[]> {
         const manifestUrl = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/manifest.json`
         const files: string[] = await fetch(manifestUrl).then((res) => res.json())
@@ -52,30 +94,58 @@ export class CsvCandleLoader {
         return candles
     }
 
+    // public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
+    //     const files = await this.getSortedFiles(ticker)
+
+    //     const date = new Date(timestamp * 1000)
+    //     const { year, week } = this.getIsoWeek(date)
+
+    //     const fileName = `${year}-${week}.csv`
+
+    //     return files.indexOf(fileName)
+    // }
+
     public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
-        const files = await this.getSortedFiles(ticker)
+        const ranges = await this.getFileRanges(ticker)
 
-        const date = new Date(timestamp * 1000)
-        const { year, week } = this.getIsoWeek(date)
+        let left = 0
+        let right = ranges.length - 1
 
-        const fileName = `${year}-${week}.csv`
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2)
+            const range = ranges[mid]
 
-        return files.indexOf(fileName)
-    }
+            if (timestamp < range.firstTime) {
+                right = mid - 1
+            } else if (timestamp > range.lastTime) {
+                left = mid + 1
+            } else {
+                console.log('Matched file', {
+                    file: range.file,
+                    timestamp,
+                    date: new Date(timestamp * 1000).toISOString(),
+                })
 
-    private static getIsoWeek(date: Date) {
-        const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
-
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
-
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-        const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
-
-        return {
-            year: d.getUTCFullYear(),
-            week,
+                return mid
+            }
         }
+
+        return -1
     }
+
+    // private static getIsoWeek(date: Date) {
+    //     const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+
+    //     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+
+    //     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+    //     const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+
+    //     return {
+    //         year: d.getUTCFullYear(),
+    //         week,
+    //     }
+    // }
 
     public static async getFileCount(ticker: string): Promise<number> {
         const files = await this.getSortedFiles(ticker)
