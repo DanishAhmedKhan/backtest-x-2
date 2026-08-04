@@ -78,31 +78,32 @@ export default function DrawingToolbar() {
                                 toolStore.select(ToolType.HorizontalLine)
                             },
                         },
-                        {
-                            type: 'dropdown',
-                            id: 'asdsa',
-                            selectedId: `trend-line`,
-                            options: tools,
-                            renderTrigger: ({ selected, open, toggleDropdown }) => {
-                                console.log(selected)
-                                return (
-                                    <button className="toolbar-trigger">
-                                        <div
-                                            className={`toolbar-arrow ${open ? 'open' : ''}`}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                padding: '0px 6px',
-                                                height: '100%',
-                                            }}
-                                            onClick={toggleDropdown}
-                                        >
-                                            {selected?.icon}
-                                        </div>
-                                    </button>
-                                )
-                            },
-                        },
+                        // {
+                        //     type: 'dropdown',
+                        //     id: 'asdsa',
+                        //     selectedId: `trend-line`,
+                        //     options: tools,
+                        //     renderTrigger: ({ selected, open, toggleDropdown }) => {
+                        //         console.log(selected)
+                        //         return (
+                        //             <div className="toolbar-btn-dropdown">
+                        //                 <button className={'toolbar-icon ' + `${open ? 'open' : ''}`}>
+                        //                     <div
+                        //                         style={{
+                        //                             display: 'flex',
+                        //                             alignItems: 'center',
+                        //                             padding: '0px 6px',
+                        //                             height: '100%',
+                        //                         }}
+                        //                     >
+                        //                         {selected?.icon}
+                        //                     </div>
+                        //                 </button>
+                        //                 <button className="toolbar-btn-dropdown-arrow"></button>
+                        //             </div>
+                        //         )
+                        //     },
+                        // },
                     ],
                 },
             ]}
