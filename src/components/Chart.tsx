@@ -122,6 +122,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         ticker,
         timeframe,
         chartReady,
+        raw1mRef,
         loadedWindowRef,
         totalFilesRef,
         isLoadingDataRef,
@@ -269,7 +270,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         return unsubscribe
     }, [])
 
-    const handleReplaySelection2 = async () => {
+    const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
@@ -278,10 +279,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         const series = seriesRef.current
 
         if (!chart || !series) return
-
-        const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, previewTime)
-
-        setRaw1mData(raw1mRef, result.rawCandles)
 
         captureViewportAroundTime({
             chart,
@@ -298,63 +295,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         }
 
         replayStore.start(startIndex, raw1mRef.current.candles, timeframe.toSeconds())
-
-        clearPreview()
-
-        eventBus.emit('replayUpdateIntervalChanged', {
-            seconds: timeframe.toSeconds(),
-        })
-
-        eventBus.emit('replayStart')
-    }
-
-    const handleReplaySelection = async () => {
-        if (!replayStore.isSelecting) return
-        if (!replayStore.showToolbar) return
-        if (previewTime === null) return
-
-        const chart = chartRef.current
-        const series = seriesRef.current
-
-        if (!chart || !series) return
-
-        captureViewportAroundTime({
-            chart,
-            candles: candlesRef.current,
-            viewport: replayViewportRef,
-            timestamp: previewTime,
-        })
-
-        let search = binarySearch(raw1mRef.current.times, previewTime)
-
-        console.log(search)
-
-        if (!search.exact) {
-            console.time('a')
-            const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, previewTime)
-            console.time('a')
-
-            setRaw1mData(raw1mRef, result.rawCandles)
-
-            loadedWindowRef.current = result.loadedWindow
-
-            applyChartData({
-                candles: result.chartCandles,
-                series,
-                candlesRef,
-                candleMapRef,
-                timesRef,
-            })
-
-            search = binarySearch(raw1mRef.current.times, previewTime)
-
-            if (!search.exact) {
-                console.error('Replay start candle not found.')
-                return
-            }
-        }
-
-        replayStore.start(search.left, raw1mRef.current.candles, timeframe.toSeconds())
 
         clearPreview()
 

@@ -3,7 +3,6 @@ import type { CandlestickData, IChartApi, ISeriesApi, Time } from 'lightweight-c
 
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
-import { TimeframeUnit } from '../../core/TimeframeUnit'
 import { CandleService } from '../../core/CandleService'
 import type { Raw1mData } from '../../components/Chart'
 
@@ -47,20 +46,34 @@ export function useJumpTo({
 
             if (!chart || !series) return
 
-            const chartResult = await CandleService.getCandlesAroundTime(ticker, timeframe, timestamp)
+            // const chartResult = await CandleService.getCandlesAroundTime(ticker, timeframe, timestamp)
 
-            const rawResult = await CandleService.getCandlesAroundTime(
-                ticker,
-                new Timeframe(1, TimeframeUnit.Minute),
-                timestamp,
-            )
+            // const rawResult = await CandleService.getCandlesAroundTime(
+            //     ticker,
+            //     new Timeframe(1, TimeframeUnit.Minute),
+            //     timestamp,
+            // )
 
-            setRaw1mData(raw1mRef, rawResult.candles)
+            // setRaw1mData(raw1mRef, rawResult.candles)
 
-            loadedWindowRef.current = chartResult.loadedWindow
+            // loadedWindowRef.current = chartResult.loadedWindow
+
+            // applyChartData({
+            //     candles: chartResult.candles,
+            //     series,
+            //     candlesRef,
+            //     candleMapRef,
+            //     timesRef,
+            // })
+
+            const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, timestamp)
+
+            setRaw1mData(raw1mRef, result.rawCandles)
+
+            loadedWindowRef.current = result.loadedWindow
 
             applyChartData({
-                candles: chartResult.candles,
+                candles: result.chartCandles,
                 series,
                 candlesRef,
                 candleMapRef,

@@ -13,6 +13,8 @@ import type { ViewportState } from '../../types/Viewport'
 import { CandleService } from '../../core/CandleService'
 
 import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
+import type { Raw1mData } from '../../components/Chart'
+import { loadChartAndRawAdjacentWindow } from '../utilities/loadChartAndRawAdjacentWindow'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -25,6 +27,7 @@ type Params = {
     chartReady: boolean
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
+    raw1mRef: React.RefObject<Raw1mData>
     isLoadingDataRef: React.RefObject<boolean>
     isChangingTimeframeRef: React.RefObject<boolean>
     isViewportInteractionRef: React.RefObject<boolean>
@@ -43,6 +46,7 @@ export function useInfiniteScroll({
     chartReady,
     loadedWindowRef,
     totalFilesRef,
+    raw1mRef,
     isLoadingDataRef,
     isChangingTimeframeRef,
     isViewportInteractionRef,
@@ -58,6 +62,12 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
+            console.log('InfiniteScroll', {
+                replayEnabled: replayStore.enabled,
+                replayPlaying: replayStore.isPlaying,
+                range: chart.timeScale().getVisibleLogicalRange(),
+            })
+
             if (
                 isChangingTimeframeRef.current ||
                 replayStore.enabled ||
@@ -76,10 +86,25 @@ export function useInfiniteScroll({
             const fileCount = CandleService.getAdjacentLoadFileCount(timeframe)
 
             try {
+                // const loadWindow = (direction: 'older' | 'newer') =>
+                //     loadAdjacentWindow({
+                //         series,
+                //         candlesRef,
+                //         candleMapRef,
+                //         timesRef,
+                //         ticker,
+                //         timeframe,
+                //         loadedWindowRef,
+                //         totalFilesRef,
+                //         direction,
+                //         fileCount,
+                //     })
+
                 const loadWindow = (direction: 'older' | 'newer') =>
-                    loadAdjacentWindow({
+                    loadChartAndRawAdjacentWindow({
                         series,
                         candlesRef,
+                        raw1mRef,
                         candleMapRef,
                         timesRef,
                         ticker,
@@ -91,6 +116,7 @@ export function useInfiniteScroll({
                     })
 
                 if (range.from < threshold) {
+                    console.log('older')
                     const beforeScroll = timeScale.scrollPosition()
 
                     const result = await loadWindow('older')
@@ -148,5 +174,6 @@ export function useInfiniteScroll({
         isViewportInteractionRef,
         viewportRef,
         runtimeRef,
+        raw1mRef,
     ])
 }
