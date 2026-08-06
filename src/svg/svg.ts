@@ -21,6 +21,10 @@ const svg = {
         horizontalLine:
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><g fill="currentColor" fill-rule="nonzero"><path d="M4 15h8.5v-1h-8.5zM16.5 15h8.5v-1h-8.5z"></path><path d="M14.5 16c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"></path></g></svg>',
     },
+    cursor: {
+        scissor:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="23" r="2.3"/><circle cx="20" cy="23" r="2.3"/><path d="M13.4 21.2 L16 16"/><path d="M18.6 21.2 L16 16"/><path d="M14.2 17.2 L20.2 5.5"/><path d="M17.8 17.2 L11.8 5.5"/></g></svg>',
+    },
 }
 
 export default svg

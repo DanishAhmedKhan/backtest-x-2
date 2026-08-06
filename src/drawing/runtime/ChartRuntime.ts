@@ -8,7 +8,6 @@ import { RenderLoop } from '../renderer/RenderLoop'
 import type { DrawingContext } from '../DrawingContext'
 import { PointerController } from '../controller/PointerController'
 import { ToolController } from '../ToolController'
-import { CursorManager } from '../CursorManager'
 import { HoverController } from '../controller/HoverController'
 import { SelectionController } from '../controller/SelectionController'
 import { EditController } from '../controller/EditController'
@@ -18,6 +17,8 @@ import { TrendLineEditor } from '../editor/TrendLineEditor'
 import { HorizontalLineEditor } from '../editor/HorizontalLineEditor'
 import type { Timeframe } from '../../core/Timeframe'
 import { PaneGeometry } from '../renderer/PaneGeometry'
+import { CursorApplier } from '../../core/cursor/CursorApplier'
+import { CursorController } from '../../core/cursor/CursorController'
 
 type Params = {
     chart: IChartApi
@@ -42,6 +43,8 @@ export class ChartRuntime {
 
     private readonly paneGeometry: PaneGeometry
     private readonly canvas: HTMLCanvasElement
+
+    private cursorController: CursorController
 
     private readonly unsubscribers: (() => void)[] = []
 
@@ -75,14 +78,15 @@ export class ChartRuntime {
             this.drawingCanvasRenderer.render()
         })
 
-        const cursorManager = new CursorManager(container)
+        const cursorApplier = new CursorApplier(container)
+        this.cursorController = new CursorController(cursorApplier)
 
         const hoverController = new HoverController(
             drawingContext.drawingStateManager,
             drawingContext.hitTestManager,
             this.transformer,
             this.renderLoop,
-            cursorManager,
+            this.cursorController,
         )
 
         const selectionController = new SelectionController(
@@ -128,6 +132,10 @@ export class ChartRuntime {
 
     public getTransformer() {
         return this.transformer
+    }
+
+    public getCursorController() {
+        return this.cursorController
     }
 
     public handlePointerDown(event: RawPointerEvent) {

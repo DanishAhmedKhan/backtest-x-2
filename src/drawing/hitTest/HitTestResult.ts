@@ -1,5 +1,5 @@
 import type { Drawing } from '../drawings/Drawing'
-import type { CursorType } from '../CursorType'
+import type { CursorType } from '../../core/cursor/CursorType'
 
 export enum HitTarget {
     None = 'none',

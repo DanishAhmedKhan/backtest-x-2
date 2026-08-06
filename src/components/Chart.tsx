@@ -37,6 +37,8 @@ import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
+import { CursorType } from '../core/cursor/CursorType'
+import { CursorSource } from '../core/cursor/CursorSource'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -321,6 +323,20 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             },
         })
     }, [chartRef, showReplayOverlay])
+
+    useEffect(() => {
+        const cursorController = runtimeRef.current?.getCursorController()
+
+        if (!cursorController) {
+            return
+        }
+
+        if (showReplayOverlay) {
+            cursorController.request(CursorSource.Replay, CursorType.ReplaySelection)
+        } else {
+            cursorController.clear(CursorSource.Replay)
+        }
+    }, [showReplayOverlay])
 
     return (
         <div

@@ -1,6 +1,6 @@
 import { CursorType } from './CursorType'
 
-export class CursorManager {
+export class CursorApplier {
     constructor(private readonly container: HTMLElement) {}
 
     private current = ''

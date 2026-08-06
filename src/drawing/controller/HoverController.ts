@@ -1,10 +1,11 @@
 import { DrawingStateManager } from '../managers/DrawingStateManager'
 import { HitTestManager } from '../hitTest/HitTestManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
-import type { CursorManager } from '../CursorManager'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import { HitTestConstants } from '../hitTest/HitTestConstant'
+import type { CursorController } from '../../core/cursor/CursorController'
+import { CursorSource } from '../../core/cursor/CursorSource'
 
 export class HoverController {
     constructor(
@@ -12,7 +13,7 @@ export class HoverController {
         private readonly hitTestManager: HitTestManager,
         private readonly transformer: CoordinateTransformer,
         private readonly renderInvalidator: RenderInvalidator,
-        private readonly cursorManager: CursorManager,
+        private readonly cursorController: CursorController,
     ) {}
 
     public handlePointerMove(event: ChartPointerEvent) {
@@ -30,16 +31,16 @@ export class HoverController {
         }
 
         if (result) {
-            this.cursorManager.set(result.cursor)
+            this.cursorController.request(CursorSource.Hover, result.cursor)
         } else {
-            this.cursorManager.reset()
+            this.cursorController.clear(CursorSource.Hover)
         }
     }
 
     public handlePointerLeave() {
         this.drawingStateManager.setHovered(null)
 
-        this.cursorManager.reset()
+        this.cursorController.clear(CursorSource.Hover)
         this.renderInvalidator.invalidate()
     }
 }

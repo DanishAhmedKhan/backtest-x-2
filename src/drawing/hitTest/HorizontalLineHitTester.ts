@@ -1,4 +1,4 @@
-import { CursorType } from '../CursorType'
+import { CursorType } from '../../core/cursor/CursorType'
 import type { Drawing } from '../drawings/Drawing'
 import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 import { DrawingType } from '../DrawingType'

@@ -5,7 +5,7 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTestResult'
 import { HitTestConstants } from './HitTestConstant'
-import { CursorType } from '../CursorType'
+import { CursorType } from '../../core/cursor/CursorType'
 import { LineGeometry } from '../geometry/LineGeometry'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 
