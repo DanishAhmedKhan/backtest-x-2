@@ -4,8 +4,6 @@ import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-c
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 
-import { loadAdjacentWindow } from '../utilities/loadAdjacentWidow,'
-
 import { replayStore } from '../../replay/ReplayStore'
 import { eventBus } from '../../event/EventBus'
 import type { LoadedWindow } from '../../types/LoadedWindow'
@@ -14,6 +12,7 @@ import { CandleService } from '../../core/CandleService'
 
 import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 import type { Raw1mData } from '../../components/Chart'
+
 import { loadChartAndRawAdjacentWindow } from '../utilities/loadChartAndRawAdjacentWindow'
 
 type Params = {
@@ -62,11 +61,9 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
-            console.log('InfiniteScroll', {
-                replayEnabled: replayStore.enabled,
-                replayPlaying: replayStore.isPlaying,
-                range: chart.timeScale().getVisibleLogicalRange(),
-            })
+            if (replayStore.showToolbar) {
+                return
+            }
 
             if (
                 isChangingTimeframeRef.current ||
@@ -86,20 +83,6 @@ export function useInfiniteScroll({
             const fileCount = CandleService.getAdjacentLoadFileCount(timeframe)
 
             try {
-                // const loadWindow = (direction: 'older' | 'newer') =>
-                //     loadAdjacentWindow({
-                //         series,
-                //         candlesRef,
-                //         candleMapRef,
-                //         timesRef,
-                //         ticker,
-                //         timeframe,
-                //         loadedWindowRef,
-                //         totalFilesRef,
-                //         direction,
-                //         fileCount,
-                //     })
-
                 const loadWindow = (direction: 'older' | 'newer') =>
                     loadChartAndRawAdjacentWindow({
                         series,
@@ -116,7 +99,6 @@ export function useInfiniteScroll({
                     })
 
                 if (range.from < threshold) {
-                    console.log('older')
                     const beforeScroll = timeScale.scrollPosition()
 
                     const result = await loadWindow('older')

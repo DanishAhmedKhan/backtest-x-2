@@ -21,7 +21,6 @@ export class CsvCandleLoader {
         }
 
         const files = await this.getSortedFiles(ticker)
-        console.log('files', files)
 
         const ranges: FileRange[] = []
 
@@ -95,17 +94,6 @@ export class CsvCandleLoader {
         return candles
     }
 
-    // public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
-    //     const files = await this.getSortedFiles(ticker)
-
-    //     const date = new Date(timestamp * 1000)
-    //     const { year, week } = this.getIsoWeek(date)
-
-    //     const fileName = `${year}-${week}.csv`
-
-    //     return files.indexOf(fileName)
-    // }
-
     public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
         const ranges = await this.getFileRanges(ticker)
 
@@ -121,32 +109,12 @@ export class CsvCandleLoader {
             } else if (timestamp > range.lastTime) {
                 left = mid + 1
             } else {
-                console.log('Matched file', {
-                    file: range.file,
-                    timestamp,
-                    date: new Date(timestamp * 1000).toISOString(),
-                })
-
                 return mid
             }
         }
 
         return -1
     }
-
-    // private static getIsoWeek(date: Date) {
-    //     const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
-
-    //     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
-
-    //     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-    //     const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
-
-    //     return {
-    //         year: d.getUTCFullYear(),
-    //         week,
-    //     }
-    // }
 
     public static async getFileCount(ticker: string): Promise<number> {
         const files = await this.getSortedFiles(ticker)

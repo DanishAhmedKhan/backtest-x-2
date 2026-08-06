@@ -110,12 +110,6 @@ export class CandleService {
     ) {
         const centerFile = await CsvCandleLoader.findFileIndex(ticker.value, timestamp)
 
-        console.log({
-            timestamp,
-            date: new Date(timestamp * 1000).toISOString(),
-            centerFile,
-        })
-
         if (centerFile === -1) {
             throw new Error('Timestamp is outside available data.')
         }

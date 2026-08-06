@@ -8,7 +8,6 @@ import DrawingCanvas from './DrawingCanvas'
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import type { Candle } from '../core/Candle'
-import { CandleService } from '../core/CandleService'
 
 import { useChart } from '../hooks/charts/useChart'
 import { useChartData } from '../hooks/charts/useChartData'
@@ -35,10 +34,8 @@ import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
-import { setRaw1mData } from '../hooks/utilities/setRaw1mData'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
-import { applyChartData } from '../hooks/utilities/applyChartData'
 
 export type Raw1mData = {
     candles: Candle[]

@@ -75,10 +75,6 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, view
                           })),
                       ]
 
-            console.log('rebuildReplay -> setData', {
-                bars: formatted.length,
-            })
-
             series.setData(formatted)
 
             restoreViewport({

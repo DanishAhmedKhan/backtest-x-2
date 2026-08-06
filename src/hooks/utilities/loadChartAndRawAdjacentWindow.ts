@@ -50,7 +50,6 @@ export async function loadChartAndRawAdjacentWindow({
         }
 
         actualFileCount = Math.min(fileCount, loadedWindowRef.current.oldestFile)
-
         startIndex = loadedWindowRef.current.oldestFile - actualFileCount
     } else {
         const remaining = totalFilesRef.current - loadedWindowRef.current.latestFile - 1
@@ -63,7 +62,6 @@ export async function loadChartAndRawAdjacentWindow({
         }
 
         actualFileCount = Math.min(fileCount, remaining)
-
         startIndex = loadedWindowRef.current.latestFile + 1
     }
 
@@ -87,24 +85,12 @@ export async function loadChartAndRawAdjacentWindow({
     if (direction === 'older') {
         candlesRef.current = [...formatted, ...candlesRef.current]
         loadedWindowRef.current.oldestFile = startIndex
+        setRaw1mData(raw1mRef, [...result.rawCandles, ...raw1mRef.current.candles])
     } else {
         candlesRef.current = [...candlesRef.current, ...formatted]
         loadedWindowRef.current.latestFile = startIndex + actualFileCount - 1
-    }
-
-    // setRaw1mData(raw1mRef, result.rawCandles)
-
-    if (direction === 'older') {
-        setRaw1mData(raw1mRef, [...result.rawCandles, ...raw1mRef.current.candles])
-    } else {
         setRaw1mData(raw1mRef, [...raw1mRef.current.candles, ...result.rawCandles])
     }
-
-    console.log({
-        afterMergeFirst: raw1mRef.current.times[0],
-        afterMergeLast: raw1mRef.current.times.at(-1),
-        afterMergeCount: raw1mRef.current.times.length,
-    })
 
     candleMapRef.current.clear()
 

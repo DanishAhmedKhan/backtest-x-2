@@ -46,26 +46,6 @@ export function useJumpTo({
 
             if (!chart || !series) return
 
-            // const chartResult = await CandleService.getCandlesAroundTime(ticker, timeframe, timestamp)
-
-            // const rawResult = await CandleService.getCandlesAroundTime(
-            //     ticker,
-            //     new Timeframe(1, TimeframeUnit.Minute),
-            //     timestamp,
-            // )
-
-            // setRaw1mData(raw1mRef, rawResult.candles)
-
-            // loadedWindowRef.current = chartResult.loadedWindow
-
-            // applyChartData({
-            //     candles: chartResult.candles,
-            //     series,
-            //     candlesRef,
-            //     candleMapRef,
-            //     timesRef,
-            // })
-
             const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, timestamp)
 
             setRaw1mData(raw1mRef, result.rawCandles)
