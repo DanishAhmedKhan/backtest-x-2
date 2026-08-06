@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, memo } from 'react'
+import { useEffect, useRef, useState, memo, useCallback } from 'react'
 import type { CandlestickData, Time } from 'lightweight-charts'
 
 import ChartOHLC from './ChartOHLC'
@@ -34,6 +34,9 @@ import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
+
+import type { PaneLayout } from '../drawing/renderer/PaneLayout'
+import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
@@ -89,6 +92,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const drawingContextRef = useRef<DrawingContext | null>(null)
     const runtimeRef = useRef<ChartRuntime | null>(null)
 
+    const paneGeometryRef = useRef<PaneGeometry | null>(null)
+    const [paneLayout, setPaneLayout] = useState<PaneLayout | null>(null)
+
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
     const { previewTime, previewX, clearPreview } = useReplayPreview({
@@ -129,9 +135,30 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         runtimeRef,
     })
 
+    const handleChartResized = useCallback(() => {
+        const pane = paneGeometryRef.current?.calculate()
+
+        if (pane) {
+            setPaneLayout((previous) => {
+                if (
+                    previous &&
+                    previous.left === pane.left &&
+                    previous.top === pane.top &&
+                    previous.width === pane.width &&
+                    previous.height === pane.height
+                ) {
+                    return previous
+                }
+
+                return pane
+            })
+        }
+    }, [])
+
     useChartResize({
         containerRef,
         chartRef,
+        onResized: handleChartResized,
     })
 
     useCrosshairSync({
@@ -202,6 +229,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         const drawingContext = drawingContextRef.current
 
+        paneGeometryRef.current = new PaneGeometry(container)
+
         runtimeRef.current = new ChartRuntime({
             chart,
             series,
@@ -210,6 +239,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             drawingContext,
             timesRef,
             timeframe,
+            paneGeometry: paneGeometryRef.current,
         })
 
         runtimeRef.current.start()
@@ -302,7 +332,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         eventBus.emit('replayStart')
     }
 
-    const showReplayOverlay = replayStore.showToolbar && replayStore.isSelecting && previewX !== null
+    const showReplayOverlay =
+        replayStore.showToolbar && replayStore.isSelecting && previewX !== null && paneLayout !== null
 
     return (
         <div
@@ -340,7 +371,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
             <DrawingCanvas ref={drawingCanvasRef} />
 
-            {showReplayOverlay && <ReplayOverlay x={previewX} />}
+            {showReplayOverlay && <ReplayOverlay x={previewX} pane={paneLayout} />}
         </div>
     )
 }

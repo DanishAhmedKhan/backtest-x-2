@@ -27,6 +27,7 @@ type Params = {
     drawingContext: DrawingContext
     timesRef: React.RefObject<number[]>
     timeframe: Timeframe
+    paneGeometry: PaneGeometry
 }
 
 export class ChartRuntime {
@@ -45,11 +46,11 @@ export class ChartRuntime {
     private readonly unsubscribers: (() => void)[] = []
 
     constructor(private readonly params: Params) {
-        const { chart, series, canvas, container, drawingContext, timesRef } = params
+        const { chart, series, canvas, container, drawingContext, timesRef, paneGeometry } = params
 
         this.canvas = canvas
 
-        this.paneGeometry = new PaneGeometry(container)
+        this.paneGeometry = paneGeometry
 
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef, params.timeframe)
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
@@ -152,6 +153,7 @@ export class ChartRuntime {
 
     public updatePaneLayout() {
         const pane = this.paneGeometry.calculate()
+        this.paneLayout = pane
 
         this.canvas.style.left = `${pane.left}px`
         this.canvas.style.top = `${pane.top}px`

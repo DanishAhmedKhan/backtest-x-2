@@ -4,9 +4,10 @@ import type { IChartApi } from 'lightweight-charts'
 type Props = {
     containerRef: React.RefObject<HTMLDivElement | null>
     chartRef: React.RefObject<IChartApi | null>
+    onResized?: () => void
 }
 
-export function useChartResize({ containerRef, chartRef }: Props) {
+export function useChartResize({ containerRef, chartRef, onResized }: Props) {
     useEffect(() => {
         const chart = chartRef.current
         const container = containerRef.current
@@ -15,6 +16,8 @@ export function useChartResize({ containerRef, chartRef }: Props) {
 
         const resize = () => {
             chart.resize(container.clientWidth, container.clientHeight, true)
+
+            onResized?.()
         }
 
         const observer = new ResizeObserver(resize)
@@ -26,5 +29,5 @@ export function useChartResize({ containerRef, chartRef }: Props) {
         return () => {
             observer.disconnect()
         }
-    }, [chartRef, containerRef])
+    }, [chartRef, containerRef, onResized])
 }
