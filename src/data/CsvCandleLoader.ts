@@ -21,6 +21,7 @@ export class CsvCandleLoader {
         }
 
         const files = await this.getSortedFiles(ticker)
+        console.log('files', files)
 
         const ranges: FileRange[] = []
 

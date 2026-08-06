@@ -269,7 +269,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         return unsubscribe
     }, [])
 
-    const handleReplaySelection = async () => {
+    const handleReplaySelection2 = async () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
@@ -308,7 +308,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         eventBus.emit('replayStart')
     }
 
-    const handleReplaySelection2 = async () => {
+    const handleReplaySelection = async () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
@@ -318,17 +318,21 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         if (!chart || !series) return
 
+        captureViewportAroundTime({
+            chart,
+            candles: candlesRef.current,
+            viewport: replayViewportRef,
+            timestamp: previewTime,
+        })
+
         let search = binarySearch(raw1mRef.current.times, previewTime)
 
-        console.log('search', search)
+        console.log(search)
 
-        // Only load another window if the raw candle isn't already loaded.
         if (!search.exact) {
-            console.log('2. before getChartAndRawCandlesAroundTime')
-
+            console.time('a')
             const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, previewTime)
-
-            console.log('3. after getChartAndRawCandlesAroundTime', result)
+            console.time('a')
 
             setRaw1mData(raw1mRef, result.rawCandles)
 
@@ -349,13 +353,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                 return
             }
         }
-
-        captureViewportAroundTime({
-            chart,
-            candles: candlesRef.current,
-            viewport: replayViewportRef,
-            timestamp: previewTime,
-        })
 
         replayStore.start(search.left, raw1mRef.current.candles, timeframe.toSeconds())
 

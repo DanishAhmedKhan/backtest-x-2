@@ -148,9 +148,14 @@ export class CandleService {
         beforeFiles: number = 4,
         afterFiles: number = 4,
     ) {
+        console.log('asas')
+        console.time('b')
         const chartResult = await this.getCandlesAroundTime(ticker, timeframe, timestamp, beforeFiles, afterFiles)
+        console.time('b')
 
+        console.time('c')
         const rawCandles = await this.loadMatchingRawWindow(ticker, chartResult.loadedWindow)
+        console.time('c')
 
         return {
             chartCandles: chartResult.candles,
