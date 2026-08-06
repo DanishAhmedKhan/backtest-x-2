@@ -8,4 +8,5 @@ export enum CursorType {
     NsResize = 'ns-resize',
     EwResize = 'ew-resize',
     NwseResize = 'nwse-resize',
+    ReplaySelection = 'cell',
 }

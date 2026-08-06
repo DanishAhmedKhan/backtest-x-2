@@ -153,7 +153,6 @@ export class ChartRuntime {
 
     public updatePaneLayout() {
         const pane = this.paneGeometry.calculate()
-        this.paneLayout = pane
 
         this.canvas.style.left = `${pane.left}px`
         this.canvas.style.top = `${pane.top}px`

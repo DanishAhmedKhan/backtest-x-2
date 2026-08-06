@@ -1,3 +1,5 @@
+import { CursorType } from './CursorType'
+
 export class CursorManager {
     constructor(private readonly container: HTMLElement) {}
 
@@ -13,6 +15,6 @@ export class CursorManager {
     }
 
     public reset() {
-        this.set('default')
+        this.set(CursorType.Default)
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, memo, useCallback } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 import type { CandlestickData, Time } from 'lightweight-charts'
 
 import ChartOHLC from './ChartOHLC'
@@ -11,7 +11,7 @@ import type { Candle } from '../core/Candle'
 
 import { useChart } from '../hooks/charts/useChart'
 import { useChartData } from '../hooks/charts/useChartData'
-import { useChartResize } from '../hooks/charts/useChartResize'
+import { useChartLayout } from '../hooks/charts/useChartLayout'
 import { useViewportSync } from '../hooks/charts/useViewportSync'
 import { useCrosshairSync } from '../hooks/charts/useCrosshairSync'
 import { useInfiniteScroll } from '../hooks/charts/useInfiniteScroll'
@@ -27,6 +27,7 @@ import { ChartRuntime } from '../drawing/runtime/ChartRuntime'
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
+import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 import { toolStore } from '../drawing/ToolStore'
 
 import { eventBus } from '../event/EventBus'
@@ -34,9 +35,6 @@ import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
 import { captureViewportAroundTime } from '../hooks/utilities/viewport'
 import { binarySearch } from '../helper/binarySearch'
-
-import type { PaneLayout } from '../drawing/renderer/PaneLayout'
-import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 
@@ -93,7 +91,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const runtimeRef = useRef<ChartRuntime | null>(null)
 
     const paneGeometryRef = useRef<PaneGeometry | null>(null)
-    const [paneLayout, setPaneLayout] = useState<PaneLayout | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
@@ -135,30 +132,10 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         runtimeRef,
     })
 
-    const handleChartResized = useCallback(() => {
-        const pane = paneGeometryRef.current?.calculate()
-
-        if (pane) {
-            setPaneLayout((previous) => {
-                if (
-                    previous &&
-                    previous.left === pane.left &&
-                    previous.top === pane.top &&
-                    previous.width === pane.width &&
-                    previous.height === pane.height
-                ) {
-                    return previous
-                }
-
-                return pane
-            })
-        }
-    }, [])
-
-    useChartResize({
+    const paneLayout = useChartLayout({
         containerRef,
         chartRef,
-        onResized: handleChartResized,
+        paneGeometryRef,
     })
 
     useCrosshairSync({
@@ -334,6 +311,16 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const showReplayOverlay =
         replayStore.showToolbar && replayStore.isSelecting && previewX !== null && paneLayout !== null
+
+    useEffect(() => {
+        chartRef.current?.applyOptions({
+            crosshair: {
+                vertLine: {
+                    labelBackgroundColor: showReplayOverlay ? '#2962ff' : '#000',
+                },
+            },
+        })
+    }, [chartRef, showReplayOverlay])
 
     return (
         <div
