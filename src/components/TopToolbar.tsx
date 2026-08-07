@@ -131,7 +131,7 @@ export default function TopToolbar({
                         ...timeframeDisplay,
                         {
                             type: 'dropdown-arrow',
-                            id: 'asa',
+                            id: 'tf-arrow',
                             selectedId: `tf-${timeframe.toKey()}`,
                             options: timeframeOptions,
                             onChange: (option) => {
@@ -182,8 +182,8 @@ export default function TopToolbar({
                             id: 'layout',
                             selectedId: `l-${layout}`,
                             options: [],
-                            renderTrigger: () => (
-                                <button className="toolbar-trigger">
+                            renderTrigger: ({ openDropdown }) => (
+                                <button className="toolbar-trigger" onClick={openDropdown}>
                                     <div
                                         style={{ width: 21, height: 19 }}
                                         dangerouslySetInnerHTML={{

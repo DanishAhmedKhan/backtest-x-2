@@ -41,6 +41,7 @@ export interface ToolbarDropdownBaseProps {
     selectedId: string
     options?: ToolbarDropdownOption[]
     renderTrigger?: (context: ToolbarDropdownRenderContext) => React.ReactNode
+    triggerClassName?: string
     width?: number | string
     searchable?: boolean
     tooltip?: string

@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ToolbarDropdownBaseProps } from './types'
 
 export function ToolbarDropdown({
     selectedId,
     renderTrigger,
     options,
-    tooltip,
     width,
     dropdown,
     onChange,
+    triggerClassName,
 }: ToolbarDropdownBaseProps) {
     const [open, setOpen] = useState(false)
 
@@ -33,14 +33,14 @@ export function ToolbarDropdown({
             }
         }
 
-        document.addEventListener('mousedown', handleClickOutside)
+        document.addEventListener('click', handleClickOutside)
 
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('click', handleClickOutside)
         }
     }, [])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!open) return
 
         const trigger = ref.current
@@ -80,22 +80,25 @@ export function ToolbarDropdown({
 
     return (
         <div ref={ref} className="toolbar-dropdown" style={{ width }}>
-            <div className={`toolbar-main ${open ? 'active' : ''}`} title={tooltip}>
-                {renderTrigger ? (
-                    renderTrigger({
-                        selected,
-                        open,
-                        openDropdown,
-                        closeDropdown,
-                        toggleDropdown,
-                    })
-                ) : (
-                    <button className="toolbar-trigger" onClick={toggleDropdown}>
-                        {selected?.icon}
-                        <span className="toolbar-dropdown-label">{selected?.label}</span>
-                    </button>
-                )}
-            </div>
+            {renderTrigger ? (
+                renderTrigger({
+                    selected,
+                    open,
+                    openDropdown,
+                    closeDropdown,
+                    toggleDropdown,
+                })
+            ) : (
+                <button
+                    type="button"
+                    className={`toolbar-trigger ${triggerClassName ?? ''} ${open ? 'active' : ''}`}
+                    onClick={toggleDropdown}
+                >
+                    {selected?.icon}
+
+                    <span className="toolbar-dropdown-label">{selected?.label}</span>
+                </button>
+            )}
 
             {open && (
                 <div
@@ -110,20 +113,21 @@ export function ToolbarDropdown({
                     {dropdown
                         ? dropdown({
                               selectedId,
-                              close: () => setOpen(false),
+                              close: closeDropdown,
                               select: (option) => {
                                   onChange?.(option)
-                                  setOpen(false)
+                                  closeDropdown()
                               },
                           })
                         : options?.map((option) => (
                               <button
+                                  type="button"
                                   key={option.id}
                                   className={`toolbar-dropdown-option ${option.id === selected?.id ? 'selected' : ''}`}
                                   disabled={option.disabled}
                                   onClick={() => {
                                       onChange?.(option)
-                                      setOpen(false)
+                                      closeDropdown()
                                   }}
                               >
                                   {option.icon}
