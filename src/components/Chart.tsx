@@ -85,6 +85,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const isChangingTimeframeRef = useRef<boolean>(false)
     const [isHovered, setIsHovered] = useState(false)
+    const [isPaneHovered, setIsPaneHovered] = useState(false)
+    const [replayCursorY, setReplayCursorY] = useState<number | null>(null)
 
     const loadedWindowRef = useRef({
         oldestFile: 0,
@@ -283,6 +285,33 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         return unsubscribe
     }, [])
 
+    const handlePaneMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (!paneLayout) {
+            setIsPaneHovered(false)
+            setReplayCursorY(null)
+            return
+        }
+
+        const rect = event.currentTarget.getBoundingClientRect()
+
+        const x = event.clientX - rect.left
+        const y = event.clientY - rect.top
+
+        const inside =
+            x >= paneLayout.left &&
+            x <= paneLayout.left + paneLayout.width &&
+            y >= paneLayout.top &&
+            y <= paneLayout.top + paneLayout.height
+
+        setIsPaneHovered(inside)
+
+        if (inside) {
+            setReplayCursorY(y)
+        } else {
+            setReplayCursorY(null)
+        }
+    }
+
     const handleReplaySelection = () => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
@@ -319,7 +348,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }
 
     const showReplayOverlay =
-        replayStore.showToolbar && replayStore.isSelecting && previewX !== null && paneLayout !== null
+        replayStore.showToolbar && replayStore.isSelecting && previewX !== null && paneLayout !== null && isPaneHovered
 
     useEffect(() => {
         chartRef.current?.applyOptions({
@@ -339,7 +368,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         }
 
         if (showReplayOverlay) {
-            cursorController.request(CursorSource.Replay, CursorType.ReplaySelection)
+            cursorController.request(CursorSource.Replay, CursorType.None)
         } else {
             cursorController.clear(CursorSource.Replay)
         }
@@ -375,14 +404,19 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                     isViewportInteractionRef.current = true
                 }}
                 onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                onMouseLeave={() => {
+                    setIsHovered(false)
+                    setIsPaneHovered(false)
+                    setReplayCursorY(null)
+                }}
+                onMouseMove={handlePaneMouseMove}
                 onClick={handleReplaySelection}
                 style={{ width: '100%', height: '100%' }}
             />
 
             <DrawingCanvas ref={drawingCanvasRef} />
 
-            {showReplayOverlay && <ReplayOverlay x={previewX} pane={paneLayout} />}
+            {showReplayOverlay && <ReplayOverlay x={previewX} y={replayCursorY} pane={paneLayout} />}
 
             {chartDataStatus === 'no-data' && <ChartNoData ticker={ticker} />}
         </div>

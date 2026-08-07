@@ -1,11 +1,13 @@
 import type { PaneLayout } from '../drawing/renderer/PaneLayout'
+import svg from '../svg/svg'
 
 type Props = {
     x: number
+    y: number
     pane: PaneLayout
 }
 
-export default function ReplayOverlay({ x, pane }: Props) {
+export default function ReplayOverlay({ x, y, pane }: Props) {
     const overlayWidth = Math.max(0, pane.left + pane.width - (x + 2))
 
     return (
@@ -33,6 +35,22 @@ export default function ReplayOverlay({ x, pane }: Props) {
                     background: 'rgba(255,255,255,0.45)',
                     pointerEvents: 'none',
                     zIndex: 999,
+                }}
+            />
+
+            <div
+                style={{
+                    position: 'absolute',
+                    left: x + 1,
+                    top: y,
+                    transform: 'translate(-50%, -50%) rotate(-90deg)',
+                    width: 24,
+                    height: 24,
+                    pointerEvents: 'none',
+                    zIndex: 1001,
+                }}
+                dangerouslySetInnerHTML={{
+                    __html: svg.scissor,
                 }}
             />
         </>
