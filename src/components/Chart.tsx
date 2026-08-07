@@ -103,7 +103,13 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const { chartRef, seriesRef, chartReady } = useChart(containerRef)
 
-    const { previewTime, previewX, clearPreview } = useReplayPreview({
+    const { paneLayout, refreshPaneLayout } = useChartLayout({
+        containerRef,
+        chartRef,
+        paneGeometryRef,
+    })
+
+    const { previewTime, previewX, updatePreviewX, clearPreview } = useReplayPreview({
         chartRef,
     })
 
@@ -139,12 +145,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         isViewportInteractionRef,
         viewportRef,
         runtimeRef,
-    })
-
-    const { paneLayout, refreshPaneLayout } = useChartLayout({
-        containerRef,
-        chartRef,
-        paneGeometryRef,
     })
 
     useCrosshairSync({
@@ -252,14 +252,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     })
 
     useEffect(() => {
-        chartRef.current?.applyOptions({
-            crosshair: {
-                horzLine: { visible: isHovered },
-            },
-        })
-    }, [chartRef, isHovered])
-
-    useEffect(() => {
         const handleMouseUp = () => {
             if (!isDraggingRef.current) {
                 return
@@ -307,6 +299,10 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         if (inside) {
             setReplayCursorY(y)
+
+            if (replayStore.isSelecting) {
+                updatePreviewX()
+            }
         } else {
             setReplayCursorY(null)
         }
@@ -348,17 +344,26 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }
 
     const showReplayOverlay =
-        replayStore.showToolbar && replayStore.isSelecting && previewX !== null && paneLayout !== null && isPaneHovered
+        replayStore.showToolbar &&
+        replayStore.isSelecting &&
+        isPaneHovered &&
+        previewTime !== null &&
+        previewX !== null &&
+        paneLayout !== null
 
     useEffect(() => {
         chartRef.current?.applyOptions({
             crosshair: {
                 vertLine: {
+                    visible: !showReplayOverlay,
                     labelBackgroundColor: showReplayOverlay ? '#2962ff' : '#000',
+                },
+                horzLine: {
+                    visible: !showReplayOverlay && isHovered,
                 },
             },
         })
-    }, [chartRef, showReplayOverlay])
+    }, [showReplayOverlay, isHovered, chartRef])
 
     useEffect(() => {
         const cursorController = runtimeRef.current?.getCursorController()
@@ -403,7 +408,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                     isDraggingRef.current = true
                     isViewportInteractionRef.current = true
                 }}
-                onMouseEnter={() => setIsHovered(true)}
+                onMouseEnter={() => {
+                    setIsHovered(true)
+                }}
                 onMouseLeave={() => {
                     setIsHovered(false)
                     setIsPaneHovered(false)
