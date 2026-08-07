@@ -109,7 +109,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         paneGeometryRef,
     })
 
-    const { previewTime, previewX, updatePreviewX, clearPreview } = useReplayPreview({
+    const { previewTime, previewX, clearPreview } = useReplayPreview({
         chartRef,
     })
 
@@ -277,11 +277,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         return unsubscribe
     }, [])
 
-    const handlePaneMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const isInsidePane = (event: React.MouseEvent<HTMLDivElement>) => {
         if (!paneLayout) {
-            setIsPaneHovered(false)
-            setReplayCursorY(null)
-            return
+            return false
         }
 
         const rect = event.currentTarget.getBoundingClientRect()
@@ -289,29 +287,34 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         const x = event.clientX - rect.left
         const y = event.clientY - rect.top
 
-        const inside =
+        return (
             x >= paneLayout.left &&
             x <= paneLayout.left + paneLayout.width &&
             y >= paneLayout.top &&
             y <= paneLayout.top + paneLayout.height
+        )
+    }
+
+    const handlePaneMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+        const inside = isInsidePane(event)
 
         setIsPaneHovered(inside)
 
         if (inside) {
-            setReplayCursorY(y)
-
-            if (replayStore.isSelecting) {
-                updatePreviewX()
-            }
+            const rect = event.currentTarget.getBoundingClientRect()
+            setReplayCursorY(event.clientY - rect.top)
         } else {
             setReplayCursorY(null)
         }
     }
 
-    const handleReplaySelection = () => {
+    const handleReplaySelection = (event: React.MouseEvent<HTMLDivElement>) => {
         if (!replayStore.isSelecting) return
         if (!replayStore.showToolbar) return
         if (previewTime === null) return
+        if (!paneLayout) return
+
+        if (!isInsidePane(event)) return
 
         const chart = chartRef.current
         const series = seriesRef.current

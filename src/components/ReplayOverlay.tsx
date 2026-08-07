@@ -3,7 +3,7 @@ import svg from '../svg/svg'
 
 type Props = {
     x: number
-    y: number
+    y: number | null
     pane: PaneLayout
 }
 
@@ -32,27 +32,29 @@ export default function ReplayOverlay({ x, y, pane }: Props) {
                     top: pane.top,
                     width: overlayWidth,
                     height: pane.height,
-                    background: 'rgba(255,255,255,0.45)',
+                    background: 'rgba(255, 255, 255, 0.45)',
                     pointerEvents: 'none',
                     zIndex: 999,
                 }}
             />
 
-            <div
-                style={{
-                    position: 'absolute',
-                    left: x + 1,
-                    top: y,
-                    transform: 'translate(-50%, -50%) rotate(-90deg)',
-                    width: 24,
-                    height: 24,
-                    pointerEvents: 'none',
-                    zIndex: 1001,
-                }}
-                dangerouslySetInnerHTML={{
-                    __html: svg.scissor,
-                }}
-            />
+            {y !== null && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: x + 1,
+                        top: y,
+                        transform: 'translate(-50%, -50%) rotate(-90deg)',
+                        width: 24,
+                        height: 24,
+                        pointerEvents: 'none',
+                        zIndex: 1001,
+                    }}
+                    dangerouslySetInnerHTML={{
+                        __html: svg.scissor,
+                    }}
+                />
+            )}
         </>
     )
 }
