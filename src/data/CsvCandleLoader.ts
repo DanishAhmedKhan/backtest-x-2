@@ -48,21 +48,26 @@ export class CsvCandleLoader {
     }
 
     private static async getSortedFiles(ticker: string): Promise<string[]> {
-        const manifestUrl = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/manifest.json`
-        const files: string[] = await fetch(manifestUrl).then((res) => res.json())
+        try {
+            const manifestUrl = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/manifest.json`
+            const files: string[] = await fetch(manifestUrl).then((res) => res.json())
 
-        return files.sort((a, b) => {
-            const [, yearA, weekA] = a.match(/^(\d{4})-(\d+)\.csv$/)!
-            const [, yearB, weekB] = b.match(/^(\d{4})-(\d+)\.csv$/)!
+            return files.sort((a, b) => {
+                const [, yearA, weekA] = a.match(/^(\d{4})-(\d+)\.csv$/)!
+                const [, yearB, weekB] = b.match(/^(\d{4})-(\d+)\.csv$/)!
 
-            const yDiff = Number(yearA) - Number(yearB)
+                const yDiff = Number(yearA) - Number(yearB)
 
-            if (yDiff !== 0) {
-                return yDiff
-            }
+                if (yDiff !== 0) {
+                    return yDiff
+                }
 
-            return Number(weekA) - Number(weekB)
-        })
+                return Number(weekA) - Number(weekB)
+            })
+        } catch (error) {
+            console.log(`${ticker} data not found. Error: ${error}`)
+            return []
+        }
     }
 
     public static async loadWindow(

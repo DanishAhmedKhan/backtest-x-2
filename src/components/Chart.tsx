@@ -4,6 +4,7 @@ import type { CandlestickData, Time } from 'lightweight-charts'
 import ChartOHLC from './ChartOHLC'
 import ReplayOverlay from './ReplayOverlay'
 import DrawingCanvas from './DrawingCanvas'
+import ChartNoData from './ChartNoData'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -45,6 +46,8 @@ export type Raw1mData = {
     times: number[]
 }
 
+export type ChartDataStatus = 'loading' | 'ready' | 'no-data'
+
 type Props = {
     id: string
     ticker: Ticker
@@ -64,6 +67,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         candles: [],
         times: [],
     })
+
+    const [chartDataStatus, setChartDataStatus] = useState<ChartDataStatus>('loading')
 
     const defaultViewport = {
         visibleBars: DEFAULT_VISIBLE_CANDLE,
@@ -162,6 +167,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         totalFilesRef,
         viewportRef,
         runtimeRef,
+        setChartDataStatus,
         setIsChangingTimeframe: (value) => {
             isChangingTimeframeRef.current = value
         },
@@ -346,7 +352,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                 height: '100%',
             }}
         >
-            <ChartOHLC ohlc={ohlc} />
+            {chartDataStatus !== 'no-data' && <ChartOHLC ohlc={ohlc} />}
+
             <div
                 ref={containerRef}
                 onWheel={() => {
@@ -375,6 +382,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             <DrawingCanvas ref={drawingCanvasRef} />
 
             {showReplayOverlay && <ReplayOverlay x={previewX} pane={paneLayout} />}
+
+            {chartDataStatus === 'no-data' && <ChartNoData ticker={ticker} />}
         </div>
     )
 }

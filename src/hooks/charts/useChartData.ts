@@ -4,7 +4,7 @@ import type { CandlestickData, Time, IChartApi, ISeriesApi } from 'lightweight-c
 import { Ticker } from '../../core/Ticker'
 import { Timeframe } from '../../core/Timeframe'
 import { CandleService } from '../../core/CandleService'
-import type { Raw1mData } from '../../components/Chart'
+import type { ChartDataStatus, Raw1mData } from '../../components/Chart'
 
 import { eventBus } from '../../event/EventBus'
 import { replayStore } from '../../replay/ReplayStore'
@@ -31,6 +31,7 @@ type Params = {
     totalFilesRef: React.RefObject<number>
     viewportRef: React.RefObject<ViewportState>
     runtimeRef: React.RefObject<ChartRuntime | null>
+    setChartDataStatus: React.Dispatch<React.SetStateAction<ChartDataStatus>>
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -48,99 +49,9 @@ export function useChartData({
     totalFilesRef,
     viewportRef,
     runtimeRef,
+    setChartDataStatus,
     setIsChangingTimeframe,
 }: Params) {
-    // useEffect(() => {
-    //     const load = async () => {
-    //         const chart = chartRef.current
-    //         const series = seriesRef.current
-
-    //         if (!chart || !series || !chartReady) return
-
-    //         setIsChangingTimeframe(true)
-
-    //         const totalFiles = await CandleService.getTotalFiles(ticker)
-    //         totalFilesRef.current = totalFiles
-
-    //         // const chartResult = await CandleService.getInitialWindow(ticker, timeframe, totalFiles)
-    //         // const candles = chartResult.candles
-
-    //         // // const rawResult = await CandleService.getInitialWindow(
-    //         // //     ticker,
-    //         // //     new Timeframe(1, TimeframeUnit.Minute),
-    //         // //     totalFiles,
-    //         // // )
-
-    //         // const rawResult = await CandleService.getCandlesWindow(
-    //         //     ticker,
-    //         //     new Timeframe(1, TimeframeUnit.Minute),
-    //         //     chartResult.oldestFile,
-    //         //     chartResult.latestFile - chartResult.oldestFile + 1,
-    //         // )
-
-    //         // // setRaw1mData(raw1mRef, rawResult.candles)
-
-    //         // setRaw1mData(raw1mRef, rawResult)
-
-    //         // loadedWindowRef.current = {
-    //         //     oldestFile: chartResult.oldestFile,
-    //         //     latestFile: chartResult.latestFile,
-    //         // }
-
-    //         const result = await CandleService.getInitialChartAndRawWindow(ticker, timeframe, totalFiles)
-
-    //         const candles = result.chartCandles
-
-    //         setRaw1mData(raw1mRef, result.rawCandles)
-
-    //         loadedWindowRef.current = result.loadedWindow
-
-    //         applyChartData({
-    //             candles,
-    //             series,
-    //             candlesRef,
-    //             candleMapRef,
-    //             timesRef,
-    //             skipSeriesUpdate: replayStore.enabled,
-    //         })
-
-    //         runtimeRef.current?.onChartDataChanged()
-
-    //         restoreViewport({
-    //             chart,
-    //             series,
-    //             viewport: viewportRef,
-    //         })
-
-    //         if (replayStore.enabled) {
-    //             const seconds = timeframe.toSeconds()
-
-    //             replayStore.setChartTimeframeSeconds(seconds)
-    //             replayStore.setUpdateIntervalSeconds(seconds)
-
-    //             eventBus.emit('replayUpdateIntervalChanged', {
-    //                 seconds,
-    //             })
-
-    //             eventBus.emit('replayPositionChanged')
-    //         } else {
-    //             restoreViewport({
-    //                 chart,
-    //                 series,
-    //                 viewport: viewportRef,
-    //             })
-    //         }
-
-    //         requestAnimationFrame(() => {
-    //             setIsChangingTimeframe(false)
-    //         })
-    //     }
-
-    //     load()
-
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [ticker, timeframe, chartReady])
-
     useEffect(() => {
         const load = async () => {
             const chart = chartRef.current
@@ -150,21 +61,62 @@ export function useChartData({
                 return
             }
 
+            const setChartEmptyState = (empty: boolean) => {
+                chart.applyOptions({
+                    rightPriceScale: {
+                        visible: !empty,
+                    },
+                    timeScale: {
+                        visible: !empty,
+                    },
+                    grid: {
+                        vertLines: {
+                            visible: !empty,
+                        },
+                        horzLines: {
+                            visible: !empty,
+                        },
+                    },
+                })
+            }
+
             setIsChangingTimeframe(true)
+            setChartDataStatus('loading')
+            setChartEmptyState(true)
+
+            series.setData([])
+
+            candlesRef.current = []
+            candleMapRef.current.clear()
+            timesRef.current = []
+
+            raw1mRef.current = {
+                candles: [],
+                times: [],
+            }
+
+            loadedWindowRef.current = {
+                oldestFile: 0,
+                latestFile: 0,
+            }
 
             try {
                 const totalFiles = await CandleService.getTotalFiles(ticker)
                 totalFilesRef.current = totalFiles
 
+                if (totalFiles === 0) {
+                    setChartDataStatus('no-data')
+                    return
+                }
+
                 const result = await CandleService.getInitialChartAndRawWindow(ticker, timeframe, totalFiles)
 
-                // Save the loaded file window.
-                loadedWindowRef.current = result.loadedWindow
+                setChartEmptyState(false)
+                setChartDataStatus('ready')
 
-                // Keep the raw 1m data synchronized with the chart window.
+                loadedWindowRef.current = result.loadedWindow
                 setRaw1mData(raw1mRef, result.rawCandles)
 
-                // Apply chart candles.
                 applyChartData({
                     candles: result.chartCandles,
                     series,

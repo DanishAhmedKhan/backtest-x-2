@@ -6,6 +6,7 @@ export class TickerRegistry {
         new Ticker('EURUSD', AssetType.FOREX),
         new Ticker('USDJPY', AssetType.FOREX),
         new Ticker('GBPUSD', AssetType.FOREX),
+        new Ticker('US100', AssetType.INDEX),
     ]
 
     public static getAll(): Ticker[] {
