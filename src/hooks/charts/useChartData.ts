@@ -32,6 +32,7 @@ type Params = {
     viewportRef: React.RefObject<ViewportState>
     runtimeRef: React.RefObject<ChartRuntime | null>
     setChartDataStatus: React.Dispatch<React.SetStateAction<ChartDataStatus>>
+    refreshPaneLayout: () => void
     setIsChangingTimeframe: (value: boolean) => void
 }
 
@@ -50,6 +51,7 @@ export function useChartData({
     viewportRef,
     runtimeRef,
     setChartDataStatus,
+    refreshPaneLayout,
     setIsChangingTimeframe,
 }: Params) {
     useEffect(() => {
@@ -112,6 +114,10 @@ export function useChartData({
                 const result = await CandleService.getInitialChartAndRawWindow(ticker, timeframe, totalFiles)
 
                 setChartEmptyState(false)
+                requestAnimationFrame(() => {
+                    refreshPaneLayout()
+                })
+
                 setChartDataStatus('ready')
 
                 loadedWindowRef.current = result.loadedWindow

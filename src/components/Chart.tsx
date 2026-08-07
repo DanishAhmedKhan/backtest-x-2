@@ -139,7 +139,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         runtimeRef,
     })
 
-    const paneLayout = useChartLayout({
+    const { paneLayout, refreshPaneLayout } = useChartLayout({
         containerRef,
         chartRef,
         paneGeometryRef,
@@ -168,6 +168,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         viewportRef,
         runtimeRef,
         setChartDataStatus,
+        refreshPaneLayout,
         setIsChangingTimeframe: (value) => {
             isChangingTimeframeRef.current = value
         },
