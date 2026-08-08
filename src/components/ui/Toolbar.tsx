@@ -1,8 +1,6 @@
 import { ToolbarProvider } from './ToolbarProvider'
 import type { ToolbarDirection } from './types'
 
-import './toolbar.css'
-
 type Props = {
     children: React.ReactNode
     direction?: ToolbarDirection

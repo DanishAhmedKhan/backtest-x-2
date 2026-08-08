@@ -16,183 +16,6 @@ import svg from '../svg/svg'
 
 import { DEFAULT_REPLAY_SPEED, REPLAY_SPEEDS, REPLAY_UPDATE_INTERVALS } from '../config/default/ReplayConfig'
 
-// export default function ReplayToolbar() {
-//     const [isPlaying, setIsPlaying] = useState(false)
-//     const [speed, setSpeed] = useState(DEFAULT_REPLAY_SPEED)
-//     const [updateInterval, setUpdateInterval] = useState(replayStore.updateIntervalSeconds)
-
-//     const handleTogglePlay = () => {
-//         setIsPlaying((prev) => {
-//             const next = !prev
-
-//             replayStore.setPlaying(next)
-
-//             return next
-//         })
-//     }
-
-//     const handleForward = () => {
-//         replayController.forward()
-//     }
-
-//     const handleUpdateInterval = (option: ToolbarDropdownOption) => {
-//         const seconds = Number(option.id)
-
-//         replayStore.setUpdateIntervalSeconds(seconds)
-
-//         eventBus.emit('replayUpdateIntervalChanged', {
-//             seconds,
-//         })
-
-//         eventBus.emit('replayTimeChanged', {
-//             time: replayStore.marketTime!,
-//         })
-//     }
-
-//     const handleSpeedChange = (option: ToolbarDropdownOption) => {
-//         setSpeed(Number(option.id))
-//     }
-
-//     const handleExit = () => {
-//         setIsPlaying(false)
-//         replayStore.stop()
-
-//         eventBus.emit('replayStop')
-//     }
-
-//     useEffect(() => {
-//         if (!isPlaying) return
-
-//         const interval = setInterval(() => {
-//             replayController.forward()
-//         }, 1000 / speed)
-
-//         return () => clearInterval(interval)
-//     }, [isPlaying, speed])
-
-//     useEffect(() => {
-//         const unsubscribe = eventBus.on('replayUpdateIntervalChanged', ({ seconds }) => {
-//             setUpdateInterval(seconds)
-//         })
-
-//         return unsubscribe
-//     }, [])
-
-//     const updateIntervalOptions: ToolbarDropdownOption[] = REPLAY_UPDATE_INTERVALS.map((tf) => ({
-//         id: String(tf.toSeconds()),
-//         label: tf.label,
-//     }))
-
-//     const speedOptions: ToolbarDropdownOption[] = REPLAY_SPEEDS.map((value) => ({
-//         id: String(value),
-//         label: `${value}x`,
-//     }))
-
-//     const toolbarItems: ToolbarItem[] = [
-//         {
-//             type: 'group',
-//             id: 'select-candle',
-//             items: [
-//                 {
-//                     type: 'button',
-//                     id: 'backward',
-//                     icon: (
-//                         <div
-//                             style={{ width: 28, height: 28 }}
-//                             dangerouslySetInnerHTML={{
-//                                 __html: svg.replay.selectBar,
-//                             }}
-//                         />
-//                     ),
-//                 },
-//             ],
-//         },
-//         {
-//             type: 'separator',
-//             id: 'select-separator',
-//         },
-//         {
-//             type: 'group',
-//             id: 'replay-controls',
-//             items: [
-//                 {
-//                     type: 'button',
-//                     id: 'play',
-//                     icon: (
-//                         <div
-//                             style={{ width: 28, height: 28 }}
-//                             dangerouslySetInnerHTML={{
-//                                 __html: isPlaying ? svg.replay.pause : svg.replay.play,
-//                             }}
-//                         />
-//                     ),
-//                     onClick: handleTogglePlay,
-//                 },
-//                 {
-//                     type: 'button',
-//                     id: 'forward',
-//                     icon: (
-//                         <div
-//                             style={{ width: 28, height: 28 }}
-//                             dangerouslySetInnerHTML={{
-//                                 __html: svg.replay.forward,
-//                             }}
-//                         />
-//                     ),
-//                     onClick: handleForward,
-//                 },
-//             ],
-//         },
-//         {
-//             type: 'separator',
-//             id: 'replay-separator',
-//         },
-//         {
-//             type: 'group',
-//             id: 'replay-settings',
-//             items: [
-//                 {
-//                     type: 'dropdown',
-//                     id: 'update-interval',
-//                     selectedId: String(updateInterval),
-//                     options: updateIntervalOptions,
-//                     onChange: handleUpdateInterval,
-//                 },
-//                 {
-//                     type: 'dropdown',
-//                     id: 'speed',
-//                     selectedId: String(speed),
-//                     options: speedOptions,
-//                     onChange: handleSpeedChange,
-//                 },
-//             ],
-//         },
-//         {
-//             type: 'separator',
-//             id: 'exit-separator',
-//         },
-//         {
-//             type: 'button',
-//             id: 'exit',
-//             icon: (
-//                 <div
-//                     style={{ width: 28, height: 28 }}
-//                     dangerouslySetInnerHTML={{
-//                         __html: svg.replay.exit,
-//                     }}
-//                 />
-//             ),
-//             onClick: handleExit,
-//         },
-//     ]
-
-//     return (
-//         <FloatingToolbar>
-//             <Toolbar direction="horizontal" items={toolbarItems} />
-//         </FloatingToolbar>
-//     )
-// }
-
 export default function ReplayToolbar() {
     const [isPlaying, setIsPlaying] = useState(false)
     const [speed, setSpeed] = useState(DEFAULT_REPLAY_SPEED)
@@ -255,6 +78,16 @@ export default function ReplayToolbar() {
         return unsubscribe
     }, [])
 
+    const updateIntervalOptions: ToolbarDropdownOption[] = REPLAY_UPDATE_INTERVALS.map((tf) => ({
+        id: String(tf.toSeconds()),
+        label: tf.label,
+    }))
+
+    const speedOptions: ToolbarDropdownOption[] = REPLAY_SPEEDS.map((value) => ({
+        id: String(value),
+        label: `${value}x`,
+    }))
+
     return (
         <FloatingToolbar>
             <Toolbar direction="horizontal">
@@ -304,21 +137,11 @@ export default function ReplayToolbar() {
                 <ToolbarGroup>
                     <ToolbarDropdown
                         selectedId={String(updateInterval)}
-                        options={REPLAY_UPDATE_INTERVALS.map((tf) => ({
-                            id: String(tf.toSeconds()),
-                            label: tf.label,
-                        }))}
+                        options={updateIntervalOptions}
                         onChange={handleUpdateInterval}
                     />
 
-                    <ToolbarDropdown
-                        selectedId={String(speed)}
-                        options={REPLAY_SPEEDS.map((value) => ({
-                            id: String(value),
-                            label: `${value}x`,
-                        }))}
-                        onChange={handleSpeedChange}
-                    />
+                    <ToolbarDropdown selectedId={String(speed)} options={speedOptions} onChange={handleSpeedChange} />
                 </ToolbarGroup>
 
                 <ToolbarSeparator />

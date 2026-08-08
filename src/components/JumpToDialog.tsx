@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import CalendarPicker from './CalendarPicker'
+import svg from '../svg/svg'
 
 type Props = {
     open: boolean
@@ -8,101 +10,127 @@ type Props = {
 }
 
 function toDateInputValue(date: Date) {
-    return date.toISOString().split('T')[0]
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
 }
 
 function toTimeInputValue(date: Date) {
     return date.toTimeString().slice(0, 5)
 }
 
+function fromDateTime(date: string, time: string) {
+    const [year, month, day] = date.split('-').map(Number)
+    const [hours, minutes] = time.split(':').map(Number)
+
+    return new Date(year, month - 1, day, hours, minutes)
+}
+
 export default function JumpToDialog({ open, initialDate = new Date(), onClose, onGo }: Props) {
-    const [date, setDate] = useState(toDateInputValue(initialDate))
-    const [time, setTime] = useState(toTimeInputValue(initialDate))
+    const [date, setDate] = useState(() => toDateInputValue(initialDate))
+    const [time, setTime] = useState(() => toTimeInputValue(initialDate))
+    const [activeTab, setActiveTab] = useState<'date' | 'range'>('date')
 
     if (!open) return null
 
+    const selectedDate = fromDateTime(date, time)
+
+    const handleCalendarChange = (nextDate: Date) => {
+        setDate(toDateInputValue(nextDate))
+    }
+
     const handleGo = () => {
-        const selected = new Date(`${date}T${time}:00`)
+        if (isNaN(selectedDate.getTime())) return
 
-        if (isNaN(selected.getTime())) return
-
-        onGo(selected.getTime() / 1000)
+        onGo(selectedDate.getTime() / 1000)
         onClose()
     }
 
     return (
         <>
-            <div
-                onClick={onClose}
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.35)',
-                    zIndex: 1000,
-                }}
-            />
+            <div className="go-to-backdrop" onMouseDown={onClose} />
 
-            <div
-                style={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 320,
-                    background: '#fff',
-                    borderRadius: 8,
-                    padding: 20,
-                    boxShadow: '0 8px 30px rgba(0,0,0,.25)',
-                    zIndex: 1001,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 16,
-                }}
-            >
-                <div
-                    style={{
-                        fontSize: 18,
-                        fontWeight: 600,
-                    }}
-                >
-                    Jump To
+            <div className="go-to-dialog">
+                <div className="go-to-header">
+                    <div className="go-to-title">Go to</div>
+
+                    <button type="button" className="go-to-close" onClick={onClose} aria-label="Close">
+                        <div style={{ width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: svg.close }} />
+                    </button>
                 </div>
 
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 6,
-                    }}
-                >
-                    <label>Date</label>
+                <div className="go-to-tabs">
+                    <button
+                        type="button"
+                        className={`go-to-tab ${activeTab === 'date' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('date')}
+                    >
+                        Date
+                    </button>
 
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                    <button
+                        type="button"
+                        className={`go-to-tab ${activeTab === 'range' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('range')}
+                    >
+                        Custom range
+                    </button>
                 </div>
 
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 6,
-                    }}
-                >
-                    <label>Time</label>
+                {activeTab === 'date' && (
+                    <>
+                        <div className="go-to-inputs">
+                            <div className="go-to-input-group">
+                                <input
+                                    type="text"
+                                    name="date"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    placeholder="YYYY-MM-DD"
+                                />
 
-                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
-                </div>
+                                <button type="button" className="go-to-input-icon">
+                                    <div
+                                        style={{ width: 28, height: 28 }}
+                                        dangerouslySetInnerHTML={{ __html: svg.calendar }}
+                                    />
+                                </button>
+                            </div>
 
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: 10,
-                        marginTop: 10,
-                    }}
-                >
-                    <button onClick={onClose}>Cancel</button>
+                            <div className="go-to-input-group">
+                                <input
+                                    type="text"
+                                    name="time"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    placeholder="HH:MM"
+                                />
 
-                    <button onClick={handleGo}>Go</button>
+                                <button type="button" className="go-to-input-icon">
+                                    <div
+                                        style={{ width: 28, height: 28 }}
+                                        dangerouslySetInnerHTML={{ __html: svg.clock }}
+                                    />
+                                </button>
+                            </div>
+                        </div>
+
+                        <CalendarPicker value={selectedDate} onChange={handleCalendarChange} />
+                    </>
+                )}
+
+                {activeTab === 'range' && <div className="go-to-range-placeholder">Custom range</div>}
+
+                <div className="go-to-footer">
+                    <button type="button" className="go-to-cancel" onClick={onClose}>
+                        Cancel
+                    </button>
+
+                    <button type="button" className="go-to-submit" onClick={handleGo}>
+                        Go to
+                    </button>
                 </div>
             </div>
         </>

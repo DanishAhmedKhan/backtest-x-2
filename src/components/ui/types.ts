@@ -28,6 +28,15 @@ export interface ToolbarButtonItem {
     popover?: ToolbarPopover
 }
 
+export interface ToolbarButtonProps {
+    icon?: React.ReactNode
+    label?: string
+    tooltip?: string
+    active?: boolean
+    onClick?: () => void
+    popover?: ToolbarPopover
+}
+
 export interface ToolbarDropdownOption {
     id: string
     label: string

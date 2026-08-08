@@ -1,0 +1,300 @@
+.go-to-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.go-to-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 304px;
+
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px #0003;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    color: #202124;
+}
+
+.go-to-dialog svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.go-to-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 14px;
+}
+
+.go-to-title {
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.go-to-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 29px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    color: #222;
+}
+
+.go-to-tabs {
+    display: flex;
+    gap: 24px;
+    margin: 0 20px;
+    border-bottom: 3px solid #eeeeee;
+}
+
+.go-to-tab {
+    position: relative;
+    height: 36px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    cursor: pointer;
+}
+
+.go-to-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 4px;
+    border-radius: 2px;
+    background: #303030;
+}
+
+.go-to-inputs {
+    display: flex;
+    gap: 10px;
+    padding: 0px 20px;
+    padding-top: 20px;
+    padding-bottom: 6px;
+}
+
+.go-to-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.go-to-input-group input {
+    width: 100%;
+    height: 34px;
+    padding: 0 36px 0 10px;
+    border: 1px solid #d5d5d5;
+    border-radius: 6px;
+    outline: none;
+    background: #fff;
+    color: #222;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.go-to-input-group:first-child input {
+    border-color: #3d6df2;
+    background: white;
+}
+
+.go-to-input-group input:focus {
+    border-color: #999;
+}
+
+.go-to-input-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.calendar-picker {
+    padding: 4px 20px 18px;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: 32px 1fr 32px;
+    align-items: center;
+    height: 42px;
+}
+
+.calendar-month {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #333;
+    font-size: 27px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.calendar-nav:hover {
+    background: #f2f2f2;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    height: 28px;
+    align-items: center;
+    border-radius: 4px;
+    background: #f7f7f7;
+}
+
+.calendar-weekday {
+    text-align: center;
+    color: #596273;
+    font-size: 12px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    row-gap: 2px;
+    margin-top: 5px;
+}
+
+.calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: #222;
+    font-size: 13px;
+}
+
+.calendar-day.today::after {
+    content: '';
+    position: absolute;
+    left: 9px;
+    right: 9px;
+    bottom: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: black;
+}
+
+.calendar-day.today.selected::after {
+    background: white;
+}
+
+.calendar-day.future {
+    color: #b8b8b8;
+}
+
+.calendar-day.future:hover {
+    background: transparent;
+}
++ .calendar-day:hover {
+    background: #eeeeee;
+}
+
+.calendar-day.outside {
+    color: #b8bdc5;
+}
+
+.calendar-day.selected {
+    background: #303030;
+    color: white;
+    font-weight: 600;
+}
+
+.go-to-range-placeholder {
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 13px;
+}
+
+.go-to-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid #eeeeee;
+}
+
+.go-to-cancel,
+.go-to-submit {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.go-to-cancel {
+    border: 1px solid #222;
+    background: white;
+    color: #222;
+}
+
+.go-to-cancel:hover {
+    background: #f4f4f4;
+}
+
+.go-to-submit {
+    border: 1px solid #303030;
+    background: #303030;
+    color: white;
+    font-weight: 500;
+}
+
+.go-to-submit:hover {
+    background: #1f1f1f;
+}

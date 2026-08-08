@@ -22,6 +22,8 @@ import { useReplayController } from '../hooks/charts/useReplayController'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 import { DrawingPropertiesToolbar } from './drawingToolbar/DrawingPropertiesToolbar'
 
+import '../../styles/index.css'
+
 const storage = new LocalStorageProvider()
 
 const DEFAULT_CONFIG: AppConfig = {
