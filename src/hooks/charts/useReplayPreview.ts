@@ -32,11 +32,6 @@ export function useReplayPreview({ chartRef }: Props) {
 
         const x = chart.timeScale().timeToCoordinate(time as Time)
 
-        console.log('Updating replay X', {
-            time,
-            x,
-        })
-
         setPreviewX(x ?? null)
     }, [chartRef])
 

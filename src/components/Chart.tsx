@@ -79,6 +79,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const viewportRef = useRef<ViewportState>(defaultViewport)
     const replayViewportRef = useRef<ViewportState>(defaultViewport)
 
+    const replayPointerDownRef = useRef(false)
+
     const isDraggingRef = useRef(false)
     const isViewportInteractionRef = useRef(false)
     const wheelTimeout = useRef<number>(0)
@@ -309,6 +311,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }
 
     const handleReplaySelection = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (!replayPointerDownRef.current) return
+
         if (!replayStore.isSelecting) return
         if (previewTime === null) return
         if (!paneLayout) return
@@ -345,6 +349,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         })
 
         eventBus.emit('replayStart')
+
+        replayPointerDownRef.current = false
     }
 
     const showReplayOverlay =
@@ -378,8 +384,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         }
     }, [showReplayOverlay])
 
-    // TODO: Fix price scale scaling but doing the mouse up inside the chart. this should not diable replay oberlay
-
     return (
         <div
             style={{
@@ -401,7 +405,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                         isViewportInteractionRef.current = false
                     }, 150)
                 }}
-                onMouseDown={() => {
+                onMouseDown={(event) => {
+                    replayPointerDownRef.current = isInsidePane(event)
+
                     if (!runtimeRef.current.getToolController()?.allowsViewportInteraction()) {
                         return
                     }
