@@ -5,7 +5,7 @@ export class ReplayStore {
 
     public showToolbar = false
 
-    public isSelecting = true
+    public isSelecting = false
     public isPlaying = false
 
     public startIndex: number | null = null
@@ -109,7 +109,6 @@ export class ReplayStore {
 
     public openToolbar() {
         this.showToolbar = true
-        this.isSelecting = true
     }
 
     public closeToolbar() {

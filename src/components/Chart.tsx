@@ -310,7 +310,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const handleReplaySelection = (event: React.MouseEvent<HTMLDivElement>) => {
         if (!replayStore.isSelecting) return
-        if (!replayStore.showToolbar) return
         if (previewTime === null) return
         if (!paneLayout) return
 
@@ -337,6 +336,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         replayStore.start(startIndex, raw1mRef.current.candles, timeframe.toSeconds())
 
+        replayStore.openToolbar()
+
         clearPreview()
 
         eventBus.emit('replayUpdateIntervalChanged', {
@@ -347,12 +348,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }
 
     const showReplayOverlay =
-        replayStore.showToolbar &&
-        replayStore.isSelecting &&
-        isPaneHovered &&
-        previewTime !== null &&
-        previewX !== null &&
-        paneLayout !== null
+        replayStore.isSelecting && isPaneHovered && previewTime !== null && previewX !== null && paneLayout !== null
 
     useEffect(() => {
         chartRef.current?.applyOptions({
@@ -381,6 +377,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
             cursorController.clear(CursorSource.Replay)
         }
     }, [showReplayOverlay])
+
+    // TODO: Fix price scale scaling but doing the mouse up inside the chart. this should not diable replay oberlay
 
     return (
         <div

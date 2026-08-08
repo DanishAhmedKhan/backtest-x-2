@@ -109,6 +109,14 @@ export default function Main() {
     }, [layout, charts])
 
     useEffect(() => {
+        const unsubscribe = eventBus.on('replayStart', () => {
+            setShowReplayToolbar(true)
+        })
+
+        return unsubscribe
+    }, [])
+
+    useEffect(() => {
         const unsub = eventBus.on('replayStop', () => {
             setShowReplayToolbar(false)
         })
@@ -148,8 +156,7 @@ export default function Main() {
                         onLayoutChange={handleLayoutChange}
                         onReplayClick={() => {
                             replayStore.isSelecting = true
-                            replayStore.openToolbar()
-                            setShowReplayToolbar(true)
+                            setShowReplayToolbar(false)
                         }}
                         onJumpToClick={() => setJumpOpen(true)}
                     />
