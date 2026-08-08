@@ -1,11 +1,23 @@
 import svg from '../../svg/svg'
 import { ToolbarDropdown } from './ToolbarDropdown'
-import type { ToolbarArrowDropdownItem } from './types'
+import type { ToolbarDropdownOption } from './types'
 
-export function ToolbarArrowDropdown(props: ToolbarArrowDropdownItem) {
+export interface ToolbarArrowDropdownProps {
+    selectedId: string
+    options: ToolbarDropdownOption[]
+    width?: number | string
+    tooltip?: string
+    onChange?: (option: ToolbarDropdownOption) => void
+}
+
+export function ToolbarArrowDropdown({ selectedId, options, width, tooltip, onChange }: ToolbarArrowDropdownProps) {
     return (
         <ToolbarDropdown
-            {...props}
+            selectedId={selectedId}
+            options={options}
+            width={width}
+            tooltip={tooltip}
+            onChange={onChange}
             renderTrigger={({ open, toggleDropdown }) => (
                 <div
                     className={`toolbar-trigger toolbar-arrow-trigger ${open ? 'active' : ''}`}

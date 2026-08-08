@@ -1,57 +1,209 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import { Toolbar } from './ui/Toolbar'
+import { FloatingToolbar } from './ui/FloatingToolbar'
+import { ToolbarButton } from './ui/ToolbarButton'
+import { ToolbarSeparator } from './ui/ToolbarSeparator'
+import { ToolbarDropdown } from './ui/ToolbarDropdown'
+import { ToolbarGroup } from './ui/ToolbarGroup'
+
+import type { ToolbarDropdownOption } from './ui/types'
+
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
-import { DEFAULT_REPLAY_SPEED, REPLAY_SPEEDS, REPLAY_UPDATE_INTERVALS } from '../config/default/ReplayConfig'
 import { replayController } from '../replay/ReplayController'
+import svg from '../svg/svg'
+
+import { DEFAULT_REPLAY_SPEED, REPLAY_SPEEDS, REPLAY_UPDATE_INTERVALS } from '../config/default/ReplayConfig'
+
+// export default function ReplayToolbar() {
+//     const [isPlaying, setIsPlaying] = useState(false)
+//     const [speed, setSpeed] = useState(DEFAULT_REPLAY_SPEED)
+//     const [updateInterval, setUpdateInterval] = useState(replayStore.updateIntervalSeconds)
+
+//     const handleTogglePlay = () => {
+//         setIsPlaying((prev) => {
+//             const next = !prev
+
+//             replayStore.setPlaying(next)
+
+//             return next
+//         })
+//     }
+
+//     const handleForward = () => {
+//         replayController.forward()
+//     }
+
+//     const handleUpdateInterval = (option: ToolbarDropdownOption) => {
+//         const seconds = Number(option.id)
+
+//         replayStore.setUpdateIntervalSeconds(seconds)
+
+//         eventBus.emit('replayUpdateIntervalChanged', {
+//             seconds,
+//         })
+
+//         eventBus.emit('replayTimeChanged', {
+//             time: replayStore.marketTime!,
+//         })
+//     }
+
+//     const handleSpeedChange = (option: ToolbarDropdownOption) => {
+//         setSpeed(Number(option.id))
+//     }
+
+//     const handleExit = () => {
+//         setIsPlaying(false)
+//         replayStore.stop()
+
+//         eventBus.emit('replayStop')
+//     }
+
+//     useEffect(() => {
+//         if (!isPlaying) return
+
+//         const interval = setInterval(() => {
+//             replayController.forward()
+//         }, 1000 / speed)
+
+//         return () => clearInterval(interval)
+//     }, [isPlaying, speed])
+
+//     useEffect(() => {
+//         const unsubscribe = eventBus.on('replayUpdateIntervalChanged', ({ seconds }) => {
+//             setUpdateInterval(seconds)
+//         })
+
+//         return unsubscribe
+//     }, [])
+
+//     const updateIntervalOptions: ToolbarDropdownOption[] = REPLAY_UPDATE_INTERVALS.map((tf) => ({
+//         id: String(tf.toSeconds()),
+//         label: tf.label,
+//     }))
+
+//     const speedOptions: ToolbarDropdownOption[] = REPLAY_SPEEDS.map((value) => ({
+//         id: String(value),
+//         label: `${value}x`,
+//     }))
+
+//     const toolbarItems: ToolbarItem[] = [
+//         {
+//             type: 'group',
+//             id: 'select-candle',
+//             items: [
+//                 {
+//                     type: 'button',
+//                     id: 'backward',
+//                     icon: (
+//                         <div
+//                             style={{ width: 28, height: 28 }}
+//                             dangerouslySetInnerHTML={{
+//                                 __html: svg.replay.selectBar,
+//                             }}
+//                         />
+//                     ),
+//                 },
+//             ],
+//         },
+//         {
+//             type: 'separator',
+//             id: 'select-separator',
+//         },
+//         {
+//             type: 'group',
+//             id: 'replay-controls',
+//             items: [
+//                 {
+//                     type: 'button',
+//                     id: 'play',
+//                     icon: (
+//                         <div
+//                             style={{ width: 28, height: 28 }}
+//                             dangerouslySetInnerHTML={{
+//                                 __html: isPlaying ? svg.replay.pause : svg.replay.play,
+//                             }}
+//                         />
+//                     ),
+//                     onClick: handleTogglePlay,
+//                 },
+//                 {
+//                     type: 'button',
+//                     id: 'forward',
+//                     icon: (
+//                         <div
+//                             style={{ width: 28, height: 28 }}
+//                             dangerouslySetInnerHTML={{
+//                                 __html: svg.replay.forward,
+//                             }}
+//                         />
+//                     ),
+//                     onClick: handleForward,
+//                 },
+//             ],
+//         },
+//         {
+//             type: 'separator',
+//             id: 'replay-separator',
+//         },
+//         {
+//             type: 'group',
+//             id: 'replay-settings',
+//             items: [
+//                 {
+//                     type: 'dropdown',
+//                     id: 'update-interval',
+//                     selectedId: String(updateInterval),
+//                     options: updateIntervalOptions,
+//                     onChange: handleUpdateInterval,
+//                 },
+//                 {
+//                     type: 'dropdown',
+//                     id: 'speed',
+//                     selectedId: String(speed),
+//                     options: speedOptions,
+//                     onChange: handleSpeedChange,
+//                 },
+//             ],
+//         },
+//         {
+//             type: 'separator',
+//             id: 'exit-separator',
+//         },
+//         {
+//             type: 'button',
+//             id: 'exit',
+//             icon: (
+//                 <div
+//                     style={{ width: 28, height: 28 }}
+//                     dangerouslySetInnerHTML={{
+//                         __html: svg.replay.exit,
+//                     }}
+//                 />
+//             ),
+//             onClick: handleExit,
+//         },
+//     ]
+
+//     return (
+//         <FloatingToolbar>
+//             <Toolbar direction="horizontal" items={toolbarItems} />
+//         </FloatingToolbar>
+//     )
+// }
 
 export default function ReplayToolbar() {
-    const [position, setPosition] = useState({
-        x: window.innerWidth / 2 - 200,
-        y: 80,
-    })
-
-    const draggingRef = useRef(false)
-    const offsetRef = useRef({
-        x: 0,
-        y: 0,
-    })
-
     const [isPlaying, setIsPlaying] = useState(false)
     const [speed, setSpeed] = useState(DEFAULT_REPLAY_SPEED)
     const [updateInterval, setUpdateInterval] = useState(replayStore.updateIntervalSeconds)
 
-    const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        draggingRef.current = true
-
-        offsetRef.current = {
-            x: e.clientX - position.x,
-            y: e.clientY - position.y,
-        }
-
-        const onMouseMove = (event: MouseEvent) => {
-            if (!draggingRef.current) return
-
-            setPosition({
-                x: event.clientX - offsetRef.current.x,
-                y: event.clientY - offsetRef.current.y,
-            })
-        }
-
-        const onMouseUp = () => {
-            draggingRef.current = false
-
-            window.removeEventListener('mousemove', onMouseMove)
-            window.removeEventListener('mouseup', onMouseUp)
-        }
-
-        window.addEventListener('mousemove', onMouseMove)
-        window.addEventListener('mouseup', onMouseUp)
-    }
-
     const handleTogglePlay = () => {
         setIsPlaying((prev) => {
             const next = !prev
+
             replayStore.setPlaying(next)
+
             return next
         })
     }
@@ -60,12 +212,8 @@ export default function ReplayToolbar() {
         replayController.forward()
     }
 
-    const handleBackward = () => {
-        replayController.backward()
-    }
-
-    const handleUpdateInterval = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const seconds = Number(e.target.value)
+    const handleUpdateInterval = (option: ToolbarDropdownOption) => {
+        const seconds = Number(option.id)
 
         replayStore.setUpdateIntervalSeconds(seconds)
 
@@ -78,6 +226,10 @@ export default function ReplayToolbar() {
         })
     }
 
+    const handleSpeedChange = (option: ToolbarDropdownOption) => {
+        setSpeed(Number(option.id))
+    }
+
     const handleExit = () => {
         setIsPlaying(false)
         replayStore.stop()
@@ -86,9 +238,7 @@ export default function ReplayToolbar() {
     }
 
     useEffect(() => {
-        if (!isPlaying) {
-            return
-        }
+        if (!isPlaying) return
 
         const interval = setInterval(() => {
             replayController.forward()
@@ -106,58 +256,85 @@ export default function ReplayToolbar() {
     }, [])
 
     return (
-        <div
-            style={{
-                position: 'fixed',
-                left: position.x,
-                top: position.y,
-                zIndex: 9999,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#1b1b1b',
-                border: '1px solid #333',
-                borderRadius: 8,
-                padding: '10px 14px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-                userSelect: 'none',
-            }}
-        >
-            <div
-                onMouseDown={onMouseDown}
-                style={{
-                    cursor: 'move',
-                    padding: '0 8px',
-                    color: '#999',
-                    fontSize: 18,
-                }}
-            >
-                ⋮⋮
-            </div>
+        <FloatingToolbar>
+            <Toolbar direction="horizontal">
+                <ToolbarGroup>
+                    <ToolbarButton
+                        icon={
+                            <div
+                                style={{ width: 28, height: 28 }}
+                                dangerouslySetInnerHTML={{
+                                    __html: svg.replay.selectBar,
+                                }}
+                            />
+                        }
+                    />
+                </ToolbarGroup>
 
-            <button onClick={handleBackward}>◀◀</button>
+                <ToolbarSeparator />
 
-            <button onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
+                <ToolbarGroup>
+                    <ToolbarButton
+                        icon={
+                            <div
+                                style={{ width: 28, height: 28 }}
+                                dangerouslySetInnerHTML={{
+                                    __html: isPlaying ? svg.replay.pause : svg.replay.play,
+                                }}
+                            />
+                        }
+                        onClick={handleTogglePlay}
+                    />
 
-            <button onClick={handleForward}>▶▶</button>
+                    <ToolbarButton
+                        icon={
+                            <div
+                                style={{ width: 28, height: 28 }}
+                                dangerouslySetInnerHTML={{
+                                    __html: svg.replay.forward,
+                                }}
+                            />
+                        }
+                        onClick={handleForward}
+                    />
+                </ToolbarGroup>
 
-            <select value={updateInterval} onChange={handleUpdateInterval}>
-                {REPLAY_UPDATE_INTERVALS.map((tf) => (
-                    <option key={tf.toKey()} value={tf.toSeconds()}>
-                        {tf.label}
-                    </option>
-                ))}
-            </select>
+                <ToolbarSeparator />
 
-            <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
-                {REPLAY_SPEEDS.map((value) => (
-                    <option key={value} value={value}>
-                        {value}x
-                    </option>
-                ))}
-            </select>
+                <ToolbarGroup>
+                    <ToolbarDropdown
+                        selectedId={String(updateInterval)}
+                        options={REPLAY_UPDATE_INTERVALS.map((tf) => ({
+                            id: String(tf.toSeconds()),
+                            label: tf.label,
+                        }))}
+                        onChange={handleUpdateInterval}
+                    />
 
-            <button onClick={handleExit}>Exit</button>
-        </div>
+                    <ToolbarDropdown
+                        selectedId={String(speed)}
+                        options={REPLAY_SPEEDS.map((value) => ({
+                            id: String(value),
+                            label: `${value}x`,
+                        }))}
+                        onChange={handleSpeedChange}
+                    />
+                </ToolbarGroup>
+
+                <ToolbarSeparator />
+
+                <ToolbarButton
+                    icon={
+                        <div
+                            style={{ width: 28, height: 28 }}
+                            dangerouslySetInnerHTML={{
+                                __html: svg.replay.exit,
+                            }}
+                        />
+                    }
+                    onClick={handleExit}
+                />
+            </Toolbar>
+        </FloatingToolbar>
     )
 }

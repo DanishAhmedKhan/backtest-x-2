@@ -369,3 +369,33 @@
 .toolbar-btn-dropdown-arrow:hover {
     background-color: #dbdbdb;
 }
+
+/* FOLATING TOOLBAR */
+
+.floating-toolbar {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px 0 #0003;
+    user-select: none;
+    height: 38px;
+}
+
+.floating-toolbar-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 10px;
+    color: #999;
+    font-size: 18px;
+    cursor: move;
+}
+
+.floating-toolbar-content {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}

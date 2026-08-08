@@ -1,18 +1,22 @@
-import type { ToolbarButtonItem } from './types'
+type Props = {
+    icon?: React.ReactNode
+    label?: string
+    tooltip?: string
+    active?: boolean
+    onClick?: () => void
+}
 
-export function ToolbarButton({ icon, label, tooltip, active, onClick, popover }: ToolbarButtonItem) {
+export function ToolbarButton({ icon, label, tooltip, active, onClick }: Props) {
     return (
-        <button className={active ? 'toolbar-btn active' : 'toolbar-btn'} title={tooltip} onClick={onClick}>
+        <button
+            type="button"
+            className={active ? 'toolbar-btn active' : 'toolbar-btn'}
+            title={tooltip}
+            onClick={onClick}
+        >
             {icon && <span className="toolbar-icon">{icon}</span>}
-            {label && <span className="toolbar-label">{label}</span>}
 
-            {popover && (
-                <div className="toolbar-btn-popover">
-                    <div className="">asda</div>
-                    <div className="">huhge</div>
-                    <div className="">eujnxiu</div>
-                </div>
-            )}
+            {label && <span className="toolbar-label">{label}</span>}
         </button>
     )
 }

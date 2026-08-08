@@ -1,5 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { ToolbarDropdownBaseProps } from './types'
+import type { ToolbarDropdownContent, ToolbarDropdownOption, ToolbarDropdownRenderContext } from './types'
+
+export interface ToolbarDropdownProps {
+    selectedId: string
+    options?: ToolbarDropdownOption[]
+    renderTrigger?: (context: ToolbarDropdownRenderContext) => React.ReactNode
+    width?: number | string
+    tooltip?: string
+    dropdown?: ToolbarDropdownContent
+    onChange?: (option: ToolbarDropdownOption) => void
+    triggerClassName?: string
+}
 
 export function ToolbarDropdown({
     selectedId,
@@ -9,7 +20,7 @@ export function ToolbarDropdown({
     dropdown,
     onChange,
     triggerClassName,
-}: ToolbarDropdownBaseProps) {
+}: ToolbarDropdownProps) {
     const [open, setOpen] = useState(false)
 
     const ref = useRef<HTMLDivElement>(null)
