@@ -27,16 +27,16 @@ export function ToolbarDropdown({
     const selected = options?.find((o) => o.id === selectedId)
 
     useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
+        function handleMouseDownOutside(event: MouseEvent) {
             if (!ref.current?.contains(event.target as Node)) {
-                setOpen(false)
+                closeDropdown()
             }
         }
 
-        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('mousedown', handleMouseDownOutside)
 
         return () => {
-            document.removeEventListener('click', handleClickOutside)
+            document.removeEventListener('mousedown', handleMouseDownOutside)
         }
     }, [])
 

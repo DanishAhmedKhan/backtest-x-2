@@ -6,10 +6,13 @@ export function ToolbarArrowDropdown(props: ToolbarArrowDropdownItem) {
     return (
         <ToolbarDropdown
             {...props}
-            renderTrigger={({ open, openDropdown }) => (
-                <div className="toolbar-trigger toolbar-arrow-trigger" onClick={openDropdown}>
+            renderTrigger={({ open, toggleDropdown }) => (
+                <div
+                    className={`toolbar-trigger toolbar-arrow-trigger ${open ? 'active' : ''}`}
+                    onClick={toggleDropdown}
+                >
                     <div
-                        className={`toolbar-arrow ${open ? 'open' : ''}`}
+                        className="toolbar-arrow"
                         style={{
                             width: 8,
                             height: 4,
