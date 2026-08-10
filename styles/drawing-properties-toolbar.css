@@ -24,7 +24,8 @@
     height: 4px;
     margin-top: 4px;
     border-radius: 2px;
-    background-size: 4px;
+    background-color: transparent;
+    background-size: 100% 100%, 4px 4px;
 }
 
 .drawing-width-trigger {

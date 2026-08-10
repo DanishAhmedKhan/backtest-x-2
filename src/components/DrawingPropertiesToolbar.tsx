@@ -90,15 +90,13 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     <div
                                                         className="drawing-color-indicator"
                                                         style={{
-                                                            backgroundColor: 'transparent',
                                                             backgroundImage: `
-                                                                linear-gradient(${color}, ${color}),
+                                                                    linear-gradient(${color}, ${color}),
                                                                     repeating-conic-gradient(
                                                                         #d0d0d0 0% 25%,
                                                                         #ffffff 0% 50%
                                                                     )
                                                                 `,
-                                                            backgroundSize: '100% 100%, 6px 6px',
                                                         }}
                                                     />
                                                 </div>
