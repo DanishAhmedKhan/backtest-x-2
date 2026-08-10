@@ -89,7 +89,7 @@ export default function ReplayToolbar() {
     }))
 
     return (
-        <FloatingToolbar>
+        <FloatingToolbar storageKey="replay-toolbar">
             <Toolbar direction="horizontal">
                 <ToolbarGroup>
                     <ToolbarButton

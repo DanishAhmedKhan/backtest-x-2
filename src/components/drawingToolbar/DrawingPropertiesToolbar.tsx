@@ -33,11 +33,6 @@ function getButtonLabel(id: string) {
 export function DrawingPropertiesToolbar({ manager }: Props) {
     const [, forceUpdate] = useState(0)
 
-    // const { position, onMouseDown } = useDraggable({
-    //     x: window.innerWidth / 2 - 180,
-    //     y: 120,
-    // })
-
     useEffect(() => {
         return manager.subscribe(() => {
             forceUpdate((value) => value + 1)
@@ -51,7 +46,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
     const items = manager.getToolbarItems()
 
     return (
-        <FloatingToolbar>
+        <FloatingToolbar storageKey="drawing-properties-toolbar">
             <Toolbar direction="horizontal">
                 <ToolbarGroup>
                     {items.map((item) => {
