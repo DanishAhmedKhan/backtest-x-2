@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 
 import TopToolbar from './TopToolbar'
 import ChartWindow from './ChartWindow'
+import JumpToDialog from './JumpToDialog'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
-import JumpToDialog from './JumpToDialog'
+import { DrawingPropertiesToolbar } from './DrawingPropertiesToolbar'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -20,7 +21,6 @@ import type { AppConfig, ChartConfig } from '../types/AppConfig'
 import { eventBus } from '../event/EventBus'
 import { useReplayController } from '../hooks/charts/useReplayController'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
-import { DrawingPropertiesToolbar } from './drawingToolbar/DrawingPropertiesToolbar'
 
 import '../../styles/index.css'
 

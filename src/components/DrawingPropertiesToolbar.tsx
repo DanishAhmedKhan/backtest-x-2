@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import { Toolbar } from '../ui/Toolbar'
-import { FloatingToolbar } from '../ui/FloatingToolbar'
-import { ToolbarItemType } from '../../drawing/toolbar/ToolbarItem'
-import { ToolbarGroup } from '../ui/ToolbarGroup'
-import { ToolbarButton } from '../ui/ToolbarButton'
-import { ToolbarDropdown } from '../ui/ToolbarDropdown'
-import { ToolbarSeparator } from '../ui/ToolbarSeparator'
-import { ColorPicker } from '../common/ColorPicker'
+import { Toolbar } from './ui/Toolbar'
+import { FloatingToolbar } from './ui/FloatingToolbar'
+import { ToolbarItemType } from '../drawing/toolbar/ToolbarItem'
+import { ToolbarGroup } from './ui/ToolbarGroup'
+import { ToolbarButton } from './ui/ToolbarButton'
+import { ToolbarDropdown } from './ui/ToolbarDropdown'
+import { ToolbarSeparator } from './ui/ToolbarSeparator'
+import { ColorPicker } from './common/ColorPicker'
 
-import type { DrawingToolbarManager } from '../../drawing/toolbar/DrawingToolbarManager'
+import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 
 type Props = {
     manager: DrawingToolbarManager

@@ -11,7 +11,7 @@ import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ToolbarButton } from './ui/ToolbarButton'
 import { ToolbarArrowDropdown } from './ui/ToolbarArrowDropdown'
 import { ToolbarFill } from './ui/ToolbarFill'
-import LayoutPicker from './ui/LayoutPicker'
+import LayoutPicker from './common/LayoutPicker'
 
 import type { ToolbarButtonItem } from './ui/types'
 
