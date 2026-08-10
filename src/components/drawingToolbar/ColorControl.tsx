@@ -1,7 +1,7 @@
 import { Popup } from '../common/Popup'
 import { usePopupController } from '../../hooks/usePopupController'
 
-import { ColorPalette } from '../common/ColorPallet'
+import { ColorPalette } from '../common/ColorPicker'
 
 import type { ToolbarItem } from '../../drawing/toolbar/ToolbarItem'
 import type { PopupController } from '../../drawing/PopupController'
