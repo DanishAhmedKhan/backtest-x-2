@@ -90,7 +90,15 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     <div
                                                         className="drawing-color-indicator"
                                                         style={{
-                                                            background: color,
+                                                            backgroundColor: 'transparent',
+                                                            backgroundImage: `
+                                                                linear-gradient(${color}, ${color}),
+                                                                    repeating-conic-gradient(
+                                                                        #d0d0d0 0% 25%,
+                                                                        #ffffff 0% 50%
+                                                                    )
+                                                                `,
+                                                            backgroundSize: '100% 100%, 6px 6px',
                                                         }}
                                                     />
                                                 </div>
@@ -102,6 +110,10 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                 onSelect={(newColor) => {
                                                     item.onChange?.(newColor)
                                                     close()
+                                                }}
+                                                onChange={(newColor) => {
+                                                    console.log(newColor)
+                                                    item.onChange?.(newColor)
                                                 }}
                                             />
                                         )}

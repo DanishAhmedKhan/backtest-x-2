@@ -1,8 +1,10 @@
+import { useState } from 'react'
+
 type Props = {
     selected: string
     opacity?: number
     onSelect: (color: string) => void
-    onOpacityChange?: (opacity: number) => void
+    onChange: (color: string) => void
 }
 
 const COLORS = [
@@ -15,24 +17,74 @@ const COLORS = [
     ['#991b1b', '#c2410c', '#a16207', '#166534', '#115e59', '#155e75', '#1e40af', '#3730a3', '#6b21a8', '#9d174d'],
 ]
 
-export function ColorPicker({ selected, opacity = 100, onSelect, onOpacityChange }: Props) {
+function hexToRgba(color: string, alpha: number) {
+    const rgbaMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*[\d.]+)?\s*\)$/i)
+
+    if (rgbaMatch) {
+        return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${alpha / 100})`
+    }
+
+    const value = color.replace('#', '')
+
+    const r = parseInt(value.substring(0, 2), 16)
+    const g = parseInt(value.substring(2, 4), 16)
+    const b = parseInt(value.substring(4, 6), 16)
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha / 100})`
+}
+
+function getRgbColor(color: string) {
+    const rgbaMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*[\d.]+)?\s*\)$/i)
+
+    if (rgbaMatch) {
+        return {
+            r: Number(rgbaMatch[1]),
+            g: Number(rgbaMatch[2]),
+            b: Number(rgbaMatch[3]),
+        }
+    }
+
+    const hex = color.replace('#', '')
+
+    if (hex.length === 6) {
+        return {
+            r: parseInt(hex.substring(0, 2), 16),
+            g: parseInt(hex.substring(2, 4), 16),
+            b: parseInt(hex.substring(4, 6), 16),
+        }
+    }
+
+    return {
+        r: 0,
+        g: 0,
+        b: 0,
+    }
+}
+
+export function ColorPicker({ selected, opacity = 100, onSelect, onChange }: Props) {
+    const [currentOpacity, setCurrentOpacity] = useState(opacity)
+
+    const rgb = getRgbColor(selected)
+
     const handleOpacityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onOpacityChange?.(Number(event.target.value))
+        const value = Number(event.target.value)
+        setCurrentOpacity(value)
+        onChange(hexToRgba(selected, value))
     }
 
     return (
         <div className="color-pallet">
-            <div className="color-pallet-list ">
-                {COLORS.flat().map((color) => {
+            <div className="color-pallet-list">
+                {COLORS.flat().map((color, index) => {
                     const isSelected = selected.toLowerCase() === color.toLowerCase()
 
                     return (
                         <button
-                            key={color}
+                            key={`color-${index}`}
                             className="color-pallet-items"
                             type="button"
                             aria-label={`Select ${color}`}
-                            onClick={() => onSelect(color)}
+                            onClick={() => onSelect(hexToRgba(color, currentOpacity))}
                             style={{
                                 background: color,
                                 outline: isSelected ? '2px solid #2563eb' : 'none',
@@ -50,17 +102,17 @@ export function ColorPicker({ selected, opacity = 100, onSelect, onOpacityChange
                 +
             </button>
 
-            <div className="opacity-title ">Opacity</div>
+            <div className="opacity-title">Opacity</div>
 
             <div className="opacity-wrapper">
                 <div className="opacity-bar">
                     <div
-                        className="opacity-color "
+                        className="opacity-color"
                         style={{
                             background: `linear-gradient(
                                 to right,
-                                rgba(0, 0, 0, 0),
-                                ${selected}
+                                rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0),
+                                rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)
                             )`,
                         }}
                     />
@@ -70,7 +122,7 @@ export function ColorPicker({ selected, opacity = 100, onSelect, onOpacityChange
                         type="range"
                         min={0}
                         max={100}
-                        value={opacity}
+                        value={currentOpacity}
                         onChange={handleOpacityChange}
                         aria-label="Opacity"
                     />
@@ -78,12 +130,14 @@ export function ColorPicker({ selected, opacity = 100, onSelect, onOpacityChange
                     <div
                         className="opacity-input-handle"
                         style={{
-                            left: `calc(${opacity}% - 5px)`,
+                            left: `calc(
+                                7px + (100% - 14px) * ${currentOpacity} / 100
+                            )`,
                         }}
                     />
                 </div>
 
-                <div className="opacity-input">{opacity}%</div>
+                <div className="opacity-input">{currentOpacity}%</div>
             </div>
         </div>
     )
