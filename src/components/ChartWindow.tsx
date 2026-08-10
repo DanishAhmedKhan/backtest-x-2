@@ -58,15 +58,7 @@ export default function ChartWindow({
     )
 
     return (
-        <div
-            ref={containerRef}
-            style={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                overflow: 'hidden',
-            }}
-        >
+        <div className="chart-window" ref={containerRef}>
             {rects.charts.map(({ node, rect }) => {
                 const chart = charts[node.chartIndex]
 
@@ -75,14 +67,12 @@ export default function ChartWindow({
                 return (
                     <div
                         key={node.id}
+                        className="chart-framw-wrapper"
                         style={{
-                            position: 'absolute',
                             left: rect.left,
                             top: rect.top,
                             width: rect.width,
                             height: rect.height,
-                            minWidth: 0,
-                            minHeight: 0,
                         }}
                     >
                         <ChartFrame
@@ -104,16 +94,13 @@ export default function ChartWindow({
                     return (
                         <div
                             key={node.id}
+                            className="chart-handle chart-vertical-handle"
                             onMouseDown={startDrag(node.id, 'vertical', rect, firstWidth)}
                             style={{
-                                position: 'absolute',
                                 left: rect.left + firstWidth,
                                 top: rect.top,
                                 width: HANDLE_SIZE,
                                 height: rect.height,
-                                background: 'white',
-                                cursor: 'col-resize',
-                                zIndex: 100,
                             }}
                         />
                     )
@@ -125,16 +112,13 @@ export default function ChartWindow({
                 return (
                     <div
                         key={node.id}
+                        className="chart-handle chart-horizontal-handle "
                         onMouseDown={startDrag(node.id, 'horizontal', rect, firstHeight)}
                         style={{
-                            position: 'absolute',
                             left: rect.left,
                             top: rect.top + firstHeight,
                             width: rect.width,
                             height: HANDLE_SIZE,
-                            background: 'white',
-                            cursor: 'row-resize',
-                            zIndex: 100,
                         }}
                     />
                 )

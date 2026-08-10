@@ -1,8 +1,6 @@
 import type React from 'react'
 import { useRef, useState } from 'react'
 
-import './toolbar.css'
-
 type Props = {
     children: React.ReactNode
     initialX?: number

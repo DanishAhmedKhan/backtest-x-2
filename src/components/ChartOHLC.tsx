@@ -16,34 +16,19 @@ function ChartOHLC({ ohlc, precision = 5 }: Props) {
     const isBullish = ohlc.change >= 0
 
     return (
-        <div
-            style={{
-                position: 'absolute',
-                top: 8,
-                left: 8,
-                zIndex: 20,
-                display: 'flex',
-                gap: 12,
-                alignItems: 'center',
-                fontSize: 13,
-                fontFamily: 'Roboto',
-                fontWeight: 500,
-                pointerEvents: 'none',
-                userSelect: 'none',
-            }}
-        >
-            <span style={{ color: '#0f0f0f' }}>O {format(ohlc.open)}</span>
+        <div className="chart-ohlc">
+            <span className="chart-ohlc-value">O {format(ohlc.open)}</span>
 
-            <span style={{ color: '#0f0f0f' }}>H {format(ohlc.high)}</span>
+            <span className="chart-ohlc-value">H {format(ohlc.high)}</span>
 
-            <span style={{ color: '#0f0f0f' }}>L {format(ohlc.low)}</span>
+            <span className="chart-ohlc-value">L {format(ohlc.low)}</span>
 
-            <span style={{ color: '#0f0f0f' }}>C {format(ohlc.close)}</span>
+            <span className="chart-ohlc-value">C {format(ohlc.close)}</span>
 
             <span
+                className="chart-ohlc-value chart-ohlc-percent"
                 style={{
                     color: isBullish ? '#4caf50' : '#f44336',
-                    fontWeight: 700,
                 }}
             >
                 {isBullish ? '+' : ''}

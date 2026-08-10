@@ -385,16 +385,11 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     }, [showReplayOverlay])
 
     return (
-        <div
-            style={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-            }}
-        >
+        <div className="chart">
             {chartDataStatus !== 'no-data' && <ChartOHLC ohlc={ohlc} />}
 
             <div
+                className="chart-container"
                 ref={containerRef}
                 onWheel={() => {
                     isViewportInteractionRef.current = true
@@ -425,7 +420,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
                 }}
                 onMouseMove={handlePaneMouseMove}
                 onClick={handleReplaySelection}
-                style={{ width: '100%', height: '100%' }}
             />
 
             <DrawingCanvas ref={drawingCanvasRef} />

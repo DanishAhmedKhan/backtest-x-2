@@ -129,62 +129,24 @@ export default function Main() {
     useReplayController()
 
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateRows: '38px 1fr',
-                gridTemplateColumns: '52px 1fr',
-                gap: '5px',
-                height: '100vh',
-                overflow: 'hidden',
-                backgroundColor: '#ebebeb',
-            }}
-        >
-            <div style={{ gridColumn: '1 / span 2' }}>
-                <div
-                    style={{
-                        display: 'block',
-                        padding: '0px 2px',
-                        backgroundColor: 'white',
-                        height: '100%',
+        <div className="main">
+            <div className="main-toptoolbar">
+                <TopToolbar
+                    ticker={activeChart.ticker}
+                    timeframe={activeChart.timeframe}
+                    layout={layout}
+                    onTickerChange={(t) => updateActiveChart({ ticker: t })}
+                    onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
+                    onLayoutChange={handleLayoutChange}
+                    onReplayClick={() => {
+                        replayStore.isSelecting = true
+                        setShowReplayToolbar(false)
                     }}
-                >
-                    <TopToolbar
-                        ticker={activeChart.ticker}
-                        timeframe={activeChart.timeframe}
-                        layout={layout}
-                        onTickerChange={(t) => updateActiveChart({ ticker: t })}
-                        onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
-                        onLayoutChange={handleLayoutChange}
-                        onReplayClick={() => {
-                            replayStore.isSelecting = true
-                            setShowReplayToolbar(false)
-                        }}
-                        onJumpToClick={() => setJumpOpen(true)}
-                    />
-                </div>
-
-                <JumpToDialog
-                    open={jumpOpen}
-                    onClose={() => setJumpOpen(false)}
-                    onGo={(timestamp) => {
-                        eventBus.emit('jumpTo', {
-                            timestamp,
-                        })
-
-                        setJumpOpen(false)
-                    }}
+                    onJumpToClick={() => setJumpOpen(true)}
                 />
             </div>
 
-            <div
-                style={{
-                    display: 'block',
-                    padding: '2px 0px',
-                    backgroundColor: 'white',
-                    width: '100%',
-                }}
-            >
+            <div className="main-drawingtoolbar">
                 <DrawingToolbar />
             </div>
 
@@ -194,6 +156,18 @@ export default function Main() {
                 onSelectChart={setActiveChartId}
                 layout={layout}
                 onDrawingToolbarManagerReady={setDrawingToolbarManager}
+            />
+
+            <JumpToDialog
+                open={jumpOpen}
+                onClose={() => setJumpOpen(false)}
+                onGo={(timestamp) => {
+                    eventBus.emit('jumpTo', {
+                        timestamp,
+                    })
+
+                    setJumpOpen(false)
+                }}
             />
 
             {showReplayToolbar && <ReplayToolbar />}

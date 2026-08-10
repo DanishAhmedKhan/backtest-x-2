@@ -13,15 +13,9 @@ type Props = {
 export default function ChartFrame({ chart, isActive, onSelect, onDrawingToolbarManagerReady }: Props) {
     return (
         <div
+            className="chart-frame"
             onClick={onSelect}
             style={{
-                height: '100%',
-                width: '100%',
-                position: 'relative',
-                overflow: 'hidden',
-                minWidth: 0,
-                minHeight: 0,
-                borderRadius: 6,
                 border: isActive ? '2px solid #0051ff' : '2px solid white',
             }}
         >
