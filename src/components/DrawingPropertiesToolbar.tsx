@@ -11,23 +11,25 @@ import { ColorPicker } from './common/ColorPicker'
 
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 
+import svg from '../svg/svg'
+
 type Props = {
     manager: DrawingToolbarManager
 }
 
 const WIDTHS = [1, 2, 3, 4, 5]
 
-function getButtonLabel(id: string) {
-    switch (id) {
-        case 'delete':
-            return '🗑'
+const BUTTON_ICONS: Record<string, string> = {
+    delete: svg.delete,
+    settings: svg.settings,
+}
 
-        case 'settings':
-            return '⚙'
+function getButtonIcon(id: string) {
+    const icon = BUTTON_ICONS[id]
 
-        default:
-            return '•'
-    }
+    if (!icon) return null
+
+    return <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: icon }} />
 }
 
 export function DrawingPropertiesToolbar({ manager }: Props) {
@@ -55,8 +57,8 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                 return (
                                     <ToolbarButton
                                         key={item.id}
+                                        icon={getButtonIcon(item.id)}
                                         tooltip={item.tooltip}
-                                        label={getButtonLabel(item.id)}
                                         onClick={item.execute}
                                     />
                                 )
@@ -77,15 +79,21 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                 title={item.tooltip}
                                                 onClick={toggleDropdown}
                                             >
-                                                <div
-                                                    style={{
-                                                        width: 18,
-                                                        height: 18,
-                                                        borderRadius: '50%',
-                                                        background: color,
-                                                        border: '1px solid #777',
-                                                    }}
-                                                />
+                                                <div className="drawing-color-trigger">
+                                                    <div
+                                                        className="drawing-color-icon"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: svg.pencil,
+                                                        }}
+                                                    />
+
+                                                    <div
+                                                        className="drawing-color-indicator"
+                                                        style={{
+                                                            background: color,
+                                                        }}
+                                                    />
+                                                </div>
                                             </button>
                                         )}
                                         dropdown={({ close }) => (
@@ -111,6 +119,31 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                             label: `${width}px`,
                                         }))}
                                         tooltip={item.tooltip}
+                                        renderTrigger={({ selected, open, toggleDropdown }) => {
+                                            const width = Number(selected?.id ?? item.value)
+
+                                            return (
+                                                <div className="drawing-width-trigger">
+                                                    <button
+                                                        type="button"
+                                                        className={`toolbar-trigger ${open ? 'active' : ''}`}
+                                                        title={item.tooltip}
+                                                        onClick={toggleDropdown}
+                                                    >
+                                                        <div className="drawing-width-trigger-inner">
+                                                            <div
+                                                                className="drawing-width-line"
+                                                                style={{
+                                                                    height: width,
+                                                                }}
+                                                            />
+
+                                                            <span className="drawing-width-label">{width}px</span>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            )
+                                        }}
                                         onChange={(option) => {
                                             item.onChange?.(Number(option.id))
                                         }}

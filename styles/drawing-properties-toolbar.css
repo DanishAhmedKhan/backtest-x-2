@@ -1,0 +1,62 @@
+.drawing-color-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* width: 20px;
+    height: 24px; */
+}
+
+.drawing-color-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drawing-color-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.drawing-color-indicator {
+    width: 22px;
+    height: 4px;
+    margin-top: 4px;
+    border-radius: 2px;
+    background-size: 4px;
+}
+
+.drawing-width-trigger {
+    height: 100%;
+}
+
+.drawing-width-trigger-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 42px;
+    height: 28px;
+}
+
+.drawing-width-trigger button {
+    padding: 0px 9px !important;
+}
+
+.drawing-width-line {
+    width: 18px;
+    min-height: 1px;
+    max-height: 5px;
+    background: currentColor;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.drawing-width-label {
+    font-size: 13px;
+    line-height: 1;
+    white-space: nowrap;
+}
