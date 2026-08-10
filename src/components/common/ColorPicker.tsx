@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { STORAGE_KEYS } from '../../storage/key'
 import { getColorOpacity, getHexFromRgb, hexToHsl, hexToRgba, hslToRgb, rgbaToHex } from '../../helper/color'
+import svg from '../../svg/svg'
 
 type Props = {
     selected: string
@@ -213,12 +214,23 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                         <input
                             className="custom-color-input"
                             value={customColor}
-                            onChange={(event) => handleHexChange(event.target.value)}
+                            onChange={(e) => handleHexChange(e.target.value)}
                         />
 
-                        <button type="button" className="custom-color-add" onClick={handleAddCustomColor}>
-                            Add
-                        </button>
+                        <div className="custom-color-actions">
+                            <button
+                                type="button"
+                                className="custom-color-back"
+                                onClick={() => setShowCustomPicker(false)}
+                                aria-label="Back"
+                            >
+                                <div dangerouslySetInnerHTML={{ __html: svg.left }} />
+                            </button>
+
+                            <button type="button" className="custom-color-add" onClick={handleAddCustomColor}>
+                                Add
+                            </button>
+                        </div>
                     </div>
 
                     <div className="custom-color-body">
@@ -260,9 +272,9 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                         </div>
                     </div>
 
-                    <button type="button" className="custom-color-back" onClick={() => setShowCustomPicker(false)}>
+                    {/* <button type="button" className="custom-color-back" onClick={() => setShowCustomPicker(false)}>
                         Back
-                    </button>
+                    </button> */}
                 </div>
             </div>
         )
@@ -271,25 +283,6 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
     return (
         <div className="color-pallet">
             <div className="color-pallet-list">
-                {customColors.map((color, index) => {
-                    const isSelected = selectedHex.toLowerCase() === color.toLowerCase()
-
-                    return (
-                        <button
-                            key={`custom-${index}`}
-                            className="color-pallet-items"
-                            type="button"
-                            aria-label={`Select ${color}`}
-                            onClick={() => handleColorSelect(color)}
-                            style={{
-                                background: color,
-                                outline: isSelected ? '2px solid #2563eb' : 'none',
-                                outlineOffset: isSelected ? 1 : 0,
-                            }}
-                        />
-                    )
-                })}
-
                 {COLORS.flat().map((color, index) => {
                     const isSelected = selectedHex.toLowerCase() === color.toLowerCase()
 
@@ -313,9 +306,32 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
 
             <div className="color-pallet-separator" />
 
-            <button className="add-color-button" type="button" aria-label="Add custom color" onClick={openCustomPicker}>
-                +
-            </button>
+            <div className="color-pallet-custom-color">
+                {customColors.map((color, index) => {
+                    const isSelected = selectedHex.toLowerCase() === color.toLowerCase()
+
+                    return (
+                        <button
+                            key={`custom-${index}`}
+                            className="color-pallet-items"
+                            type="button"
+                            aria-label={`Select ${color}`}
+                            onClick={() => handleColorSelect(color)}
+                            style={{
+                                background: color,
+                                outline: isSelected ? '2px solid #2563eb' : 'none',
+                                outlineOffset: isSelected ? 1 : 0,
+                            }}
+                        />
+                    )
+                })}
+                <button
+                    className="add-color-button"
+                    type="button"
+                    aria-label="Add custom color"
+                    onClick={openCustomPicker}
+                ></button>
+            </div>
 
             <div className="opacity-title">Opacity</div>
 
