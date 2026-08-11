@@ -5,7 +5,7 @@ import type { DrawingEditor } from './DrawingEditor'
 import type { EditingSession } from './EditingSession'
 
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-import { DrawingType } from '../DrawingType'
+import { DrawingType } from '../drawings/DrawingType'
 
 export class HorizontalLineEditor implements DrawingEditor<HorizontalLineDrawing> {
     public canEdit(drawing: Drawing): drawing is HorizontalLineDrawing {

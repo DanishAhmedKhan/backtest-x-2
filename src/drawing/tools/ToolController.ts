@@ -1,8 +1,8 @@
-import { ToolManager } from './tools/ToolManager'
-import { ToolType } from './tools/ToolType'
-
 import type { IChartApi } from 'lightweight-charts'
-import type { ViewportInteractionController } from './controller/ViewportInterationController'
+
+import type { ToolType } from './ToolType'
+import type { ToolManager } from './ToolManager'
+import type { ViewportInteractionController } from '../controller/ViewportInterationController'
 
 export class ToolController implements ViewportInteractionController {
     constructor(private readonly toolManager: ToolManager, private readonly chart: IChartApi) {}

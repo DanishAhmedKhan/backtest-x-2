@@ -7,7 +7,7 @@ import { ChartSnapshot } from '../renderer/ChartSnapshot'
 import { RenderLoop } from '../renderer/RenderLoop'
 import type { DrawingContext } from '../DrawingContext'
 import { PointerController } from '../controller/PointerController'
-import { ToolController } from '../ToolController'
+import { ToolController } from '../tools/ToolController'
 import { HoverController } from '../controller/HoverController'
 import { SelectionController } from '../controller/SelectionController'
 import { EditController } from '../controller/EditController'
@@ -177,9 +177,7 @@ export class ChartRuntime {
 
         const ctx = this.canvas.getContext('2d')
 
-        if (!ctx) {
-            return
-        }
+        if (!ctx) return
 
         const dpr = window.devicePixelRatio || 1
 

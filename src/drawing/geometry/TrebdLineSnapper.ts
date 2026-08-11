@@ -10,7 +10,7 @@ export class TrendLineSnapper {
             return event.anchor
         }
 
-        const startPoint = this.transformer.toPoint(start, true)
+        const startPoint = this.transformer.toPoint(start)
 
         if (!startPoint) {
             return event.anchor

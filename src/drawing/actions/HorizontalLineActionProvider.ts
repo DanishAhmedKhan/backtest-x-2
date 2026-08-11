@@ -1,10 +1,14 @@
-import type { Drawing } from '../drawings/Drawing'
 import { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
+
+import type { Drawing } from '../drawings/Drawing'
 import type { DrawingManager } from '../managers/DrawingManager'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { DrawingAction } from './DrawingAction'
 import type { DrawingActionProvider } from './DrawingActionProvider'
+import type { DrawingStateManager } from '../managers/DrawingStateManager'
+import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+
+import { CommonDrawingActions } from './CommonDrawingActions'
+import { StrokeActions } from './StrokeActions'
 
 export class HorizontalLineActionProvider implements DrawingActionProvider<HorizontalLineDrawing> {
     constructor(
@@ -19,58 +23,20 @@ export class HorizontalLineActionProvider implements DrawingActionProvider<Horiz
 
     public getActions(drawing: HorizontalLineDrawing): DrawingAction[] {
         return [
-            {
-                id: 'color',
-                label: 'Color',
-                value: drawing.color,
-                execute: (color) => {
-                    drawing.color = color
+            ...StrokeActions.getActions(drawing, this.drawingStateManager, this.renderInvalidator),
 
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
-
-            {
-                id: 'line-width',
-                label: 'Line Width',
-                value: drawing.width,
-                execute: (width) => {
-                    drawing.width = width
-
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
-
-            {
-                id: 'style',
-                label: 'Style',
-                value: drawing.style,
-                execute: (style) => {
-                    drawing.style = style
-
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
+            ...CommonDrawingActions.getActions(
+                drawing,
+                this.drawingManager,
+                this.drawingStateManager,
+                this.renderInvalidator,
+            ),
 
             {
                 id: 'settings',
                 label: 'Settings',
                 execute: () => {
                     console.log('Open Horizontal Line Settings')
-                },
-            },
-
-            {
-                id: 'delete',
-                label: 'Delete',
-                execute: () => {
-                    this.drawingManager.removeDrawing(drawing.id)
-
-                    this.drawingStateManager.clearSelection()
-                    this.renderInvalidator.invalidate()
                 },
             },
         ]

@@ -1,7 +1,7 @@
 import { CursorType } from '../../core/cursor/CursorType'
 import type { Drawing } from '../drawings/Drawing'
 import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
-import { DrawingType } from '../DrawingType'
+import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingHitTester } from './DrawingHitTester'

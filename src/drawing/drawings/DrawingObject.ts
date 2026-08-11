@@ -1,5 +1,5 @@
 import type { Drawing } from './Drawing'
-import type { DrawingType } from '../DrawingType'
+import type { DrawingType } from './DrawingType'
 
 export abstract class DrawingObject implements Drawing {
     public locked = false

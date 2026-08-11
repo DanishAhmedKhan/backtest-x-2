@@ -5,7 +5,7 @@ import type { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderer } from './DrawingRenderer'
 
 import { DrawingPrimitives } from './DrawingPrimitives'
-import { DrawingType } from '../DrawingType'
+import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderState } from './DrawingrendererState'
 
 export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDrawing> {

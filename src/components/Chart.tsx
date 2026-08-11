@@ -29,7 +29,7 @@ import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
-import { toolStore } from '../drawing/ToolStore'
+import { toolStore } from '../drawing/tools/ToolStore'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'

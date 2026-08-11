@@ -1,5 +1,5 @@
 import type { Drawing } from '../drawings/Drawing'
-import { DrawingType } from '../DrawingType'
+import { DrawingType } from '../drawings/DrawingType'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingHitTester } from './DrawingHitTester'

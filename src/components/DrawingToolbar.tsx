@@ -6,7 +6,7 @@ import { ToolbarButton } from './ui/ToolbarButton'
 
 import { ToolType } from '../drawing/tools/ToolType'
 
-import { toolStore } from '../drawing/ToolStore'
+import { toolStore } from '../drawing/tools/ToolStore'
 import svg from '../svg/svg'
 
 export default function DrawingToolbar() {

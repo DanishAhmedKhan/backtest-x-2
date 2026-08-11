@@ -1,7 +1,6 @@
 import { ToolManager } from './tools/ToolManager'
 import { DrawingManager } from './managers/DrawingManager'
 import { RendererManager } from './renderer/RendererManager'
-
 import { ToolType } from './tools/ToolType'
 import { PreviewDrawingManager } from './PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
@@ -11,16 +10,19 @@ import { EditorManager } from './editor/EditorManager'
 import { DrawingActionManager } from './actions/DrawingActionManager'
 import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
 import type { RenderInvalidator } from './renderer/RenderInvalidator'
+import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
+import { PopupController } from './PopupController'
 
-import { registerTools } from './utils/registerTools'
+import { PanTool } from './drawings/PanTool'
+import { TrendLineTool } from './tools/TrendLineTool'
+import { HorizontalLineTool } from './tools/HorizontalLineTool'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { LineActionProvider } from './actions/LineActionProvider'
-import { PopupController } from './PopupController'
+
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
-import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
 import { HorizontalLineActionProvider } from './actions/HorizontalLineActionProvider'
 
 export class DrawingContext {
@@ -65,13 +67,13 @@ export class DrawingContext {
     }
 
     public registerTools(transformer: CoordinateTransformer) {
-        registerTools(
-            this.toolManager,
-            this.drawingManager,
-            this.previewDrawingManager,
-            this.drawingStateManager,
-            transformer,
+        this.toolManager.register(new PanTool(this.drawingManager))
+
+        this.toolManager.register(
+            new TrendLineTool(this.drawingManager, this.previewDrawingManager, this.drawingStateManager, transformer),
         )
+
+        this.toolManager.register(new HorizontalLineTool(this.drawingManager, this.drawingStateManager))
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {

@@ -1,13 +1,15 @@
-import type { DrawingAction } from './DrawingAction'
-import type { DrawingActionProvider } from './DrawingActionProvider'
+import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+import { LineDrawing } from '../drawings/LineDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
-import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
-
 import { DrawingManager } from '../managers/DrawingManager'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+import type { DrawingAction } from './DrawingAction'
+import type { DrawingActionProvider } from './DrawingActionProvider'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
-import { LineDrawing } from '../drawings/LineDrawing'
+import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+
+import { StrokeActions } from './StrokeActions'
+import { CommonDrawingActions } from './CommonDrawingActions'
 
 export class LineActionProvider implements DrawingActionProvider<LineDrawing> {
     constructor(
@@ -22,54 +24,20 @@ export class LineActionProvider implements DrawingActionProvider<LineDrawing> {
 
     public getActions(drawing: TrendLineDrawing): DrawingAction[] {
         return [
-            {
-                id: 'color',
-                label: 'Color',
-                value: drawing.color,
-                execute: (color) => {
-                    drawing.color = color
+            ...StrokeActions.getActions(drawing, this.drawingStateManager, this.renderInvalidator),
 
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
-            {
-                id: 'line-width',
-                label: 'Line Width',
-                value: drawing.width,
-                execute: (width) => {
-                    drawing.width = width
+            ...CommonDrawingActions.getActions(
+                drawing,
+                this.drawingManager,
+                this.drawingStateManager,
+                this.renderInvalidator,
+            ),
 
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
-            {
-                id: 'style',
-                label: 'Style',
-                value: drawing.style,
-                execute: (style) => {
-                    drawing.style = style
-
-                    this.drawingStateManager.refresh()
-                    this.renderInvalidator.invalidate()
-                },
-            },
             {
                 id: 'settings',
                 label: 'Settings',
                 execute: () => {
                     console.log('Open Trend Line Settings')
-                },
-            },
-            {
-                id: 'delete',
-                label: 'Delete',
-                execute: () => {
-                    this.drawingManager.removeDrawing(drawing.id)
-
-                    this.drawingStateManager.clearSelection()
-                    this.renderInvalidator.invalidate()
                 },
             },
         ]

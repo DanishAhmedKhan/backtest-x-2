@@ -1,4 +1,4 @@
-import type { DrawingType } from '../DrawingType'
+import type { DrawingType } from './DrawingType'
 
 export interface Drawing {
     readonly id: string

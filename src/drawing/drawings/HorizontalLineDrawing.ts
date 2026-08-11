@@ -1,4 +1,4 @@
-import { DrawingType } from '../DrawingType'
+import { DrawingType } from './DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import { DrawingObject } from './DrawingObject'
 
