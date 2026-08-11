@@ -6,16 +6,18 @@ import { TrendLineTool } from '../tools/TrendLineTool'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import { HorizontalLineTool } from '../tools/HorizontalLineTool'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export function registerTools(
     toolManager: ToolManager,
     drawingManager: DrawingManager,
     previewDrawingManager: PreviewDrawingManager,
     drawingStateManager: DrawingStateManager,
+    transformer: CoordinateTransformer,
 ) {
     toolManager.register(new PanTool(drawingManager))
 
-    toolManager.register(new TrendLineTool(drawingManager, previewDrawingManager, drawingStateManager))
+    toolManager.register(new TrendLineTool(drawingManager, previewDrawingManager, drawingStateManager, transformer))
 
     toolManager.register(new HorizontalLineTool(drawingManager, drawingStateManager))
 }

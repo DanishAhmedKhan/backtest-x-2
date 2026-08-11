@@ -42,14 +42,16 @@ export function useDrawingTools({ chartRef, containerRef, runtimeRef }: Params) 
                 return
             }
 
+            const sourceEvent = param.sourceEvent
+
             runtimeRef.current?.handlePointerMove(
                 createRawPointerEvent(
                     param.point.x,
                     param.point.y,
                     typeof param.time === 'number' ? param.time : undefined,
-                    false,
-                    false,
-                    false,
+                    sourceEvent?.shiftKey ?? false,
+                    sourceEvent?.ctrlKey ?? false,
+                    sourceEvent?.altKey ?? false,
                 ),
             )
         }

@@ -59,7 +59,9 @@ export class ChartRuntime {
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
-        drawingContext.editorManager.register(new TrendLineEditor(this.timeResolver))
+        drawingContext.registerTools(this.transformer)
+
+        drawingContext.editorManager.register(new TrendLineEditor(this.timeResolver, this.transformer))
         drawingContext.editorManager.register(new HorizontalLineEditor())
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(

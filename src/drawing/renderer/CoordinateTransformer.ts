@@ -18,6 +18,14 @@ export class CoordinateTransformer {
         const x = this.timeResolver.logicalToCoordinate(anchor.logical)
         const y = this.series.priceToCoordinate(anchor.price)
 
+        // console.log('toPoint', {
+        //     anchor,
+        //     x,
+        //     y,
+        //     xNull: x == null,
+        //     yNull: y == null,
+        // })
+
         if (x == null || y == null) {
             return null
         }

@@ -8,9 +8,18 @@ import type { EditingSession } from './EditingSession'
 import { HitTarget } from '../hitTest/HitTestResult'
 import { DrawingType } from '../DrawingType'
 import type { TimeCoordinateResolver } from '../renderer/TimeCoordinateResolver'
+import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
-    constructor(private readonly timeResolver: TimeCoordinateResolver) {}
+    private readonly snapper: TrendLineSnapper
+
+    constructor(
+        private readonly timeResolver: TimeCoordinateResolver,
+        private readonly transformer: CoordinateTransformer,
+    ) {
+        this.snapper = new TrendLineSnapper(transformer)
+    }
 
     public canEdit(drawing: Drawing): drawing is TrendLineDrawing {
         return drawing.type === DrawingType.TrendLine
@@ -21,9 +30,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) {
-            return
-        }
+        if (!target) return
 
         const drawing = target.drawing as TrendLineDrawing
 
@@ -45,15 +52,19 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     public endEdit(_session: EditingSession) {}
 
     private moveStartHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
-        drawing.start = {
-            ...event.anchor,
-        }
+        // drawing.start = {
+        //     ...event.anchor,
+        // }
+
+        drawing.start = this.snapper.snap(drawing.end, event)
     }
 
     private moveEndHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
-        drawing.end = {
-            ...event.anchor,
-        }
+        // drawing.end = {
+        //     ...event.anchor,
+        // }
+
+        drawing.end = this.snapper.snap(drawing.start, event)
     }
 
     private moveBody(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {

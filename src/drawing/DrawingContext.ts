@@ -20,6 +20,7 @@ import { LineActionProvider } from './actions/LineActionProvider'
 import { PopupController } from './PopupController'
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
+import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -59,9 +60,17 @@ export class DrawingContext {
         this.hitTestManager.register(new TrendLineHitTester())
         this.hitTestManager.register(new HorizontalLineHitTester())
 
-        registerTools(this.toolManager, this.drawingManager, this.previewDrawingManager, this.drawingStateManager)
-
         this.toolManager.selectByType(ToolType.Pan)
+    }
+
+    public registerTools(transformer: CoordinateTransformer) {
+        registerTools(
+            this.toolManager,
+            this.drawingManager,
+            this.previewDrawingManager,
+            this.drawingStateManager,
+            transformer,
+        )
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {

@@ -5,6 +5,9 @@ import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingManager } from '../managers/DrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
+import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
+
 import { eventBus } from '../../event/EventBus'
 
 export class TrendLineTool implements Tool {
@@ -16,11 +19,16 @@ export class TrendLineTool implements Tool {
 
     private preview: TrendLineDrawing | null = null
 
+    private readonly snapper: TrendLineSnapper
+
     constructor(
         private readonly drawingManager: DrawingManager,
         private readonly previewDrawingManager: PreviewDrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
-    ) {}
+        transformer: CoordinateTransformer,
+    ) {
+        this.snapper = new TrendLineSnapper(transformer)
+    }
 
     public activate() {}
 
@@ -37,12 +45,10 @@ export class TrendLineTool implements Tool {
             return
         }
 
-        this.preview.end = event.anchor
+        this.preview.end = this.snapper.snap(this.preview.start, event)
 
         this.drawingManager.addDrawing(this.preview)
-
         this.previewDrawingManager.clear()
-
         this.drawingStateManager.setSelected(this.preview)
 
         this.preview = null
@@ -55,7 +61,7 @@ export class TrendLineTool implements Tool {
             return
         }
 
-        this.preview.end = event.anchor
+        this.preview.end = this.snapper.snap(this.preview.start, event)
 
         this.previewDrawingManager.set(this.preview)
     }
@@ -66,7 +72,6 @@ export class TrendLineTool implements Tool {
 
     public cancel() {
         this.preview = null
-
         this.previewDrawingManager.clear()
     }
 }
