@@ -25,7 +25,14 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
 
         const width = ctx.canvas.clientWidth
 
-        DrawingPrimitives.line(ctx, { x: 0, y: anchor.y }, { x: width, y: anchor.y }, drawing.color, drawing.width)
+        DrawingPrimitives.line(
+            ctx,
+            { x: 0, y: anchor.y },
+            { x: width, y: anchor.y },
+            drawing.color,
+            drawing.width,
+            drawing.style,
+        )
 
         if (state.hovered === drawing || state.selected === drawing) {
             const handle = {

@@ -21,6 +21,7 @@ import { PopupController } from './PopupController'
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
+import { HorizontalLineActionProvider } from './actions/HorizontalLineActionProvider'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -76,6 +77,10 @@ export class DrawingContext {
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
         this.drawingActionManager.register(
             new LineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+        )
+
+        this.drawingActionManager.register(
+            new HorizontalLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
         )
     }
 }

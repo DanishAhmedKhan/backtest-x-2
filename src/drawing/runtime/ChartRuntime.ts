@@ -44,7 +44,7 @@ export class ChartRuntime {
     private readonly paneGeometry: PaneGeometry
     private readonly canvas: HTMLCanvasElement
 
-    private cursorController: CursorController
+    private readonly cursorController: CursorController
 
     private readonly unsubscribers: (() => void)[] = []
 

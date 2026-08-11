@@ -10,16 +10,12 @@ export class TrendLineSnapper {
             return event.anchor
         }
 
-        console.log(start)
-        const startPoint = this.transformer.toPoint(start)
-        console.log(startPoint)
+        const startPoint = this.transformer.toPoint(start, true)
 
         if (!startPoint) {
             return event.anchor
         }
 
-        // The pointer event already contains the current screen position.
-        // Do not convert event.anchor back into screen coordinates.
         const currentPoint = event.screen
 
         const dx = currentPoint.x - startPoint.x
@@ -31,7 +27,6 @@ export class TrendLineSnapper {
 
         const angle = Math.atan2(dy, dx)
 
-        // 0°, 45°, 90°, 135°, ...
         const snapStep = Math.PI / 4
         const snappedAngle = Math.round(angle / snapStep) * snapStep
 

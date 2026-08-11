@@ -14,10 +14,7 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     private readonly snapper: TrendLineSnapper
 
-    constructor(
-        private readonly timeResolver: TimeCoordinateResolver,
-        private readonly transformer: CoordinateTransformer,
-    ) {
+    constructor(private readonly timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
         this.snapper = new TrendLineSnapper(transformer)
     }
 
