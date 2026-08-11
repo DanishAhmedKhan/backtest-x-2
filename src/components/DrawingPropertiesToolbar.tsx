@@ -6,6 +6,7 @@ import { ToolbarItemType } from '../drawing/toolbar/ToolbarItem'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
 import { ToolbarDropdown } from './ui/ToolbarDropdown'
+import { ToolIcon } from './ui/ToolbarIcon'
 import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ColorPicker } from './common/ColorPicker'
 
@@ -80,13 +81,12 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                 onClick={toggleDropdown}
                                             >
                                                 <div className="drawing-color-trigger">
-                                                    <div
+                                                    <ToolIcon
                                                         className="drawing-color-icon"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: svg.pencil,
-                                                        }}
+                                                        width={16}
+                                                        height={16}
+                                                        svg={svg.pencil}
                                                     />
-
                                                     <div
                                                         className="drawing-color-indicator"
                                                         style={{
@@ -196,10 +196,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     title={item.tooltip}
                                                     onClick={toggleDropdown}
                                                 >
-                                                    <div
-                                                        style={{ width: 28, height: 28 }}
-                                                        dangerouslySetInnerHTML={{ __html: icon }}
-                                                    />
+                                                    <ToolIcon svg={icon} />
                                                 </button>
                                             )
                                         }}
@@ -218,10 +215,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <div
-                                                            className="line-style-icon"
-                                                            dangerouslySetInnerHTML={{ __html: svg.style.solid }}
-                                                        />
+                                                        <ToolIcon className="line-style-icon" svg={svg.style.solid} />
 
                                                         <span>Line</span>
                                                     </button>
@@ -236,10 +230,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <div
-                                                            className="line-style-icon"
-                                                            dangerouslySetInnerHTML={{ __html: svg.style.dashed }}
-                                                        />
+                                                        <ToolIcon className="line-style-icon" svg={svg.style.dashed} />
 
                                                         <span>Dashed line</span>
                                                     </button>
@@ -254,10 +245,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <div
-                                                            className="line-style-icon"
-                                                            dangerouslySetInnerHTML={{ __html: svg.style.dotted }}
-                                                        />
+                                                        <ToolIcon className="line-style-icon" svg={svg.style.dotted} />
 
                                                         <span>Dotted line</span>
                                                     </button>

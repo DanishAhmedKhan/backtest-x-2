@@ -1,5 +1,8 @@
 import { useState } from 'react'
+
+import { ToolIcon } from './ui/ToolbarIcon'
 import CalendarPicker from './CalendarPicker'
+
 import svg from '../svg/svg'
 
 type Props = {
@@ -92,10 +95,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
                                 />
 
                                 <button type="button" className="go-to-input-icon">
-                                    <div
-                                        style={{ width: 28, height: 28 }}
-                                        dangerouslySetInnerHTML={{ __html: svg.calendar }}
-                                    />
+                                    <ToolIcon svg={svg.calendar} />
                                 </button>
                             </div>
 
@@ -109,10 +109,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
                                 />
 
                                 <button type="button" className="go-to-input-icon">
-                                    <div
-                                        style={{ width: 28, height: 28 }}
-                                        dangerouslySetInnerHTML={{ __html: svg.clock }}
-                                    />
+                                    <ToolIcon svg={svg.clock} />
                                 </button>
                             </div>
                         </div>

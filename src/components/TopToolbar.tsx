@@ -7,10 +7,11 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarDropdown } from './ui/ToolbarDropdown'
-import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ToolbarButton } from './ui/ToolbarButton'
-import { ToolbarArrowDropdown } from './ui/ToolbarArrowDropdown'
+import { ToolIcon } from './ui/ToolbarIcon'
+import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ToolbarFill } from './ui/ToolbarFill'
+import { ToolbarArrowDropdown } from './ui/ToolbarArrowDropdown'
 import LayoutPicker from './common/LayoutPicker'
 
 import type { ToolbarButtonItem } from './ui/types'
@@ -51,14 +52,7 @@ export default function TopToolbar({
 
     const layoutButtons = LAYOUT_TYPES.map((layoutType) => ({
         id: `l-${layoutType}`,
-        icon: (
-            <div
-                style={{ width: 21, height: 19 }}
-                dangerouslySetInnerHTML={{
-                    __html: svg.layout[layoutType],
-                }}
-            />
-        ),
+        icon: <ToolIcon width={21} height={19} svg={svg.layout[layoutType]} />,
     }))
 
     const layoutGroups: ToolbarButtonItem[][] = [[], [], [], []]
@@ -117,29 +111,8 @@ export default function TopToolbar({
             <ToolbarSeparator />
 
             <ToolbarGroup>
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{
-                                __html: svg.replay.replay,
-                            }}
-                        />
-                    }
-                    onClick={onReplayClick}
-                />
-
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{
-                                __html: svg.goTo,
-                            }}
-                        />
-                    }
-                    onClick={onJumpToClick}
-                />
+                <ToolbarButton icon={<ToolIcon svg={svg.replay.replay} />} onClick={onReplayClick} />
+                <ToolbarButton icon={<ToolIcon svg={svg.goTo} />} onClick={onJumpToClick} />
             </ToolbarGroup>
 
             <ToolbarFill />
@@ -154,16 +127,7 @@ export default function TopToolbar({
                             className={`toolbar-trigger ${open ? 'active' : ''}`}
                             onClick={toggleDropdown}
                         >
-                            <div
-                                style={{
-                                    width: 21,
-                                    height: 19,
-                                    pointerEvents: 'none',
-                                }}
-                                dangerouslySetInnerHTML={{
-                                    __html: svg.layout[layout],
-                                }}
-                            />
+                            <ToolIcon svg={svg.layout[layout]} width={21} height={19} />
                         </button>
                     )}
                     dropdown={({ select }) => (
@@ -182,27 +146,8 @@ export default function TopToolbar({
                     )}
                 />
 
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{
-                                __html: svg.settings,
-                            }}
-                        />
-                    }
-                />
-
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{
-                                __html: svg.snapshot,
-                            }}
-                        />
-                    }
-                />
+                <ToolbarButton icon={<ToolIcon svg={svg.settings} />} />
+                <ToolbarButton icon={<ToolIcon svg={svg.snapshot} />} />
             </ToolbarGroup>
         </Toolbar>
     )

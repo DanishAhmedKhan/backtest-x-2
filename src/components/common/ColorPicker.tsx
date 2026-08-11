@@ -1,7 +1,11 @@
 import { useState } from 'react'
-import { STORAGE_KEYS } from '../../storage/key'
+
+import { ToolIcon } from '../ui/ToolbarIcon'
+
 import { getColorOpacity, getHexFromRgb, hexToHsl, hexToRgba, hslToRgb, rgbaToHex } from '../../helper/color'
 import svg from '../../svg/svg'
+
+import { STORAGE_KEYS } from '../../storage/key'
 
 type Props = {
     selected: string
@@ -224,7 +228,7 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                                 onClick={() => setShowCustomPicker(false)}
                                 aria-label="Back"
                             >
-                                <div dangerouslySetInnerHTML={{ __html: svg.left }} />
+                                <ToolIcon svg={svg.left} />
                             </button>
 
                             <button type="button" className="custom-color-add" onClick={handleAddCustomColor}>

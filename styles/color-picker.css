@@ -17,7 +17,6 @@
     padding: 0;
     border: none;
     border-radius: 2px;
-    cursor: pointer;
     box-sizing: border-box;
 }
 
@@ -113,7 +112,6 @@
     height: 20px;
     margin: 0;
     opacity: 0;
-    cursor: pointer;
 }
 
 .opacity-input-handle {
@@ -197,7 +195,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     box-sizing: border-box;
 }
 
@@ -245,7 +242,7 @@
     flex-shrink: 0;
     border-radius: 2px;
     overflow: hidden;
-    cursor: crosshair;
+    /* cursor: crosshair; */
     user-select: none;
 }
 
@@ -267,7 +264,6 @@
     height: 200px;
     flex-shrink: 0;
     border-radius: 2px;
-    cursor: pointer;
     user-select: none;
     background: linear-gradient(
         to bottom,
@@ -302,3 +298,5 @@
     width: 28px;
     height: 28px;
 }
+
+/* TODO: change background color of back button when clicked */

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 
 import { Toolbar } from './ui/Toolbar'
 import { FloatingToolbar } from './ui/FloatingToolbar'
-import { ToolbarButton } from './ui/ToolbarButton'
-import { ToolbarSeparator } from './ui/ToolbarSeparator'
-import { ToolbarDropdown } from './ui/ToolbarDropdown'
 import { ToolbarGroup } from './ui/ToolbarGroup'
+import { ToolbarButton } from './ui/ToolbarButton'
+import { ToolbarDropdown } from './ui/ToolbarDropdown'
+import { ToolbarSeparator } from './ui/ToolbarSeparator'
+import { ToolIcon } from './ui/ToolbarIcon'
 
 import type { ToolbarDropdownOption } from './ui/types'
 
@@ -92,44 +93,15 @@ export default function ReplayToolbar() {
         <FloatingToolbar storageKey="replay-toolbar">
             <Toolbar direction="horizontal">
                 <ToolbarGroup>
-                    <ToolbarButton
-                        icon={
-                            <div
-                                style={{ width: 28, height: 28 }}
-                                dangerouslySetInnerHTML={{
-                                    __html: svg.replay.selectBar,
-                                }}
-                            />
-                        }
-                    />
+                    <ToolbarButton icon={<ToolIcon svg={svg.replay.selectBar} />} />
                 </ToolbarGroup>
 
                 <ToolbarSeparator />
 
                 <ToolbarGroup>
-                    <ToolbarButton
-                        icon={
-                            <div
-                                style={{ width: 28, height: 28 }}
-                                dangerouslySetInnerHTML={{
-                                    __html: isPlaying ? svg.replay.pause : svg.replay.play,
-                                }}
-                            />
-                        }
-                        onClick={handleTogglePlay}
-                    />
+                    <ToolbarButton icon={<ToolIcon svg={svg.replay.play} />} onClick={handleTogglePlay} />
 
-                    <ToolbarButton
-                        icon={
-                            <div
-                                style={{ width: 28, height: 28 }}
-                                dangerouslySetInnerHTML={{
-                                    __html: svg.replay.forward,
-                                }}
-                            />
-                        }
-                        onClick={handleForward}
-                    />
+                    <ToolbarButton icon={<ToolIcon svg={svg.replay.forward} />} onClick={handleForward} />
                 </ToolbarGroup>
 
                 <ToolbarSeparator />
@@ -146,17 +118,7 @@ export default function ReplayToolbar() {
 
                 <ToolbarSeparator />
 
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{
-                                __html: svg.replay.exit,
-                            }}
-                        />
-                    }
-                    onClick={handleExit}
-                />
+                <ToolbarButton icon={<ToolIcon svg={svg.replay.exit} />} onClick={handleExit} />
             </Toolbar>
         </FloatingToolbar>
     )
