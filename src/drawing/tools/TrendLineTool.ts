@@ -1,12 +1,13 @@
+import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
+
 import type { Tool } from './Tool'
 import { ToolType } from './ToolType'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
-import { PreviewDrawingManager } from '../PreviewDrawingManager'
 import type { DrawingManager } from '../managers/DrawingManager'
+import type { PreviewDrawingManager } from '../renderer/PreviewDrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
-import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
 
 import { eventBus } from '../../event/EventBus'
 

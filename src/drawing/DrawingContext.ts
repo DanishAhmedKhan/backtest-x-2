@@ -2,7 +2,7 @@ import { ToolManager } from './tools/ToolManager'
 import { DrawingManager } from './managers/DrawingManager'
 import { RendererManager } from './renderer/RendererManager'
 import { ToolType } from './tools/ToolType'
-import { PreviewDrawingManager } from './PreviewDrawingManager'
+import { PreviewDrawingManager } from './renderer/PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
 import { HitTestManager } from './hitTest/HitTestManager'
 import { EditingSession } from './editor/EditingSession'
@@ -11,7 +11,6 @@ import { DrawingActionManager } from './actions/DrawingActionManager'
 import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
 import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
-import { PopupController } from './PopupController'
 
 import { PanTool } from './drawings/PanTool'
 import { TrendLineTool } from './tools/TrendLineTool'
@@ -44,12 +43,9 @@ export class DrawingContext {
 
     public readonly drawingActionManager = new DrawingActionManager()
 
-    public readonly popupController = new PopupController()
-
     public readonly drawingToolbarManager = new DrawingToolbarManager(
         this.drawingStateManager,
         this.drawingActionManager,
-        this.popupController,
     )
 
     constructor() {

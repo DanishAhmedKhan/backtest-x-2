@@ -110,7 +110,6 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     close()
                                                 }}
                                                 onChange={(newColor) => {
-                                                    console.log(newColor)
                                                     item.onChange?.(newColor)
                                                 }}
                                             />

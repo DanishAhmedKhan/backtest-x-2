@@ -1,5 +1,5 @@
 import type { DrawingManager } from '../managers/DrawingManager'
-import { PreviewDrawingManager } from '../PreviewDrawingManager'
+import type { PreviewDrawingManager } from './PreviewDrawingManager'
 import { RendererManager } from './RendererManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import { CoordinateTransformer } from './CoordinateTransformer'

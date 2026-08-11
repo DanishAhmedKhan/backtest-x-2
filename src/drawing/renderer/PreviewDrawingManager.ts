@@ -1,4 +1,4 @@
-import type { Drawing } from './drawings/Drawing'
+import type { Drawing } from '../drawings/Drawing'
 
 type Listener = () => void
 
