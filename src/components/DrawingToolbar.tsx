@@ -4,10 +4,8 @@ import { Toolbar } from './ui/Toolbar'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
 
-import { ToolType } from '../drawing/tools/ToolType'
-
 import { toolStore } from '../drawing/tools/ToolStore'
-import svg from '../svg/svg'
+import { drawingTools } from '../drawing/config/drawingTools'
 
 export default function DrawingToolbar() {
     const [selectedTool, setSelectedTool] = useState(toolStore.getSelectedTool())
@@ -19,52 +17,16 @@ export default function DrawingToolbar() {
     return (
         <Toolbar direction="vertical">
             <ToolbarGroup>
-                <ToolbarButton
-                    icon={<div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.tool.pan }} />}
-                    active={selectedTool === ToolType.Pan}
-                    onClick={() => {
-                        toolStore.select(ToolType.Pan)
-                    }}
-                />
-
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{ __html: svg.tool.trendLine }}
-                        />
-                    }
-                    active={selectedTool === ToolType.TrendLine}
-                    onClick={() => {
-                        toolStore.select(ToolType.TrendLine)
-                    }}
-                />
-
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{ __html: svg.tool.horizontalLine }}
-                        />
-                    }
-                    active={selectedTool === ToolType.HorizontalLine}
-                    onClick={() => {
-                        toolStore.select(ToolType.HorizontalLine)
-                    }}
-                />
-
-                <ToolbarButton
-                    icon={
-                        <div
-                            style={{ width: 28, height: 28 }}
-                            dangerouslySetInnerHTML={{ __html: svg.tool.verticalLine }}
-                        />
-                    }
-                    active={selectedTool === ToolType.VerticalLine}
-                    onClick={() => {
-                        toolStore.select(ToolType.VerticalLine)
-                    }}
-                />
+                {drawingTools.map((tool) => (
+                    <ToolbarButton
+                        key={tool.type}
+                        icon={<div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: tool.icon }} />}
+                        active={selectedTool === tool.type}
+                        onClick={() => {
+                            toolStore.select(tool.type)
+                        }}
+                    />
+                ))}
             </ToolbarGroup>
         </Toolbar>
     )
