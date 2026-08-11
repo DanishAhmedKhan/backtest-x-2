@@ -4,7 +4,7 @@ import { DrawingObject } from './DrawingObject'
 
 export class HorizontalLineDrawing extends DrawingObject {
     public color = '#2962FF'
-
+    public style = 'solid'
     public width = 2
 
     constructor(id: string, public anchor: DrawingAnchor) {
@@ -15,6 +15,7 @@ export class HorizontalLineDrawing extends DrawingObject {
         const clone = new HorizontalLineDrawing(this.id, { ...this.anchor })
 
         clone.color = this.color
+        clone.style = this.style
         clone.width = this.width
 
         return clone

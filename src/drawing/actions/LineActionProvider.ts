@@ -45,12 +45,13 @@ export class LineActionProvider implements DrawingActionProvider<LineDrawing> {
                 },
             },
             {
-                id: 'delete',
-                label: 'Delete',
-                execute: () => {
-                    this.drawingManager.removeDrawing(drawing.id)
+                id: 'style',
+                label: 'Line Width',
+                value: drawing.style,
+                execute: (style) => {
+                    drawing.style = style
 
-                    this.drawingStateManager.clearSelection()
+                    this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },
             },
@@ -59,6 +60,16 @@ export class LineActionProvider implements DrawingActionProvider<LineDrawing> {
                 label: 'Settings',
                 execute: () => {
                     console.log('Open Trend Line Settings')
+                },
+            },
+            {
+                id: 'delete',
+                label: 'Delete',
+                execute: () => {
+                    this.drawingManager.removeDrawing(drawing.id)
+
+                    this.drawingStateManager.clearSelection()
+                    this.renderInvalidator.invalidate()
                 },
             },
         ]

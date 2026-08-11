@@ -4,7 +4,7 @@ import { DrawingObject } from './DrawingObject'
 
 export abstract class LineDrawing extends DrawingObject {
     public color = '#2962FF'
-
+    public style = 'sollid'
     public width = 2
 
     constructor(id: string, type: DrawingType, public start: DrawingAnchor, public end: DrawingAnchor) {

@@ -25,7 +25,7 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         if (!start || !end) return
 
-        DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width)
+        DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width, drawing.style)
 
         if (hovered || selected) {
             DrawingPrimitives.circle(ctx, start, 5, '#fff', drawing.color)
@@ -33,7 +33,5 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         }
     }
 
-    public destroy(drawing: TrendLineDrawing) {
-        console.info(drawing)
-    }
+    public destroy(_drawing: TrendLineDrawing) {}
 }

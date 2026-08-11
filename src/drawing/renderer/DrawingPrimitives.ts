@@ -1,11 +1,32 @@
 import type { Point } from '../geometry/Point'
 
 export class DrawingPrimitives {
-    public static line(ctx: CanvasRenderingContext2D, start: Point, end: Point, color: string, width: number) {
+    public static line(
+        ctx: CanvasRenderingContext2D,
+        start: Point,
+        end: Point,
+        color: string,
+        width: number,
+        style: string,
+    ) {
         ctx.save()
 
         ctx.strokeStyle = color
         ctx.lineWidth = width
+
+        switch (style) {
+            case 'dashed':
+                ctx.setLineDash([8, 6])
+                break
+
+            case 'dotted':
+                ctx.setLineDash([2, 4])
+                break
+
+            case 'solid':
+                ctx.setLineDash([])
+                break
+        }
 
         ctx.beginPath()
         ctx.moveTo(start.x, start.y)

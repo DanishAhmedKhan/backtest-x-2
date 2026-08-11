@@ -41,6 +41,16 @@ export class ToolbarModelBuilder {
                         execute: () => {},
                         onChange: (value) => action.execute(value as number),
                     }
+
+                case 'style':
+                    return {
+                        id: action.id,
+                        type: ToolbarItemType.Style,
+                        tooltip: action.label,
+                        value: action.value,
+                        execute: () => {},
+                        onChange: (value) => action.execute(value as string),
+                    }
             }
         })
     }

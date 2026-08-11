@@ -59,3 +59,43 @@
     line-height: 1;
     white-space: nowrap;
 }
+
+.line-style-option {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #0f0f0f;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.line-style-option:hover {
+    background: #f2f2f2;
+}
+
+.line-style-option.selected {
+    background: #2e2e2e;
+    color: #fff;
+}
+
+.line-style-icon {
+    width: 22px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.line-style-icon svg {
+    width: 22px;
+    height: 18px;
+}

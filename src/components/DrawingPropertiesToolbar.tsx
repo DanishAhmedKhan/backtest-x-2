@@ -160,6 +160,114 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                     />
                                 )
 
+                            case ToolbarItemType.Style:
+                                return (
+                                    <ToolbarDropdown
+                                        key={item.id}
+                                        selectedId={String(item.value)}
+                                        options={[
+                                            {
+                                                id: 'solid',
+                                                label: 'Line',
+                                            },
+                                            {
+                                                id: 'dashed',
+                                                label: 'Dashed line',
+                                            },
+                                            {
+                                                id: 'dotted',
+                                                label: 'Dotted line',
+                                            },
+                                        ]}
+                                        tooltip={item.tooltip}
+                                        renderTrigger={({ open, toggleDropdown }) => {
+                                            const style = String(item.value)
+
+                                            const icon =
+                                                style === 'dashed'
+                                                    ? svg.style.dashed
+                                                    : style === 'dotted'
+                                                    ? svg.style.dotted
+                                                    : svg.style.solid
+
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    className={`toolbar-trigger ${open ? 'active' : ''}`}
+                                                    title={item.tooltip}
+                                                    onClick={toggleDropdown}
+                                                >
+                                                    <div
+                                                        style={{ width: 28, height: 28 }}
+                                                        dangerouslySetInnerHTML={{ __html: icon }}
+                                                    />
+                                                </button>
+                                            )
+                                        }}
+                                        dropdown={({ close }) => {
+                                            const style = String(item.value)
+
+                                            return (
+                                                <div className="line-style-dropdown">
+                                                    <button
+                                                        type="button"
+                                                        className={`line-style-option ${
+                                                            style === 'solid' ? 'selected' : ''
+                                                        }`}
+                                                        onClick={() => {
+                                                            item.onChange?.('solid')
+                                                            close()
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className="line-style-icon"
+                                                            dangerouslySetInnerHTML={{ __html: svg.style.solid }}
+                                                        />
+
+                                                        <span>Line</span>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className={`line-style-option ${
+                                                            style === 'dashed' ? 'selected' : ''
+                                                        }`}
+                                                        onClick={() => {
+                                                            item.onChange?.('dashed')
+                                                            close()
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className="line-style-icon"
+                                                            dangerouslySetInnerHTML={{ __html: svg.style.dashed }}
+                                                        />
+
+                                                        <span>Dashed line</span>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className={`line-style-option ${
+                                                            style === 'dotted' ? 'selected' : ''
+                                                        }`}
+                                                        onClick={() => {
+                                                            item.onChange?.('dotted')
+                                                            close()
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className="line-style-icon"
+                                                            dangerouslySetInnerHTML={{ __html: svg.style.dotted }}
+                                                        />
+
+                                                        <span>Dotted line</span>
+                                                    </button>
+                                                </div>
+                                            )
+                                        }}
+                                    />
+                                )
+
                             case ToolbarItemType.Separator:
                                 return <ToolbarSeparator key={item.id} />
 

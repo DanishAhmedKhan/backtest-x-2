@@ -4,6 +4,7 @@ export enum ToolbarItemType {
     Button = 'button',
     Color = 'color',
     Width = 'width',
+    Style = 'style',
     Toggle = 'toggle',
     Separator = 'separator',
 }

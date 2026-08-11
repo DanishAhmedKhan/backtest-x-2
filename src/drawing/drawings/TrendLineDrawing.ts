@@ -11,6 +11,7 @@ export class TrendLineDrawing extends LineDrawing {
         const clone = new TrendLineDrawing(this.id, { ...this.start }, { ...this.end })
 
         clone.color = this.color
+        clone.style = this.style
         clone.width = this.width
 
         return clone
