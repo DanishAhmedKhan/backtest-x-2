@@ -6,18 +6,17 @@ import { DrawingCanvasRenderer } from '../renderer/DrawingCanvasRenderer'
 import { ChartSnapshot } from '../renderer/ChartSnapshot'
 import { RenderLoop } from '../renderer/RenderLoop'
 import type { DrawingContext } from '../DrawingContext'
-import { PointerController } from '../controller/PointerController'
-import { ToolController } from '../tools/ToolController'
-import { HoverController } from '../controller/HoverController'
-import { SelectionController } from '../controller/SelectionController'
-import { EditController } from '../controller/EditController'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
 import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
-import { TrendLineEditor } from '../editor/TrendLineEditor'
-import { HorizontalLineEditor } from '../editor/HorizontalLineEditor'
 import type { Timeframe } from '../../core/Timeframe'
 import { PaneGeometry } from '../renderer/PaneGeometry'
 import { CursorApplier } from '../../core/cursor/CursorApplier'
+
+import { PointerController } from '../controller/PointerController'
+import { HoverController } from '../controller/HoverController'
+import { SelectionController } from '../controller/SelectionController'
+import { ToolController } from '../tools/ToolController'
+import { EditController } from '../controller/EditController'
 import { CursorController } from '../../core/cursor/CursorController'
 
 type Params = {
@@ -60,9 +59,7 @@ export class ChartRuntime {
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
         drawingContext.registerTools(this.transformer)
-
-        drawingContext.editorManager.register(new TrendLineEditor(this.timeResolver, this.transformer))
-        drawingContext.editorManager.register(new HorizontalLineEditor())
+        drawingContext.registerEditor(this.timeResolver, this.transformer)
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,

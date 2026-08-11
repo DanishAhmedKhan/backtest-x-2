@@ -4,7 +4,7 @@ export enum DrawingType {
     ExtendedLine = 'extended-line',
     TrendAngle = 'trend-angle',
     HorizontalLine = 'horizontal-line',
-    HorixontalRay = 'horizontal-ray',
+    HorizontalRay = 'horizontal-ray',
     VerticalLine = 'vertical-line',
     Rectangle = 'rectangle',
     Crossline = 'crossline',

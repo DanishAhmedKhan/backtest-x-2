@@ -1,4 +1,4 @@
-import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
+import type { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -9,13 +9,13 @@ import { HitTestConstants } from './HitTestConstant'
 import { HitTarget } from './HitTestResult'
 import { CursorType } from '../../core/cursor/CursorType'
 
-export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineDrawing> {
-    public canHitTest(drawing: Drawing): drawing is HorizontalLineDrawing {
-        return drawing.type === DrawingType.HorizontalLine
+export class VerticalLineHitTester implements DrawingHitTester<VerticalLineDrawing> {
+    public canHitTest(drawing: Drawing): drawing is VerticalLineDrawing {
+        return drawing.type === DrawingType.VerticalLine
     }
 
     public hitTest(
-        drawing: HorizontalLineDrawing,
+        drawing: VerticalLineDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
         tolerance = HitTestConstants.HOVER_LINE_TOLERANCE,
@@ -27,7 +27,7 @@ export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineD
             return null
         }
 
-        if (Math.abs(mouse.y - line.y) <= tolerance) {
+        if (Math.abs(mouse.x - line.x) <= tolerance) {
             return {
                 drawing,
                 target: HitTarget.Body,

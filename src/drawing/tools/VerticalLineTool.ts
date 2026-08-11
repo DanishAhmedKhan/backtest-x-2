@@ -1,4 +1,4 @@
-import { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
+import { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 
 import type { Tool } from './Tool'
 import { ToolType } from './ToolType'
@@ -9,8 +9,8 @@ import type { DrawingStateManager } from '../managers/DrawingStateManager'
 
 import { eventBus } from '../../event/EventBus'
 
-export class HorizontalLineTool implements Tool {
-    public readonly type = ToolType.HorizontalLine
+export class VerticalLineTool implements Tool {
+    public readonly type = ToolType.VerticalLine
 
     public readonly allowsViewportInteraction = false
 
@@ -26,7 +26,7 @@ export class HorizontalLineTool implements Tool {
     public deactivate() {}
 
     public handlePointerDown(event: ChartPointerEvent) {
-        const drawing = new HorizontalLineDrawing(crypto.randomUUID(), { ...event.anchor })
+        const drawing = new VerticalLineDrawing(crypto.randomUUID(), { ...event.anchor })
 
         this.drawingManager.addDrawing(drawing)
 

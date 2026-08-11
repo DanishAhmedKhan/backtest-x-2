@@ -52,6 +52,19 @@ export default function DrawingToolbar() {
                         toolStore.select(ToolType.HorizontalLine)
                     }}
                 />
+
+                <ToolbarButton
+                    icon={
+                        <div
+                            style={{ width: 28, height: 28 }}
+                            dangerouslySetInnerHTML={{ __html: svg.tool.verticalLine }}
+                        />
+                    }
+                    active={selectedTool === ToolType.VerticalLine}
+                    onClick={() => {
+                        toolStore.select(ToolType.VerticalLine)
+                    }}
+                />
             </ToolbarGroup>
         </Toolbar>
     )

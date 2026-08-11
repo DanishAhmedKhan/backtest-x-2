@@ -11,18 +11,28 @@ import { DrawingActionManager } from './actions/DrawingActionManager'
 import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
 import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
+import type { TimeCoordinateResolver } from './renderer/TimeCoordinateResolver'
 
 import { PanTool } from './drawings/PanTool'
 import { TrendLineTool } from './tools/TrendLineTool'
 import { HorizontalLineTool } from './tools/HorizontalLineTool'
+import { VerticalLineTool } from './tools/VerticalLineTool'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
-import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
-import { LineActionProvider } from './actions/LineActionProvider'
-
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
+import { VerticalLineRenderer } from './renderer/VerticalLinerenderer'
+
+import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
+import { VerticalLineHitTester } from './hitTest/VerticalLineHitTester'
+
+import { LineActionProvider } from './actions/LineActionProvider'
 import { HorizontalLineActionProvider } from './actions/HorizontalLineActionProvider'
+import { VerticalLineActionProvider } from './actions/VerticalLineActionProvider'
+
+import { TrendLineEditor } from './editor/TrendLineEditor'
+import { HorizontalLineEditor } from './editor/HorizontalLineEditor'
+import { VerticalLineEditor } from './editor/VerticalLineEditor'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -55,9 +65,11 @@ export class DrawingContext {
     private initialize() {
         this.rendererManager.register(new TrendLineRenderer())
         this.rendererManager.register(new HorizontalLineRenderer())
+        this.rendererManager.register(new VerticalLineRenderer())
 
         this.hitTestManager.register(new TrendLineHitTester())
         this.hitTestManager.register(new HorizontalLineHitTester())
+        this.hitTestManager.register(new VerticalLineHitTester())
 
         this.toolManager.selectByType(ToolType.Pan)
     }
@@ -70,6 +82,8 @@ export class DrawingContext {
         )
 
         this.toolManager.register(new HorizontalLineTool(this.drawingManager, this.drawingStateManager))
+
+        this.toolManager.register(new VerticalLineTool(this.drawingManager, this.drawingStateManager))
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
@@ -80,5 +94,15 @@ export class DrawingContext {
         this.drawingActionManager.register(
             new HorizontalLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
         )
+
+        this.drawingActionManager.register(
+            new VerticalLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+        )
+    }
+
+    public registerEditor(timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
+        this.editorManager.register(new TrendLineEditor(timeResolver, transformer))
+        this.editorManager.register(new HorizontalLineEditor())
+        this.editorManager.register(new VerticalLineEditor())
     }
 }
