@@ -28,4 +28,9 @@ export const drawingTools: DrawingToolConfig[] = [
         icon: svg.tool.verticalLine,
         label: 'Vertical Line',
     },
+    {
+        type: ToolType.Rectangle,
+        icon: svg.tool.rectangle,
+        label: 'Rectangle',
+    },
 ]

@@ -1,13 +1,16 @@
-import type { Drawing } from '../drawings/Drawing'
-import { DrawingType } from '../drawings/DrawingType'
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
-import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
+
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTestResult'
 import { HitTestConstants } from './HitTestConstant'
+
+import type { Drawing } from '../drawings/Drawing'
+import { DrawingType } from '../drawings/DrawingType'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
+import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
+
 import { CursorType } from '../../core/cursor/CursorType'
 import { LineGeometry } from '../geometry/LineGeometry'
-import type { DrawingAnchor } from '../models/DrawingAnchor'
 
 export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
     public canHitTest(drawing: Drawing): drawing is TrendLineDrawing {

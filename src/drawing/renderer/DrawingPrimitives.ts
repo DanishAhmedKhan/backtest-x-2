@@ -18,11 +18,9 @@ export class DrawingPrimitives {
             case 'dashed':
                 ctx.setLineDash([8, 6])
                 break
-
             case 'dotted':
                 ctx.setLineDash([2, 4])
                 break
-
             case 'solid':
                 ctx.setLineDash([])
                 break
@@ -57,38 +55,48 @@ export class DrawingPrimitives {
 
     public static rectangle(
         ctx: CanvasRenderingContext2D,
-        topLeft: Point,
+        x: number,
+        y: number,
         width: number,
         height: number,
-        fill?: string,
-        stroke?: string,
+        borderColor: string,
+        borderWidth: number,
+        borderStyle: string,
+        backgroundColor: string,
     ) {
         ctx.save()
 
-        if (fill) {
-            ctx.fillStyle = fill
-            ctx.fillRect(topLeft.x, topLeft.y, width, height)
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(x, y, width, height)
+
+        ctx.strokeStyle = borderColor
+        ctx.lineWidth = borderWidth
+
+        if (borderStyle === 'dashed') {
+            ctx.setLineDash([8, 6])
+        } else if (borderStyle === 'dotted') {
+            ctx.setLineDash([2, 4])
+        } else {
+            ctx.setLineDash([])
         }
 
-        if (stroke) {
-            ctx.strokeStyle = stroke
-            ctx.strokeRect(topLeft.x, topLeft.y, width, height)
-        }
+        ctx.strokeRect(x, y, width, height)
 
         ctx.restore()
     }
 
-    public static square(ctx: CanvasRenderingContext2D, center: Point, size: number, fill?: string, stroke?: string) {
-        this.rectangle(
-            ctx,
-            {
-                x: center.x - size / 2,
-                y: center.y - size / 2,
-            },
-            size,
-            size,
-            fill,
-            stroke,
-        )
+    public static square(
+        ctx: CanvasRenderingContext2D,
+        center: Point,
+        size: number,
+        borderColor: string,
+        borderWidth: number,
+        borderStyle: string,
+        backgroundColor: string,
+    ) {
+        const x = center.x - size / 2
+        const y = center.y - size / 2
+
+        this.rectangle(ctx, x, y, size, size, borderColor, borderWidth, borderStyle, backgroundColor)
     }
 }

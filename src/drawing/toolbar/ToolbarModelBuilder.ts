@@ -51,6 +51,16 @@ export class ToolbarModelBuilder {
                         execute: () => {},
                         onChange: (value) => action.execute(value as string),
                     }
+
+                case 'background':
+                    return {
+                        id: action.id,
+                        type: ToolbarItemType.Background,
+                        tooltip: action.label,
+                        value: action.value,
+                        execute: () => {},
+                        onChange: (value) => action.execute(value as string),
+                    }
             }
         })
     }

@@ -3,6 +3,7 @@ export enum ToolbarItemType {
     Color = 'color',
     Width = 'width',
     Style = 'style',
+    Background = 'background',
     Toggle = 'toggle',
     Separator = 'separator',
 }

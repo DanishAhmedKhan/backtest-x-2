@@ -23,6 +23,12 @@ export type DrawingAction =
           execute: (style: string) => void
       }
     | {
+          id: 'background'
+          label: string
+          value: string
+          execute: (style: string) => void
+      }
+    | {
           id: 'settings'
           label: string
           execute: () => void

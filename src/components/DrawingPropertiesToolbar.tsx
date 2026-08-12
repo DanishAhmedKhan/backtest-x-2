@@ -47,6 +47,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
     }
 
     const items = manager.getToolbarItems()
+    console.log(items)
 
     return (
         <FloatingToolbar storageKey="drawing-properties-toolbar">
@@ -86,6 +87,60 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                         width={16}
                                                         height={16}
                                                         svg={svg.pencil}
+                                                    />
+                                                    <div
+                                                        className="drawing-color-indicator"
+                                                        style={{
+                                                            backgroundImage: `
+                                                                    linear-gradient(${color}, ${color}),
+                                                                    repeating-conic-gradient(
+                                                                        #d0d0d0 0% 25%,
+                                                                        #ffffff 0% 50%
+                                                                    )
+                                                                `,
+                                                        }}
+                                                    />
+                                                </div>
+                                            </button>
+                                        )}
+                                        dropdown={({ close }) => (
+                                            <ColorPicker
+                                                selected={color}
+                                                onSelect={(newColor) => {
+                                                    item.onChange?.(newColor)
+                                                    close()
+                                                }}
+                                                onChange={(newColor) => {
+                                                    item.onChange?.(newColor)
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                )
+                            }
+
+                            case ToolbarItemType.Background: {
+                                const color = item.value as string
+
+                                return (
+                                    <ToolbarDropdown
+                                        key={item.id}
+                                        selectedId={item.id}
+                                        options={[]}
+                                        tooltip={item.tooltip}
+                                        renderTrigger={({ open, toggleDropdown }) => (
+                                            <button
+                                                type="button"
+                                                className={`toolbar-trigger ${open ? 'active' : ''}`}
+                                                title={item.tooltip}
+                                                onClick={toggleDropdown}
+                                            >
+                                                <div className="drawing-color-trigger">
+                                                    <ToolIcon
+                                                        className="drawing-color-icon"
+                                                        width={16}
+                                                        height={20}
+                                                        svg={svg.fill}
                                                     />
                                                     <div
                                                         className="drawing-color-indicator"
