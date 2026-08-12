@@ -22,6 +22,7 @@ export class EditController {
             {
                 drawing: hit.drawing,
                 target: hit.target,
+                handle: hit.handle,
             },
             event.anchor,
             hit.drawing.clone(),

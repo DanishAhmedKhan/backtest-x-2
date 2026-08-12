@@ -1,21 +1,12 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { RectangleDrawing } from '../drawings/RectangleDrawing'
+import { RectangleHandle } from '../hitTest/RectangleHitTester'
 
 import type { DrawingEditor } from './DrawingEditor'
 import { DrawingType } from '../drawings/DrawingType'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { EditingSession } from './EditingSession'
-import { HitTarget } from '../hitTest/HitTestResult'
-
-type RectangleHandle =
-    | HitTarget.TopLeft
-    | HitTarget.Top
-    | HitTarget.TopRight
-    | HitTarget.Right
-    | HitTarget.BottomRight
-    | HitTarget.Bottom
-    | HitTarget.BottomLeft
-    | HitTarget.Left
+import { HitTarget } from '../hitTest/HitTarget'
 
 const rectangleHandleAxes: Record<
     RectangleHandle,
@@ -24,42 +15,42 @@ const rectangleHandleAxes: Record<
         vertical: 'top' | 'bottom' | null
     }
 > = {
-    [HitTarget.TopLeft]: {
+    [RectangleHandle.TopLeft]: {
         horizontal: 'left',
         vertical: 'top',
     },
 
-    [HitTarget.Top]: {
+    [RectangleHandle.Top]: {
         horizontal: null,
         vertical: 'top',
     },
 
-    [HitTarget.TopRight]: {
+    [RectangleHandle.TopRight]: {
         horizontal: 'right',
         vertical: 'top',
     },
 
-    [HitTarget.Right]: {
+    [RectangleHandle.Right]: {
         horizontal: 'right',
         vertical: null,
     },
 
-    [HitTarget.BottomRight]: {
+    [RectangleHandle.BottomRight]: {
         horizontal: 'right',
         vertical: 'bottom',
     },
 
-    [HitTarget.Bottom]: {
+    [RectangleHandle.Bottom]: {
         horizontal: null,
         vertical: 'bottom',
     },
 
-    [HitTarget.BottomLeft]: {
+    [RectangleHandle.BottomLeft]: {
         horizontal: 'left',
         vertical: 'bottom',
     },
 
-    [HitTarget.Left]: {
+    [RectangleHandle.Left]: {
         horizontal: 'left',
         vertical: null,
     },
@@ -87,8 +78,8 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
             return
         }
 
-        if (this.isRectangleHandle(target.target)) {
-            this.resize(drawing, original, target.target, event)
+        if (target.target === HitTarget.Handle && target.handle !== null) {
+            this.resize(drawing, original, target.handle, event)
         }
     }
 
@@ -103,8 +94,11 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         const axes = rectangleHandleAxes[handle]
 
         const originalLeft = Math.min(original.start.logical, original.end.logical)
+
         const originalRight = Math.max(original.start.logical, original.end.logical)
+
         const originalTop = Math.max(original.start.price, original.end.price)
+
         const originalBottom = Math.min(original.start.price, original.end.price)
 
         let left = originalLeft
@@ -167,18 +161,5 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
             logical: original.end.logical + dx,
             price: original.end.price + dy,
         }
-    }
-
-    private isRectangleHandle(target: HitTarget): target is RectangleHandle {
-        return (
-            target === HitTarget.TopLeft ||
-            target === HitTarget.Top ||
-            target === HitTarget.TopRight ||
-            target === HitTarget.Right ||
-            target === HitTarget.BottomRight ||
-            target === HitTarget.Bottom ||
-            target === HitTarget.BottomLeft ||
-            target === HitTarget.Left
-        )
     }
 }

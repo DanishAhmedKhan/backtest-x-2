@@ -1,14 +1,14 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+import { TrendLineHandle } from '../hitTest/TrendLineHitTester'
+import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
 
 import type { DrawingEditor } from './DrawingEditor'
-
+import { DrawingType } from '../drawings/DrawingType'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { EditingSession } from './EditingSession'
-import { HitTarget } from '../hitTest/HitTestResult'
-import { DrawingType } from '../drawings/DrawingType'
+import { HitTarget } from '../hitTest/HitTarget'
 import type { TimeCoordinateResolver } from '../renderer/TimeCoordinateResolver'
-import { TrendLineSnapper } from '../geometry/TrebdLineSnapper'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
@@ -32,12 +32,16 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
         const drawing = target.drawing as TrendLineDrawing
 
         switch (target.target) {
-            case HitTarget.StartHandle:
-                this.moveStartHandle(drawing, event)
-                break
+            case HitTarget.Handle:
+                switch (target.handle) {
+                    case TrendLineHandle.Start:
+                        this.moveStartHandle(drawing, event)
+                        break
 
-            case HitTarget.EndHandle:
-                this.moveEndHandle(drawing, event)
+                    case TrendLineHandle.End:
+                        this.moveEndHandle(drawing, event)
+                        break
+                }
                 break
 
             case HitTarget.Body:

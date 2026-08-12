@@ -1,7 +1,7 @@
 import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
-import { HitTarget } from './HitTestResult'
+import { HitTarget } from './HitTarget'
 import { HitTestConstants } from './HitTestConstant'
 
 import type { Drawing } from '../drawings/Drawing'
@@ -33,6 +33,7 @@ export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineD
             return {
                 drawing,
                 target: HitTarget.Body,
+                handle: null,
                 cursor: CursorType.Move,
             }
         }

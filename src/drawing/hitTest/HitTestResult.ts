@@ -1,25 +1,10 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { CursorType } from '../../core/cursor/CursorType'
+import type { HitTarget } from './HitTarget'
 
-export enum HitTarget {
-    None = 'none',
-
-    Body = 'body',
-    StartHandle = 'start-handle',
-    EndHandle = 'end-handle',
-
-    TopLeft = 'top-left',
-    Top = 'top',
-    TopRight = 'top-right',
-    Right = 'right',
-    BottomRight = 'bottom-right',
-    Bottom = 'bottom',
-    BottomLeft = 'bottom-left',
-    Left = 'left',
-}
-
-export interface HitTestResult {
+export type HitTestResult<THandle = null> = {
     drawing: Drawing
     target: HitTarget
+    handle: THandle | null
     cursor: CursorType
 }

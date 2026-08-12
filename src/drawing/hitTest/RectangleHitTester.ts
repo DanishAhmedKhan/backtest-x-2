@@ -1,7 +1,7 @@
 import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
-import { HitTarget } from './HitTestResult'
+import { HitTarget } from './HitTarget'
 import { HitTestConstants } from './HitTestConstant'
 
 import type { Drawing } from '../drawings/Drawing'
@@ -11,7 +11,18 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 import { CursorType } from '../../core/cursor/CursorType'
 
-export class RectangleHitTester implements DrawingHitTester<RectangleDrawing> {
+export enum RectangleHandle {
+    TopLeft = 'top-left',
+    Top = 'top',
+    TopRight = 'top-right',
+    Right = 'right',
+    BottomRight = 'bottom-right',
+    Bottom = 'bottom',
+    BottomLeft = 'bottom-left',
+    Left = 'left',
+}
+
+export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, RectangleHandle> {
     public canHitTest(drawing: Drawing): drawing is RectangleDrawing {
         return drawing.type === DrawingType.Rectangle
     }
@@ -38,51 +49,56 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing> {
         const centerX = (left + right) / 2
         const centerY = (top + bottom) / 2
 
-        const handles = [
+        const handles: {
+            handle: RectangleHandle
+            x: number
+            y: number
+            cursor: CursorType
+        }[] = [
             {
-                target: HitTarget.TopLeft,
+                handle: RectangleHandle.TopLeft,
                 x: left,
                 y: top,
                 cursor: CursorType.NWSE,
             },
             {
-                target: HitTarget.Top,
+                handle: RectangleHandle.Top,
                 x: centerX,
                 y: top,
                 cursor: CursorType.NS,
             },
             {
-                target: HitTarget.TopRight,
+                handle: RectangleHandle.TopRight,
                 x: right,
                 y: top,
                 cursor: CursorType.NESW,
             },
             {
-                target: HitTarget.Right,
+                handle: RectangleHandle.Right,
                 x: right,
                 y: centerY,
                 cursor: CursorType.EW,
             },
             {
-                target: HitTarget.BottomRight,
+                handle: RectangleHandle.BottomRight,
                 x: right,
                 y: bottom,
                 cursor: CursorType.NWSE,
             },
             {
-                target: HitTarget.Bottom,
+                handle: RectangleHandle.Bottom,
                 x: centerX,
                 y: bottom,
                 cursor: CursorType.NS,
             },
             {
-                target: HitTarget.BottomLeft,
+                handle: RectangleHandle.BottomLeft,
                 x: left,
                 y: bottom,
                 cursor: CursorType.NESW,
             },
             {
-                target: HitTarget.Left,
+                handle: RectangleHandle.Left,
                 x: left,
                 y: centerY,
                 cursor: CursorType.EW,
@@ -93,7 +109,8 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing> {
             if (Math.abs(mouse.x - handle.x) <= tolerance && Math.abs(mouse.y - handle.y) <= tolerance) {
                 return {
                     drawing,
-                    target: handle.target,
+                    target: HitTarget.Handle,
+                    handle: handle.handle,
                     cursor: handle.cursor,
                 }
             }
@@ -103,6 +120,7 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing> {
             return {
                 drawing,
                 target: HitTarget.Body,
+                handle: null,
                 cursor: CursorType.Move,
             }
         }

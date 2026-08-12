@@ -1,8 +1,8 @@
 import type { Drawing } from '../drawings/Drawing'
-import type { HitTarget } from '../hitTest/HitTestResult'
+import type { HitTarget } from '../hitTest/HitTarget'
 
-export interface EditTarget {
+export type EditTarget = {
     drawing: Drawing
-
     target: HitTarget
+    handle: null
 }

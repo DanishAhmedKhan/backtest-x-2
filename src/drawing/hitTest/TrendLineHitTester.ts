@@ -1,7 +1,7 @@
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
-import { HitTarget } from './HitTestResult'
+import { HitTarget } from './HitTarget'
 import { HitTestConstants } from './HitTestConstant'
 
 import type { Drawing } from '../drawings/Drawing'
@@ -12,7 +12,12 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import { CursorType } from '../../core/cursor/CursorType'
 import { LineGeometry } from '../geometry/LineGeometry'
 
-export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
+export enum TrendLineHandle {
+    Start = 'start',
+    End = 'end',
+}
+
+export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, TrendLineHandle> {
     public canHitTest(drawing: Drawing): drawing is TrendLineDrawing {
         return drawing.type === DrawingType.TrendLine
     }
@@ -31,15 +36,11 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
             return null
         }
 
-        const segment = {
-            start,
-            end,
-        }
-
         if (LineGeometry.isNearHandle(mouse, start, HitTestConstants.HANDLE_RADIUS)) {
             return {
                 drawing,
-                target: HitTarget.StartHandle,
+                target: HitTarget.Handle,
+                handle: TrendLineHandle.Start,
                 cursor: CursorType.Move,
             }
         }
@@ -47,15 +48,22 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing> {
         if (LineGeometry.isNearHandle(mouse, end, HitTestConstants.HANDLE_RADIUS)) {
             return {
                 drawing,
-                target: HitTarget.EndHandle,
+                target: HitTarget.Handle,
+                handle: TrendLineHandle.End,
                 cursor: CursorType.Move,
             }
+        }
+
+        const segment = {
+            start,
+            end,
         }
 
         if (LineGeometry.isNearBody(mouse, segment, tolerance)) {
             return {
                 drawing,
                 target: HitTarget.Body,
+                handle: null,
                 cursor: CursorType.Move,
             }
         }
