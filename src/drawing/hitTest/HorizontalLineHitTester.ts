@@ -2,7 +2,6 @@ import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTarget'
-import { HitTestConstants } from './HitTestConstant'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -20,7 +19,7 @@ export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineD
         drawing: HorizontalLineDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
-        tolerance = HitTestConstants.HOVER_LINE_TOLERANCE,
+        tolerance: number,
     ) {
         const line = transformer.toPoint(drawing.anchor)
         const mouse = transformer.toPoint(point)

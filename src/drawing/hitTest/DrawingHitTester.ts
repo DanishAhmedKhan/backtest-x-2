@@ -3,6 +3,7 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 
 import type { HitTestResult } from './HitTestResult'
+import type { DrawingHitTestContext } from './DrawingHitTestContext'
 
 export interface DrawingHitTester<TDrawing extends Drawing = Drawing, THandle = null> {
     canHitTest(drawing: Drawing): drawing is TDrawing
@@ -12,5 +13,6 @@ export interface DrawingHitTester<TDrawing extends Drawing = Drawing, THandle = 
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
         tolerance?: number,
+        state?: DrawingHitTestContext,
     ): HitTestResult<THandle> | null
 }

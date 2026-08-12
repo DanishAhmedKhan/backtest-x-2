@@ -50,7 +50,7 @@ export class DrawingContext {
 
     public readonly drawingStateManager = new DrawingStateManager()
 
-    public readonly hitTestManager = new HitTestManager(this.drawingManager)
+    public readonly hitTestManager = new HitTestManager(this.drawingManager, this.drawingStateManager)
 
     public readonly editingSession = new EditingSession()
 

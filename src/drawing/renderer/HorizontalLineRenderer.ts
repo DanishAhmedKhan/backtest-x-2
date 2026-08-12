@@ -1,12 +1,13 @@
-import type { Drawing } from '../drawings/Drawing'
 import { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 
-import type { CoordinateTransformer } from './CoordinateTransformer'
-import type { DrawingRenderer } from './DrawingRenderer'
-
-import { DrawingPrimitives } from './DrawingPrimitives'
+import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderer } from './DrawingRenderer'
+import type { CoordinateTransformer } from './CoordinateTransformer'
+
+import { DrawingPrimitives } from './DrawingPrimitives'
+import { DrawingHandles } from './DrawingHandles'
 
 export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDrawing> {
     public canRender(drawing: Drawing): drawing is HorizontalLineDrawing {
@@ -39,7 +40,7 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
                 x: width - 100,
                 y: anchor.y,
             }
-            DrawingPrimitives.circle(ctx, handle, 5, '#fff', drawing.color)
+            DrawingHandles.square(ctx, handle, state.selected === drawing)
         }
     }
 

@@ -1,12 +1,13 @@
-import type { Drawing } from '../drawings/Drawing'
 import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 
-import type { CoordinateTransformer } from './CoordinateTransformer'
+import type { Drawing } from '../drawings/Drawing'
+import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderer } from './DrawingRenderer'
+import type { DrawingRenderState } from './DrawingrendererState'
+import type { CoordinateTransformer } from './CoordinateTransformer'
 
 import { DrawingPrimitives } from './DrawingPrimitives'
-import { DrawingType } from '../drawings/DrawingType'
-import type { DrawingRenderState } from './DrawingrendererState'
+import { DrawingHandles, HandleType } from './DrawingHandles'
 
 export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
     public canRender(drawing: Drawing): drawing is RectangleDrawing {
@@ -55,7 +56,7 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
                     right,
                     bottom,
                 },
-                drawing.color,
+                state.selected === drawing,
             )
         }
     }
@@ -68,26 +69,33 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
             right: number
             bottom: number
         },
-        color: string,
+        selected: boolean = false,
     ) {
         const { left, top, right, bottom } = rect
 
         const handles = [
-            { x: left, y: top },
-            { x: (left + right) / 2, y: top },
-            { x: right, y: top },
+            { x: (left + right) / 2, y: top, type: HandleType.SQUARE },
+            { x: (left + right) / 2, y: bottom, type: HandleType.SQUARE },
 
-            { x: right, y: (top + bottom) / 2 },
+            { x: left, y: top, type: HandleType.CIRCLE },
+            { x: left, y: bottom, type: HandleType.CIRCLE },
+            { x: left, y: (top + bottom) / 2, type: HandleType.SQUARE },
 
-            { x: right, y: bottom },
-            { x: (left + right) / 2, y: bottom },
-            { x: left, y: bottom },
-
-            { x: left, y: (top + bottom) / 2 },
+            { x: right, y: top, type: HandleType.CIRCLE },
+            { x: right, y: (top + bottom) / 2, type: HandleType.SQUARE },
+            { x: right, y: bottom, type: HandleType.CIRCLE },
         ]
 
         for (const handle of handles) {
-            DrawingPrimitives.square(ctx, handle, 6, '#fff', color)
+            switch (handle.type) {
+                case HandleType.CIRCLE:
+                    DrawingHandles.circle(ctx, handle, selected)
+                    break
+
+                case HandleType.SQUARE:
+                    DrawingHandles.square(ctx, handle, selected)
+                    break
+            }
         }
     }
 

@@ -1,12 +1,13 @@
-import type { Drawing } from '../drawings/Drawing'
 import type { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 
-import type { CoordinateTransformer } from './CoordinateTransformer'
-import type { DrawingRenderer } from './DrawingRenderer'
-
-import { DrawingPrimitives } from './DrawingPrimitives'
+import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderer } from './DrawingRenderer'
+import type { CoordinateTransformer } from './CoordinateTransformer'
+
+import { DrawingPrimitives } from './DrawingPrimitives'
+import { DrawingHandles } from './DrawingHandles'
 
 export class VerticalLineRenderer implements DrawingRenderer<VerticalLineDrawing> {
     public canRender(drawing: Drawing): drawing is VerticalLineDrawing {
@@ -39,8 +40,7 @@ export class VerticalLineRenderer implements DrawingRenderer<VerticalLineDrawing
                 x: anchor.x,
                 y: height - 100,
             }
-
-            DrawingPrimitives.circle(ctx, handle, 5, '#fff', drawing.color)
+            DrawingHandles.square(ctx, handle, state.selected === drawing)
         }
     }
 

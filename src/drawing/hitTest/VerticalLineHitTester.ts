@@ -2,7 +2,6 @@ import type { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTarget'
-import { HitTestConstants } from './HitTestConstant'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -20,7 +19,7 @@ export class VerticalLineHitTester implements DrawingHitTester<VerticalLineDrawi
         drawing: VerticalLineDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
-        tolerance = HitTestConstants.HOVER_LINE_TOLERANCE,
+        tolerance: number,
     ) {
         const line = transformer.toPoint(drawing.anchor)
         const mouse = transformer.toPoint(point)

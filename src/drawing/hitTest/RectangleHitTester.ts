@@ -2,7 +2,7 @@ import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTarget'
-import { HitTestConstants } from './HitTestConstant'
+import type { DrawingHitTestContext } from './DrawingHitTestContext'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -10,6 +10,7 @@ import type { DrawingAnchor } from '../models/DrawingAnchor'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 import { CursorType } from '../../core/cursor/CursorType'
+import { RectangleGeometry } from '../geometry/RectangleGeometry'
 
 export enum RectangleHandle {
     TopLeft = 'top-left',
@@ -31,7 +32,8 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
         drawing: RectangleDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
-        tolerance = HitTestConstants.HANDLE_TOLERANCE,
+        tolerance: number,
+        context?: DrawingHitTestContext,
     ) {
         const start = transformer.toPoint(drawing.start)
         const end = transformer.toPoint(drawing.end)
@@ -116,7 +118,18 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
             }
         }
 
-        if (mouse.x >= left && mouse.x <= right && mouse.y >= top && mouse.y <= bottom) {
+        if (RectangleGeometry.isNearBoundary(mouse, left, top, right, bottom, tolerance)) {
+            return {
+                drawing,
+                target: HitTarget.Body,
+                handle: null,
+                cursor: CursorType.Move,
+            }
+        }
+
+        const isSelected = context?.selected === drawing
+
+        if (isSelected && mouse.x > left && mouse.x < right && mouse.y > top && mouse.y < bottom) {
             return {
                 drawing,
                 target: HitTarget.Body,
@@ -128,5 +141,3 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
         return null
     }
 }
-
-// thanks the handle is working fine. i want to make a change the hit test for the rectangle should be only around the boundary of the rectangle and no inside the interior. so the selection and hover should only work on the border and not from inside the rectangle. this is how tradingview rectabgle works.

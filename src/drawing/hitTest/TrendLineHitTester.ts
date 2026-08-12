@@ -26,7 +26,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, Tr
         drawing: TrendLineDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
-        tolerance = HitTestConstants.HOVER_LINE_TOLERANCE,
+        tolerance: number,
     ) {
         const start = transformer.toPoint(drawing.start)
         const end = transformer.toPoint(drawing.end)

@@ -1,10 +1,13 @@
+import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
-import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { DrawingRenderer } from './DrawingRenderer'
-import { CoordinateTransformer } from './CoordinateTransformer'
 import type { DrawingRenderState } from './DrawingrendererState'
+import { CoordinateTransformer } from './CoordinateTransformer'
+
 import { DrawingPrimitives } from './DrawingPrimitives'
+import { DrawingHandles } from './DrawingHandles'
 
 export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
     public canRender(drawing: Drawing): drawing is TrendLineDrawing {
@@ -28,8 +31,8 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width, drawing.style)
 
         if (hovered || selected) {
-            DrawingPrimitives.circle(ctx, start, 5, '#fff', drawing.color)
-            DrawingPrimitives.circle(ctx, end, 5, '#fff', drawing.color)
+            DrawingHandles.circle(ctx, start, selected)
+            DrawingHandles.circle(ctx, end, selected)
         }
     }
 
