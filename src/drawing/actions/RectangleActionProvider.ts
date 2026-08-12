@@ -24,7 +24,7 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
 
     public getActions(drawing: RectangleDrawing): DrawingAction[] {
         return [
-            ...StrokeActions.getActions(drawing, this.drawingStateManager, this.renderInvalidator),
+            StrokeActions.color(drawing, this.drawingStateManager, this.renderInvalidator),
 
             {
                 id: 'background',
@@ -37,6 +37,9 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
                     this.renderInvalidator.invalidate()
                 },
             },
+
+            StrokeActions.width(drawing, this.drawingStateManager, this.renderInvalidator),
+            StrokeActions.style(drawing, this.drawingStateManager, this.renderInvalidator),
 
             {
                 id: 'settings',

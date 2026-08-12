@@ -47,7 +47,6 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
     }
 
     const items = manager.getToolbarItems()
-    console.log(items)
 
     return (
         <FloatingToolbar storageKey="drawing-properties-toolbar">
@@ -139,7 +138,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     <ToolIcon
                                                         className="drawing-color-icon"
                                                         width={16}
-                                                        height={20}
+                                                        height={16}
                                                         svg={svg.fill}
                                                     />
                                                     <div

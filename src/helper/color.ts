@@ -1,5 +1,9 @@
-export function hexToRgba(hex, opacity = 100) {
+export function hexToRgba(hex: string, opacity = 100) {
     const value = hex.replace('#', '').trim()
+
+    if (value.length !== 6 && value.length !== 8) {
+        return hex
+    }
 
     if (!/^[0-9a-fA-F]{6}$/.test(value)) {
         return hex
@@ -9,48 +13,70 @@ export function hexToRgba(hex, opacity = 100) {
     const g = parseInt(value.slice(2, 4), 16)
     const b = parseInt(value.slice(4, 6), 16)
 
+    if ([r, g, b].some(Number.isNaN)) {
+        return hex
+    }
+
     const alpha = Math.max(0, Math.min(100, opacity)) / 100
 
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
-export function rgbaToHex(color) {
+export function rgbaToHex(color: string) {
     if (!color) {
         return '#000000'
     }
 
-    const hexMatch = color.match(/^#([0-9a-f]{6})$/i)
+    const value = color.trim()
 
-    if (hexMatch) {
-        return `#${hexMatch[1]}`
+    if (/^#[0-9a-fA-F]{6}$/.test(value)) {
+        return value
     }
 
-    const rgbMatch = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*[\d.]+)?\s*\)/i)
-
-    if (!rgbMatch) {
-        return '#000000'
+    if (/^#[0-9a-fA-F]{8}$/.test(value)) {
+        return value.slice(0, 7)
     }
 
-    const [, r, g, b] = rgbMatch
+    const match = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)/i)
+
+    if (!match) {
+        return color
+    }
+
+    const [, r, g, b] = match
 
     return '#' + [r, g, b].map((value) => Number(value).toString(16).padStart(2, '0')).join('')
 }
 
-export function getColorOpacity(color) {
+export function getColorOpacity(color: string) {
     if (!color) {
         return 100
     }
 
-    const match = color.match(/rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*([\d.]+))?\s*\)/i)
+    const value = color.trim()
+
+    if (/^#[0-9a-fA-F]{8}$/.test(value)) {
+        const alpha = parseInt(value.slice(7, 9), 16)
+
+        return Math.round((alpha / 255) * 100)
+    }
+
+    if (/^#[0-9a-fA-F]{6}$/.test(value)) {
+        return 100
+    }
+
+    const match = value.match(/rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*[,/]\s*([\d.]+%?))?\s*\)/i)
 
     if (!match || match[1] === undefined) {
         return 100
     }
 
-    return Math.round(Math.max(0, Math.min(1, Number(match[1]))) * 100)
+    const alpha = match[1].endsWith('%') ? Number(match[1].slice(0, -1)) : Number(match[1]) * 100
+
+    return Math.round(Math.max(0, Math.min(100, alpha)))
 }
 
-export function getRgb(color) {
+export function getRgb(color: string) {
     const hex = rgbaToHex(color)
 
     return {
@@ -60,7 +86,7 @@ export function getRgb(color) {
     }
 }
 
-export function getHexFromRgb(r, g, b) {
+export function getHexFromRgb(r: number, g: number, b: number) {
     return (
         '#' +
         [r, g, b]
@@ -73,62 +99,13 @@ export function getHexFromRgb(r, g, b) {
     )
 }
 
-export function rgbToHsl(r, g, b) {
-    r /= 255
-    g /= 255
-    b /= 255
+export function hsvToHex(h: number, s: number, v: number) {
+    s /= 100
+    v /= 100
 
-    const max = Math.max(r, g, b)
-    const min = Math.min(r, g, b)
-
-    let h = 0
-    let s = 0
-
-    const l = (max + min) / 2
-
-    if (max !== min) {
-        const d = max - min
-
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-
-        switch (max) {
-            case r:
-                h = (g - b) / d + (g < b ? 6 : 0)
-                break
-
-            case g:
-                h = (b - r) / d + 2
-                break
-
-            case b:
-                h = (r - g) / d + 4
-                break
-        }
-
-        h /= 6
-    }
-
-    return {
-        h: h * 360,
-        s: s * 100,
-        l: l * 100,
-    }
-}
-
-export function hexToHsl(hex) {
-    const { r, g, b } = getRgb(hex)
-
-    return rgbToHsl(r, g, b)
-}
-
-export function hslToRgb(h, s, l) {
-    h = ((h % 360) + 360) % 360
-    s = Math.max(0, Math.min(100, s)) / 100
-    l = Math.max(0, Math.min(100, l)) / 100
-
-    const c = (1 - Math.abs(2 * l - 1)) * s
+    const c = v * s
     const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
-    const m = l - c / 2
+    const m = v - c
 
     let r = 0
     let g = 0
@@ -154,19 +131,43 @@ export function hslToRgb(h, s, l) {
         b = x
     }
 
-    return {
-        r: Math.round((r + m) * 255),
-        g: Math.round((g + m) * 255),
-        b: Math.round((b + m) * 255),
+    return getHexFromRgb(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255))
+}
+
+export function hexToHsv(hex: string) {
+    const { r, g, b } = getRgb(hex)
+
+    const red = r / 255
+    const green = g / 255
+    const blue = b / 255
+
+    const max = Math.max(red, green, blue)
+    const min = Math.min(red, green, blue)
+
+    const delta = max - min
+
+    let h = 0
+
+    if (delta !== 0) {
+        if (max === red) {
+            h = 60 * (((green - blue) / delta) % 6)
+        } else if (max === green) {
+            h = 60 * ((blue - red) / delta + 2)
+        } else {
+            h = 60 * ((red - green) / delta + 4)
+        }
     }
-}
 
-export function hslToHex(h, s, l) {
-    const { r, g, b } = hslToRgb(h, s, l)
+    if (h < 0) {
+        h += 360
+    }
 
-    return getHexFromRgb(r, g, b)
-}
+    const s = max === 0 ? 0 : (delta / max) * 100
+    const v = max * 100
 
-export function getHueColor(hue) {
-    return `hsl(${hue}, 100%, 50%)`
+    return {
+        h,
+        s,
+        v,
+    }
 }

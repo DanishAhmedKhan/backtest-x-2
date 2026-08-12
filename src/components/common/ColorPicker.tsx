@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { ToolIcon } from '../ui/ToolbarIcon'
 
-import { getColorOpacity, getHexFromRgb, hexToHsl, hexToRgba, hslToRgb, rgbaToHex } from '../../helper/color'
+import { getColorOpacity, hexToHsv, hexToRgba, hsvToHex, rgbaToHex } from '../../helper/color'
 import svg from '../../svg/svg'
 
 import { STORAGE_KEYS } from '../../storage/key'
@@ -59,11 +59,14 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
     const [showCustomPicker, setShowCustomPicker] = useState(false)
     const [customColor, setCustomColor] = useState(selectedHex)
 
-    const initialHsl = hexToHsl(selectedHex)
+    const initialHsv = hexToHsv(selectedHex)
 
-    const [hue, setHue] = useState(initialHsl.h)
-    const [saturation, setSaturation] = useState(initialHsl.s)
-    const [lightness, setLightness] = useState(initialHsl.l)
+    const [hue, setHue] = useState(initialHsv.h)
+    const [saturation, setSaturation] = useState(initialHsv.s)
+    const [value, setValue] = useState(initialHsv.v)
+
+    const gradientRef = useRef<HTMLDivElement>(null)
+    const gradientDraggingRef = useRef(false)
 
     const updateOpacityState = (value) => {
         setOpacityState({
@@ -83,12 +86,12 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
     }
 
     const openCustomPicker = () => {
-        const hsl = hexToHsl(selectedHex)
+        const hsv = hexToHsv(selectedHex)
 
         setCustomColor(selectedHex)
-        setHue(hsl.h)
-        setSaturation(hsl.s)
-        setLightness(hsl.l)
+        setHue(hsv.h)
+        setSaturation(hsv.s)
+        setValue(hsv.v)
         setShowCustomPicker(true)
     }
 
@@ -99,92 +102,32 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
             return
         }
 
-        const hsl = hexToHsl(value)
+        const hsv = hexToHsv(value)
 
-        setHue(hsl.h)
-        setSaturation(hsl.s)
-        setLightness(hsl.l)
+        setHue(hsv.h)
+        setSaturation(hsv.s)
+        setValue(hsv.v)
     }
 
-    const handleGradientMouseDown = (event) => {
-        const updateGradient = (clientX: number, clientY: number) => {
-            const rect = event.currentTarget.getBoundingClientRect()
+    const updateGradientColor = (clientX: number, clientY: number) => {
+        const element = gradientRef.current
 
-            const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+        if (!element) return
 
-            const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
+        const rect = element.getBoundingClientRect()
 
-            const hueRgb = hslToRgb(hue, 100, 50)
+        const x = Math.max(0, Math.min(rect.width, clientX - rect.left))
+        const y = Math.max(0, Math.min(rect.height, clientY - rect.top))
 
-            const red = Math.round(255 + (hueRgb.r - 255) * x)
-            const green = Math.round(255 + (hueRgb.g - 255) * x)
-            const blue = Math.round(255 + (hueRgb.b - 255) * x)
+        const nextSaturation = (x / rect.width) * 100
+        const nextValue = 100 - (y / rect.height) * 100
 
-            const darkenedRed = Math.round(red * (1 - y))
-            const darkenedGreen = Math.round(green * (1 - y))
-            const darkenedBlue = Math.round(blue * (1 - y))
+        setSaturation(nextSaturation)
+        setValue(nextValue)
 
-            const nextColor = getHexFromRgb(darkenedRed, darkenedGreen, darkenedBlue)
+        const nextColor = hsvToHex(hue, nextSaturation, nextValue)
 
-            setSaturation(x * 100)
-            setLightness((1 - y) * 50)
-            setCustomColor(nextColor)
-        }
-
-        updateGradient(event.clientX, event.clientY)
-
-        const handleMouseMove = (moveEvent) => {
-            updateGradient(moveEvent.clientX, moveEvent.clientY)
-        }
-
-        const handleMouseUp = () => {
-            window.removeEventListener('mousemove', handleMouseMove)
-            window.removeEventListener('mouseup', handleMouseUp)
-        }
-
-        window.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('mouseup', handleMouseUp)
-    }
-
-    const handleHueMouseDown = (event) => {
-        const rect = event.currentTarget.getBoundingClientRect()
-
-        const updateHue = (clientY: number) => {
-            const position = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
-
-            const nextHue = position * 360
-
-            setHue(nextHue)
-
-            const hueRgb = hslToRgb(nextHue, 100, 50)
-
-            const x = saturation / 100
-            const y = 1 - lightness / 50
-
-            const red = Math.round(255 + (hueRgb.r - 255) * x)
-            const green = Math.round(255 + (hueRgb.g - 255) * x)
-            const blue = Math.round(255 + (hueRgb.b - 255) * x)
-
-            const darkenedRed = Math.round(red * (1 - y))
-            const darkenedGreen = Math.round(green * (1 - y))
-            const darkenedBlue = Math.round(blue * (1 - y))
-
-            setCustomColor(getHexFromRgb(darkenedRed, darkenedGreen, darkenedBlue))
-        }
-
-        updateHue(event.clientY)
-
-        const handleMouseMove = (moveEvent) => {
-            updateHue(moveEvent.clientY)
-        }
-
-        const handleMouseUp = () => {
-            window.removeEventListener('mousemove', handleMouseMove)
-            window.removeEventListener('mouseup', handleMouseUp)
-        }
-
-        window.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('mouseup', handleMouseUp)
+        setCustomColor(nextColor)
     }
 
     const handleAddCustomColor = () => {
@@ -199,6 +142,85 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
         saveCustomColors(nextColors)
 
         onSelect(hexToRgba(normalizedColor, currentOpacity))
+    }
+
+    const handleGradientPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        gradientDraggingRef.current = true
+
+        event.currentTarget.setPointerCapture(event.pointerId)
+
+        updateGradientColor(event.clientX, event.clientY)
+    }
+
+    const handleGradientPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!gradientDraggingRef.current) return
+
+        event.preventDefault()
+
+        updateGradientColor(event.clientX, event.clientY)
+    }
+
+    const handleGradientPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+        gradientDraggingRef.current = false
+
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId)
+        }
+    }
+
+    const handleGradientPointerCancel = () => {
+        gradientDraggingRef.current = false
+    }
+
+    const hueDraggingRef = useRef(false)
+    const [hueDragging, setHueDragging] = useState(false)
+
+    const updateHue = (clientY: number, element: HTMLElement) => {
+        const rect = element.getBoundingClientRect()
+
+        const position = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
+
+        const nextHue = position * 360
+        setHue(nextHue)
+
+        const nextColor = hsvToHex(nextHue, saturation, value)
+        setCustomColor(nextColor)
+    }
+
+    const handleHuePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        event.preventDefault()
+
+        updateHue(event.clientY, event.currentTarget)
+
+        event.currentTarget.setPointerCapture(event.pointerId)
+
+        hueDraggingRef.current = true
+    }
+
+    const handleHuePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!hueDraggingRef.current) {
+            return
+        }
+
+        event.preventDefault()
+
+        if (!hueDragging) {
+            setHueDragging(true)
+        }
+
+        updateHue(event.clientY, event.currentTarget)
+    }
+
+    const handleHuePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+        hueDraggingRef.current = false
+        setHueDragging(false)
+
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId)
+        }
     }
 
     const gradientHueColor = `hsl(${hue}, 100%, 50%)`
@@ -239,6 +261,7 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
 
                     <div className="custom-color-body">
                         <div
+                            ref={gradientRef}
                             className="custom-color-gradient"
                             style={{
                                 background: `
@@ -255,30 +278,36 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                                     ${gradientHueColor}
                                 `,
                             }}
-                            onMouseDown={handleGradientMouseDown}
+                            onPointerDown={handleGradientPointerDown}
+                            onPointerMove={handleGradientPointerMove}
+                            onPointerUp={handleGradientPointerUp}
+                            onPointerCancel={handleGradientPointerCancel}
                         >
                             <div
                                 className="custom-color-gradient-handle"
                                 style={{
                                     left: `${saturation}%`,
-                                    top: `${100 - (lightness / 50) * 100}%`,
+                                    top: `${100 - value}%`,
                                 }}
                             />
                         </div>
 
-                        <div className="custom-color-hue" onMouseDown={handleHueMouseDown}>
+                        <div
+                            className={`custom-color-hue ${hueDragging ? 'dragging' : ''}`}
+                            onPointerDown={handleHuePointerDown}
+                            onPointerMove={handleHuePointerMove}
+                            onPointerUp={handleHuePointerUp}
+                            onPointerCancel={handleHuePointerUp}
+                        >
                             <div
                                 className="custom-color-hue-handle"
                                 style={{
-                                    top: `${(hue / 360) * 100}%`,
+                                    top: `calc(3px + (100% - 6px) * ${hue / 360})`,
+                                    background: `hsl(${hue}, 100%, 50%)`,
                                 }}
                             />
                         </div>
                     </div>
-
-                    {/* <button type="button" className="custom-color-back" onClick={() => setShowCustomPicker(false)}>
-                        Back
-                    </button> */}
                 </div>
             </div>
         )

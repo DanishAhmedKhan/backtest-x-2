@@ -3,10 +3,10 @@ import { DrawingType } from './DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 
 export class RectangleDrawing extends DrawingObject {
-    public color = '#2962FF'
+    public color = '#2962ff'
     public style = 'solid'
     public width = 1
-    public backgropund = '#2962FF66'
+    public backgropund = '#2962ff66'
 
     constructor(id: string, public start: DrawingAnchor, public end: DrawingAnchor) {
         super(id, DrawingType.Rectangle)
