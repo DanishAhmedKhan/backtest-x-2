@@ -26,34 +26,68 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
             return
         }
 
-        const x = Math.min(start.x, end.x)
-        const y = Math.min(start.y, end.y)
-        const width = Math.abs(end.x - start.x)
-        const height = Math.abs(end.y - start.y)
+        const left = Math.min(start.x, end.x)
+        const right = Math.max(start.x, end.x)
+        const top = Math.min(start.y, end.y)
+        const bottom = Math.max(start.y, end.y)
+
+        const width = right - left
+        const height = bottom - top
 
         DrawingPrimitives.rectangle(
             ctx,
-            x,
-            y,
+            left,
+            top,
             width,
             height,
             drawing.color,
             drawing.width,
             drawing.style,
-            drawing.backgropund,
+            drawing.background,
         )
 
         if (state.hovered === drawing || state.selected === drawing) {
-            DrawingPrimitives.circle(
+            this.renderHandles(
                 ctx,
                 {
-                    x: end.x,
-                    y: end.y,
+                    left,
+                    top,
+                    right,
+                    bottom,
                 },
-                5,
-                '#fff',
                 drawing.color,
             )
+        }
+    }
+
+    private renderHandles(
+        ctx: CanvasRenderingContext2D,
+        rect: {
+            left: number
+            top: number
+            right: number
+            bottom: number
+        },
+        color: string,
+    ) {
+        const { left, top, right, bottom } = rect
+
+        const handles = [
+            { x: left, y: top },
+            { x: (left + right) / 2, y: top },
+            { x: right, y: top },
+
+            { x: right, y: (top + bottom) / 2 },
+
+            { x: right, y: bottom },
+            { x: (left + right) / 2, y: bottom },
+            { x: left, y: bottom },
+
+            { x: left, y: (top + bottom) / 2 },
+        ]
+
+        for (const handle of handles) {
+            DrawingPrimitives.square(ctx, handle, 6, '#fff', color)
         }
     }
 

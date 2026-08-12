@@ -89,14 +89,17 @@ export class DrawingPrimitives {
         ctx: CanvasRenderingContext2D,
         center: Point,
         size: number,
-        borderColor: string,
-        borderWidth: number,
-        borderStyle: string,
         backgroundColor: string,
+        borderColor: string,
     ) {
         const x = center.x - size / 2
         const y = center.y - size / 2
 
-        this.rectangle(ctx, x, y, size, size, borderColor, borderWidth, borderStyle, backgroundColor)
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(x, y, size, size)
+
+        ctx.strokeStyle = borderColor
+        ctx.lineWidth = 2
+        ctx.strokeRect(x, y, size, size)
     }
 }

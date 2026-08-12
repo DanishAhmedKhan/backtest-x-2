@@ -6,9 +6,10 @@ export const CursorType = {
     Crosshair: 'crosshair',
     Grab: 'grab',
     Grabbing: 'grabbing',
-    NsResize: 'ns-resize',
-    EwResize: 'ew-resize',
-    NwseResize: 'nwse-resize',
+    NS: 'ns-resize',
+    EW: 'ew-resize',
+    NWSE: 'nwse-resize',
+    NESW: 'nesw-resize',
 } as const
 
 export type CursorType = (typeof CursorType)[keyof typeof CursorType]

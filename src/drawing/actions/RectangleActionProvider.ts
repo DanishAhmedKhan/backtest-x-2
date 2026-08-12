@@ -29,9 +29,9 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
             {
                 id: 'background',
                 label: 'Background Color',
-                value: drawing.backgropund,
+                value: drawing.background,
                 execute: (backgroundColor) => {
-                    drawing.backgropund = backgroundColor
+                    drawing.background = backgroundColor
 
                     this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
