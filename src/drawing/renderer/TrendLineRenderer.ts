@@ -3,7 +3,7 @@ import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderer } from './DrawingRenderer'
-import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderState } from './DrawingRenderState'
 import { CoordinateTransformer } from './CoordinateTransformer'
 
 import { DrawingPrimitives } from './DrawingPrimitives'
@@ -23,16 +23,13 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
         const start = transformer.toPoint(drawing.start)
         const end = transformer.toPoint(drawing.end)
 
-        const hovered = state.hovered === drawing
-        const selected = state.selected === drawing
-
         if (!start || !end) return
 
         DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width, drawing.style)
 
-        if (hovered || selected) {
-            DrawingHandles.circle(ctx, start, selected)
-            DrawingHandles.circle(ctx, end, selected)
+        if (state.active) {
+            DrawingHandles.circle(ctx, start, state.selected)
+            DrawingHandles.circle(ctx, end, state.selected)
         }
     }
 

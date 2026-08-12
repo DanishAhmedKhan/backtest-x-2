@@ -1,7 +1,6 @@
 import type { Drawing } from '../drawings/Drawing'
 
-export interface DrawingRenderState {
+export interface GlobalDrawingRenderState {
     hovered: Drawing | null
-
     selected: Drawing | null
 }

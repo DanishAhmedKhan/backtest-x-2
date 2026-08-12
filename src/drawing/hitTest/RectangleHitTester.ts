@@ -118,12 +118,12 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
             }
         }
 
-        if (RectangleGeometry.isNearBoundary(mouse, left, top, right, bottom, tolerance)) {
+        if (RectangleGeometry.isNearBoundary(mouse, start, end, tolerance)) {
             return {
                 drawing,
                 target: HitTarget.Body,
                 handle: null,
-                cursor: CursorType.Move,
+                cursor: CursorType.Pointer,
             }
         }
 
@@ -134,7 +134,7 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
                 drawing,
                 target: HitTarget.Body,
                 handle: null,
-                cursor: CursorType.Move,
+                cursor: CursorType.Pointer,
             }
         }
 

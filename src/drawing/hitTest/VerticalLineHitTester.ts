@@ -33,7 +33,7 @@ export class VerticalLineHitTester implements DrawingHitTester<VerticalLineDrawi
                 drawing,
                 target: HitTarget.Body,
                 handle: null,
-                cursor: CursorType.Move,
+                cursor: CursorType.Pointer,
             }
         }
 

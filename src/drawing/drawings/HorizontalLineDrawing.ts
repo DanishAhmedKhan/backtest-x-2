@@ -3,7 +3,7 @@ import type { DrawingAnchor } from '../models/DrawingAnchor'
 import { DrawingObject } from './DrawingObject'
 
 export class HorizontalLineDrawing extends DrawingObject {
-    public color = '#2962FF'
+    public color = '#2962ff'
     public style = 'solid'
     public width = 2
 

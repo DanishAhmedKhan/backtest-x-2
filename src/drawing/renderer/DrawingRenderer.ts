@@ -1,6 +1,6 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { CoordinateTransformer } from './CoordinateTransformer'
-import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderState } from './DrawingRenderState'
 
 export interface DrawingRenderer<T extends Drawing = Drawing> {
     canRender(drawing: Drawing): drawing is T

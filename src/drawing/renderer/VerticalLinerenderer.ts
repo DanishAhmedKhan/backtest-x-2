@@ -2,7 +2,7 @@ import type { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
-import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderState } from './DrawingRenderState'
 import type { DrawingRenderer } from './DrawingRenderer'
 import type { CoordinateTransformer } from './CoordinateTransformer'
 
@@ -35,12 +35,12 @@ export class VerticalLineRenderer implements DrawingRenderer<VerticalLineDrawing
             drawing.style,
         )
 
-        if (state.hovered === drawing || state.selected === drawing) {
+        if (state.hovered || state.selected) {
             const handle = {
                 x: anchor.x,
                 y: height - 100,
             }
-            DrawingHandles.square(ctx, handle, state.selected === drawing)
+            DrawingHandles.square(ctx, handle, state.selected)
         }
     }
 

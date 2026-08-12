@@ -3,7 +3,7 @@ import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingRenderer } from './DrawingRenderer'
-import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderState } from './DrawingRenderState'
 import type { CoordinateTransformer } from './CoordinateTransformer'
 
 import { DrawingPrimitives } from './DrawingPrimitives'
@@ -47,7 +47,7 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
             drawing.background,
         )
 
-        if (state.hovered === drawing || state.selected === drawing) {
+        if (state.active) {
             this.renderHandles(
                 ctx,
                 {
@@ -56,7 +56,7 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
                     right,
                     bottom,
                 },
-                state.selected === drawing,
+                state.selected,
             )
         }
     }

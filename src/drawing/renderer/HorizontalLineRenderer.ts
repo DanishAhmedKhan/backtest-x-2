@@ -2,7 +2,7 @@ import { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
-import type { DrawingRenderState } from './DrawingrendererState'
+import type { DrawingRenderState } from './DrawingRenderState'
 import type { DrawingRenderer } from './DrawingRenderer'
 import type { CoordinateTransformer } from './CoordinateTransformer'
 
@@ -35,12 +35,12 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
             drawing.style,
         )
 
-        if (state.hovered === drawing || state.selected === drawing) {
+        if (state.active) {
             const handle = {
                 x: width - 100,
                 y: anchor.y,
             }
-            DrawingHandles.square(ctx, handle, state.selected === drawing)
+            DrawingHandles.square(ctx, handle, state.selected)
         }
     }
 

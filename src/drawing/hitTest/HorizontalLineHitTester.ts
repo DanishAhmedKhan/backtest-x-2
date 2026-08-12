@@ -33,7 +33,7 @@ export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineD
                 drawing,
                 target: HitTarget.Body,
                 handle: null,
-                cursor: CursorType.Move,
+                cursor: CursorType.Pointer,
             }
         }
 

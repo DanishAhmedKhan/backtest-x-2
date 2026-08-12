@@ -6,7 +6,7 @@ export class RectangleDrawing extends DrawingObject {
     public color = '#2962ff'
     public style = 'solid'
     public width = 1
-    public background = '#2962ff66'
+    public background = '#2962ff33'
 
     constructor(id: string, public start: DrawingAnchor, public end: DrawingAnchor) {
         super(id, DrawingType.Rectangle)

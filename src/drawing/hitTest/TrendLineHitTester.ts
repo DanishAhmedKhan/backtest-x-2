@@ -41,7 +41,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, Tr
                 drawing,
                 target: HitTarget.Handle,
                 handle: TrendLineHandle.Start,
-                cursor: CursorType.Move,
+                cursor: CursorType.Default,
             }
         }
 
@@ -50,7 +50,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, Tr
                 drawing,
                 target: HitTarget.Handle,
                 handle: TrendLineHandle.End,
-                cursor: CursorType.Move,
+                cursor: CursorType.Default,
             }
         }
 
@@ -64,7 +64,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, Tr
                 drawing,
                 target: HitTarget.Body,
                 handle: null,
-                cursor: CursorType.Move,
+                cursor: CursorType.Pointer,
             }
         }
 
