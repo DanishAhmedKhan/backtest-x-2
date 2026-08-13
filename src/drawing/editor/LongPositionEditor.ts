@@ -18,76 +18,88 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) {
-            return
-        }
+        if (!target) return
 
         const drawing = target.drawing as LongPositionDrawing
         const original = session.getOriginalDrawing() as LongPositionDrawing
 
-        if (!original) {
+        if (!original) return
+
+        if (target.target === HitTarget.Body) {
+            this.moveBody(drawing, original, session, event)
             return
         }
 
-        switch (target.target) {
-            case HitTarget.Handle:
-                switch (target.handle) {
-                    case LongPositionHandle.Start:
-                        this.moveStart(drawing, event)
-                        break
+        if (target.target !== HitTarget.Handle) {
+            return
+        }
 
-                    case LongPositionHandle.End:
-                        this.moveEnd(drawing, event)
-                        break
-
-                    case LongPositionHandle.Top:
-                        this.moveTop(drawing, event)
-                        break
-
-                    case LongPositionHandle.Bottom:
-                        this.moveBottom(drawing, event)
-                        break
-                }
+        switch (target.handle) {
+            case LongPositionHandle.Start:
+                this.moveStart(drawing, original, event)
                 break
 
-            case HitTarget.Body:
-                this.moveBody(drawing, original, session, event)
+            case LongPositionHandle.End:
+                this.moveEnd(drawing, original, event)
+                break
+
+            case LongPositionHandle.Top:
+                this.moveTop(drawing, original, event)
+                break
+
+            case LongPositionHandle.Bottom:
+                this.moveBottom(drawing, original, event)
                 break
         }
     }
 
     public endEdit(_session: EditingSession) {}
 
-    private moveStart(drawing: LongPositionDrawing, event: ChartPointerEvent) {
-        drawing.start = {
-            ...drawing.start,
-            logical: event.anchor.logical,
-            price: event.anchor.price,
-        }
+    private moveStart(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+        const topPrice = Math.max(original.top.price, original.bottom.price)
+        const bottomPrice = Math.min(original.top.price, original.bottom.price)
+
+        const price = Math.max(bottomPrice, Math.min(topPrice, event.anchor.price))
+
+        const logical = event.anchor.logical
+
+        drawing.start = { ...original.start, logical, price }
+        drawing.top = { ...original.top, logical }
+        drawing.bottom = { ...original.bottom, logical }
+        drawing.end = { ...original.end, price }
     }
 
-    private moveEnd(drawing: LongPositionDrawing, event: ChartPointerEvent) {
-        drawing.end = {
-            ...drawing.end,
-            logical: event.anchor.logical,
-            price: event.anchor.price,
-        }
+    private moveEnd(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+        const logical = Math.max(event.anchor.logical, original.start.logical)
+
+        drawing.end = { ...original.end, logical }
+        drawing.start = { ...original.start }
+        drawing.top = { ...original.top }
+        drawing.bottom = { ...original.bottom }
     }
 
-    private moveTop(drawing: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveTop(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
         drawing.top = {
-            ...drawing.top,
-            logical: event.anchor.logical,
+            ...original.top,
+            logical: original.top.logical,
             price: event.anchor.price,
         }
+
+        drawing.start = { ...original.start }
+        drawing.end = { ...original.end }
+        drawing.bottom = { ...original.bottom }
     }
 
-    private moveBottom(drawing: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveBottom(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
         drawing.bottom = {
-            ...drawing.bottom,
-            logical: event.anchor.logical,
+            ...original.bottom,
+            logical: original.bottom.logical,
             price: event.anchor.price,
         }
+
+        drawing.start = { ...original.start }
+        drawing.end = { ...original.end }
+        drawing.top = { ...original.top }
     }
 
     private moveBody(
@@ -103,7 +115,6 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         }
 
         const logicalDelta = event.anchor.logical - startPointer.logical
-
         const priceDelta = event.anchor.price - startPointer.price
 
         drawing.start = {

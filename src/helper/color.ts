@@ -171,3 +171,11 @@ export function hexToHsv(hex: string) {
         v,
     }
 }
+
+export function removeAlpha(color: string): string {
+    if (/^#[0-9a-fA-F]{8}$/.test(color)) {
+        return color.slice(0, 7)
+    }
+
+    return color
+}

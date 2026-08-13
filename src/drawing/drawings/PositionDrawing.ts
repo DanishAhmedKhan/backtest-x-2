@@ -10,7 +10,7 @@ export enum PositionDirection {
 export abstract class PositionDrawing extends DrawingObject {
     public profitColor = '#26a69a44'
     public lossColor = '#ef535044'
-    public lineColor = '#2962ff'
+    public lineColor = '#aaa'
 
     constructor(
         id: string,
