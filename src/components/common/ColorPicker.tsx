@@ -46,11 +46,14 @@ function saveCustomColors(colors) {
 
 export function ColorPicker({ selected, onSelect, onChange }: Props) {
     const selectedHex = rgbaToHex(selected)
+    const selectedOpacity = getColorOpacity(selected)
 
     const [opacityState, setOpacityState] = useState(() => ({
         color: selectedHex,
-        value: getColorOpacity(selected),
+        value: selectedOpacity,
     }))
+
+    const [opacityInput, setOpacityInput] = useState(() => String(selectedOpacity))
 
     const currentOpacity =
         opacityState.color.toLowerCase() === selectedHex.toLowerCase() ? opacityState.value : getColorOpacity(selected)
@@ -68,7 +71,13 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
     const gradientRef = useRef<HTMLDivElement>(null)
     const gradientDraggingRef = useRef(false)
 
-    const updateOpacityState = (value) => {
+    const updateOpacity = (value: number) => {
+        updateOpacityState(value)
+        setOpacityInput(String(value))
+        onChange?.(hexToRgba(selectedHex, value))
+    }
+
+    const updateOpacityState = (value: number) => {
         setOpacityState({
             color: selectedHex,
             value,
@@ -77,12 +86,15 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
 
     const handleOpacityChange = (event) => {
         const value = Number(event.target.value)
-        updateOpacityState(value)
-        onChange?.(hexToRgba(selectedHex, value))
+        updateOpacity(value)
     }
 
-    const handleColorSelect = (color) => {
-        onSelect(hexToRgba(color, currentOpacity))
+    const handleColorSelect = (color: string) => {
+        const rgba = hexToRgba(color, currentOpacity)
+
+        setOpacityInput(String(currentOpacity))
+
+        onSelect(rgba)
     }
 
     const openCustomPicker = () => {
@@ -107,6 +119,32 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
         setHue(hsv.h)
         setSaturation(hsv.s)
         setValue(hsv.v)
+    }
+
+    const handleOpacityInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+
+        if (value === '') {
+            setOpacityInput('')
+            return
+        }
+
+        if (!/^\d+$/.test(value)) return
+        if (Number(value) > 100) return
+        if (value.length === 3 && value !== '100') return
+
+        setOpacityInput(value)
+
+        const opacity = Number(value)
+
+        updateOpacityState(opacity)
+        onChange?.(hexToRgba(selectedHex, opacity))
+    }
+
+    const handleOpacityInputBlur = () => {
+        if (opacityInput === '') {
+            setOpacityInput(String(currentOpacity))
+        }
     }
 
     const updateGradientColor = (clientX: number, clientY: number) => {
@@ -405,7 +443,18 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                     />
                 </div>
 
-                <div className="opacity-input">{currentOpacity}%</div>
+                <div className="opacity-input">
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        value={opacityInput}
+                        onChange={handleOpacityInputChange}
+                        onBlur={handleOpacityInputBlur}
+                        aria-label="Opacity percentage"
+                    />
+
+                    <span>%</span>
+                </div>
             </div>
         </div>
     )

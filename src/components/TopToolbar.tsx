@@ -100,6 +100,7 @@ export default function TopToolbar({
                 ))}
 
                 <ToolbarArrowDropdown
+                    width={100}
                     selectedId={`tf-${timeframe.toKey()}`}
                     options={timeframeOptions}
                     onChange={(option) => {

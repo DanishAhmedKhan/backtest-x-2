@@ -18,7 +18,7 @@ type Props = {
     manager: DrawingToolbarManager
 }
 
-const WIDTHS = [1, 2, 3, 4, 5]
+const WIDTHS = [1, 2, 3, 4]
 
 const BUTTON_ICONS: Record<string, string> = {
     delete: svg.delete,
@@ -203,23 +203,55 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                         title={item.tooltip}
                                                         onClick={toggleDropdown}
                                                     >
-                                                        <div className="drawing-width-trigger-inner">
-                                                            <div
-                                                                className="drawing-width-line"
-                                                                style={{
-                                                                    height: width,
-                                                                }}
-                                                            />
+                                                        <ToolIcon
+                                                            svg={svg.line[`line${width}`]}
+                                                            width={18}
+                                                            height={width}
+                                                        />
 
-                                                            <span className="drawing-width-label">{width}px</span>
-                                                        </div>
+                                                        <span className="drawing-width-label">{width}px</span>
                                                     </button>
                                                 </div>
                                             )
                                         }}
-                                        onChange={(option) => {
-                                            item.onChange?.(Number(option.id))
-                                        }}
+                                        dropdown={({ select, close }) => (
+                                            <div className="drawing-width-dropdown">
+                                                {WIDTHS.map((width) => {
+                                                    const isSelected = Number(item.value) === width
+
+                                                    return (
+                                                        <button
+                                                            key={width}
+                                                            type="button"
+                                                            className={`drawing-width-option ${
+                                                                isSelected ? 'selected' : ''
+                                                            }`}
+                                                            onClick={() => {
+                                                                select({
+                                                                    id: String(width),
+                                                                    label: `${width}px`,
+                                                                })
+
+                                                                item.onChange?.(width)
+                                                                close()
+                                                            }}
+                                                        >
+                                                            <span className="drawing-width-option-icon">
+                                                                <ToolIcon
+                                                                    width={18}
+                                                                    height={width}
+                                                                    svg={svg.line[`line${width}`]}
+                                                                />
+                                                            </span>
+
+                                                            <span className="drawing-width-option-label">
+                                                                {width}px
+                                                            </span>
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
                                     />
                                 )
 

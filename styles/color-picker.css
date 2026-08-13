@@ -139,6 +139,34 @@
     color: #222;
     box-sizing: border-box;
     flex-shrink: 0;
+    background: #fff;
+}
+
+.opacity-input input {
+    width: 25px;
+    height: 100%;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #222;
+    font-size: 12px;
+    text-align: right;
+    box-sizing: border-box;
+    appearance: textfield;
+}
+
+.opacity-input input::-webkit-inner-spin-button,
+.opacity-input input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.opacity-input span {
+    flex-shrink: 0;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-left: 1px;
 }
 
 /* CUSTOM COLOR PICKER */

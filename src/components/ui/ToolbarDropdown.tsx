@@ -93,7 +93,7 @@ export function ToolbarDropdown({
     }, [open])
 
     return (
-        <div ref={ref} className="toolbar-dropdown" style={{ width }}>
+        <div ref={ref} className="toolbar-dropdown">
             {renderTrigger ? (
                 renderTrigger({
                     selected,
@@ -120,6 +120,7 @@ export function ToolbarDropdown({
                         ref={popupRef}
                         className="toolbar-dropdown-menu"
                         style={{
+                            width,
                             position: 'fixed',
                             left: position.left,
                             top: position.top,
