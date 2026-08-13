@@ -98,8 +98,9 @@ export class ChartRuntime {
         this.toolController = new ToolController(drawingContext.toolManager, chart)
 
         const editController = new EditController(
-            drawingContext.editingSession,
+            drawingContext.drawingStateManager,
             drawingContext.editorManager,
+            drawingContext.editingSession,
             this.renderLoop,
             this.toolController,
         )

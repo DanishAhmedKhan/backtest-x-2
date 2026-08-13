@@ -7,6 +7,7 @@ export class DrawingStateManager {
     private selected: Drawing | null = null
 
     private editing = false
+    private moving = false
 
     private readonly listeners = new Set<Listener>()
 
@@ -70,6 +71,19 @@ export class DrawingStateManager {
         }
 
         this.editing = value
+        this.notify()
+    }
+
+    public isMoving() {
+        return this.moving
+    }
+
+    public setMoving(value: boolean) {
+        if (this.moving === value) {
+            return
+        }
+
+        this.moving = value
         this.notify()
     }
 

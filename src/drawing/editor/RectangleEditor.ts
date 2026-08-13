@@ -66,9 +66,7 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) {
-            return
-        }
+        if (!target) return
 
         const drawing = target.drawing as RectangleDrawing
         const original = session.getOriginalDrawing() as RectangleDrawing
@@ -94,11 +92,8 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         const axes = rectangleHandleAxes[handle]
 
         const originalLeft = Math.min(original.start.logical, original.end.logical)
-
         const originalRight = Math.max(original.start.logical, original.end.logical)
-
         const originalTop = Math.max(original.start.price, original.end.price)
-
         const originalBottom = Math.min(original.start.price, original.end.price)
 
         let left = originalLeft

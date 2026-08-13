@@ -82,7 +82,7 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         drawing.top = {
             ...original.top,
             logical: original.top.logical,
-            price: event.anchor.price,
+            price: Math.max(event.anchor.price, original.start.price),
         }
 
         drawing.start = { ...original.start }
@@ -94,7 +94,7 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         drawing.bottom = {
             ...original.bottom,
             logical: original.bottom.logical,
-            price: event.anchor.price,
+            price: Math.min(event.anchor.price, original.start.price),
         }
 
         drawing.start = { ...original.start }
