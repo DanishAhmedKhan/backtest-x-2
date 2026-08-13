@@ -28,6 +28,7 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
                 label: 'Profit Background Color',
                 value: drawing.profitColor,
                 execute: (color) => {
+                    console.log(color)
                     drawing.profitColor = color
 
                     this.drawingStateManager.refresh()

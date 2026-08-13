@@ -177,5 +177,11 @@ export function removeAlpha(color: string): string {
         return color.slice(0, 7)
     }
 
+    const rgbaMatch = color.match(/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*[\d.]+\s*\)$/i)
+
+    if (rgbaMatch) {
+        return `rgb(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]})`
+    }
+
     return color
 }

@@ -24,7 +24,7 @@ export class ToolbarModelBuilder {
 
                 case 'color':
                     return {
-                        id: action.id,
+                        id: action.label,
                         type: ToolbarItemType.Color,
                         tooltip: action.label,
                         value: action.value,
@@ -34,7 +34,7 @@ export class ToolbarModelBuilder {
 
                 case 'line-width':
                     return {
-                        id: action.id,
+                        id: action.label,
                         type: ToolbarItemType.Width,
                         tooltip: action.label,
                         value: action.value,
@@ -44,7 +44,7 @@ export class ToolbarModelBuilder {
 
                 case 'style':
                     return {
-                        id: action.id,
+                        id: action.label,
                         type: ToolbarItemType.Style,
                         tooltip: action.label,
                         value: action.value,
@@ -54,7 +54,7 @@ export class ToolbarModelBuilder {
 
                 case 'background':
                     return {
-                        id: action.id,
+                        id: action.label,
                         type: ToolbarItemType.Background,
                         tooltip: action.label,
                         value: action.value,

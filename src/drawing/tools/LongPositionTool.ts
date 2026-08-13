@@ -39,13 +39,13 @@ export class LongPositionTool implements Tool {
         if (!start) return
 
         const end = {
-            x: start.x + 100,
+            x: start.x + 150,
             y: start.y,
         }
 
         const top = {
             x: start.x,
-            y: start.y - 100,
+            y: start.y - 150,
         }
 
         const bottom = {
