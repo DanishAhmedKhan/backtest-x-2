@@ -6,6 +6,8 @@ export class DrawingStateManager {
     private hovered: Drawing | null = null
     private selected: Drawing | null = null
 
+    private editing = false
+
     private readonly listeners = new Set<Listener>()
 
     private notify() {
@@ -56,6 +58,19 @@ export class DrawingStateManager {
 
     public clearSelection() {
         this.setSelected(null)
+    }
+
+    public isEditing() {
+        return this.editing
+    }
+
+    public setEditing(value: boolean) {
+        if (this.editing === value) {
+            return
+        }
+
+        this.editing = value
+        this.notify()
     }
 
     public isSelected(drawing: Drawing) {

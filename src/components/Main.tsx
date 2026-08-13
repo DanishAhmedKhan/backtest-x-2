@@ -172,7 +172,7 @@ export default function Main() {
 
             {showReplayToolbar && <ReplayToolbar />}
 
-            {drawingToolbarManager && <DrawingPropertiesToolbar manager={drawingToolbarManager} />}
+            <DrawingPropertiesToolbar manager={drawingToolbarManager} />
         </div>
     )
 }

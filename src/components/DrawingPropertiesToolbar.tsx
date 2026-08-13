@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Toolbar } from './ui/Toolbar'
 import { FloatingToolbar } from './ui/FloatingToolbar'
-import { ToolbarItemType } from '../drawing/toolbar/ToolbarItem'
+import { ToolbarItemType, type ToolbarItem } from '../drawing/toolbar/ToolbarItem'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
 import { ToolbarDropdown } from './ui/ToolbarDropdown'
@@ -34,22 +34,32 @@ function getButtonIcon(id: string) {
 }
 
 export function DrawingPropertiesToolbar({ manager }: Props) {
-    const [, forceUpdate] = useState(0)
+    const [isVisible, setIsVisible] = useState(() => manager?.isVisible() ?? false)
+    const [items, setItems] = useState<ToolbarItem[]>(() => manager?.getToolbarItems() ?? [])
 
     useEffect(() => {
+        if (!manager) return
+
         return manager.subscribe(() => {
-            forceUpdate((value) => value + 1)
+            const visible = manager.isVisible()
+
+            setIsVisible(visible)
+
+            if (visible) {
+                const nextItems = manager.getToolbarItems()
+
+                if (nextItems.length > 0) {
+                    setItems(nextItems)
+                }
+            }
         })
     }, [manager])
 
-    if (!manager.isVisible()) {
-        return null
-    }
-
-    const items = manager.getToolbarItems()
-
     return (
-        <FloatingToolbar storageKey="drawing-properties-toolbar">
+        <FloatingToolbar
+            className={isVisible ? 'floating-toolbar-visible' : 'floating-toolbar-hidden'}
+            storageKey="drawing-properties-toolbar"
+        >
             <Toolbar direction="horizontal">
                 <ToolbarGroup>
                     {items.map((item) => {

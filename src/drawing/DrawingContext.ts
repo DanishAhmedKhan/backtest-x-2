@@ -54,7 +54,7 @@ export class DrawingContext {
 
     public readonly editingSession = new EditingSession()
 
-    public readonly editorManager = new EditorManager()
+    public readonly editorManager = new EditorManager(this.drawingStateManager)
 
     public readonly drawingActionManager = new DrawingActionManager()
 

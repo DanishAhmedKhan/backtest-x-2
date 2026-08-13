@@ -49,6 +49,6 @@ export class DrawingToolbarManager {
     }
 
     public isVisible() {
-        return this.getDrawing() !== null
+        return this.getDrawing() !== null && !this.drawingStateManager.isEditing()
     }
 }

@@ -1,11 +1,13 @@
 import type { Drawing } from '../drawings/Drawing'
-import type { ChartPointerEvent } from '../models/ChartPointerEvents'
-
+import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { DrawingEditor } from './DrawingEditor'
 import type { EditingSession } from './EditingSession'
+import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 
 export class EditorManager {
     private readonly editors: DrawingEditor[] = []
+
+    constructor(private readonly drawingStateManager: DrawingStateManager) {}
 
     public register(editor: DrawingEditor) {
         this.editors.push(editor)
@@ -22,7 +24,10 @@ export class EditorManager {
             return
         }
 
-        this.getEditor(target.drawing)?.beginEdit(session, event)
+        this.drawingStateManager.setEditing(true)
+
+        const drawing = target.drawing
+        this.getEditor(drawing)?.beginEdit(session, event)
     }
 
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
@@ -43,5 +48,7 @@ export class EditorManager {
         }
 
         this.getEditor(target.drawing)?.endEdit(session)
+
+        this.drawingStateManager.setEditing(false)
     }
 }

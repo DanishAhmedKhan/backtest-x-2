@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ToolbarDropdownContent, ToolbarDropdownOption, ToolbarDropdownRenderContext } from './types'
+import { createPortal } from 'react-dom'
 
 export interface ToolbarDropdownProps {
     selectedId: string
@@ -39,7 +40,9 @@ export function ToolbarDropdown({
 
     useEffect(() => {
         function handleMouseDownOutside(event: MouseEvent) {
-            if (!ref.current?.contains(event.target as Node)) {
+            const target = event.target as Node
+
+            if (!ref.current?.contains(target) && !popupRef.current?.contains(target)) {
                 closeDropdown()
             }
         }
@@ -111,49 +114,53 @@ export function ToolbarDropdown({
                 </button>
             )}
 
-            {open && (
-                <div
-                    ref={popupRef}
-                    className="toolbar-dropdown-menu"
-                    style={{
-                        position: 'fixed',
-                        left: position.left,
-                        top: position.top,
-                    }}
-                >
-                    {dropdown
-                        ? dropdown({
-                              selectedId,
-                              close: closeDropdown,
-                              select: (option) => {
-                                  onChange?.(option)
-                                  closeDropdown()
-                              },
-                          })
-                        : options?.map((option) => (
-                              <button
-                                  type="button"
-                                  key={option.id}
-                                  className={`toolbar-dropdown-option ${option.id === selected?.id ? 'selected' : ''}`}
-                                  disabled={option.disabled}
-                                  onClick={() => {
+            {open &&
+                createPortal(
+                    <div
+                        ref={popupRef}
+                        className="toolbar-dropdown-menu"
+                        style={{
+                            position: 'fixed',
+                            left: position.left,
+                            top: position.top,
+                        }}
+                    >
+                        {dropdown
+                            ? dropdown({
+                                  selectedId,
+                                  close: closeDropdown,
+                                  select: (option) => {
                                       onChange?.(option)
                                       closeDropdown()
-                                  }}
-                              >
-                                  {option.icon}
+                                  },
+                              })
+                            : options?.map((option) => (
+                                  <button
+                                      type="button"
+                                      key={option.id}
+                                      className={`toolbar-dropdown-option ${
+                                          option.id === selected?.id ? 'selected' : ''
+                                      }`}
+                                      disabled={option.disabled}
+                                      onClick={() => {
+                                          onChange?.(option)
+                                          closeDropdown()
+                                      }}
+                                  >
+                                      {option.icon}
 
-                                  <div className="toolbar-dropdown-text">
-                                      <div>{option.label}</div>
+                                      <div className="toolbar-dropdown-text">
+                                          <div>{option.label}</div>
 
-                                      {option.subLabel && (
-                                          <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>
-                                      )}
-                                  </div>
-                              </button>
-                          ))}
-                </div>
-            )}
+                                          {option.subLabel && (
+                                              <div className="toolbar-dropdown-subtitle">{option.subLabel}</div>
+                                          )}
+                                      </div>
+                                  </button>
+                              ))}
+                    </div>,
+                    document.body,
+                )}
         </div>
     )
 }
