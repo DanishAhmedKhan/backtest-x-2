@@ -1,35 +1,41 @@
-export type DrawingAction =
-    | {
-          id: 'delete'
-          label: string
-          execute: () => void
-      }
-    | {
-          id: 'color'
-          label: string
-          value: string
-          execute: (color: string) => void
-      }
-    | {
-          id: 'line-width'
-          label: string
-          value: number
-          execute: (width: number) => void
-      }
-    | {
-          id: 'style'
-          label: string
-          value: string
-          execute: (style: string) => void
-      }
-    | {
-          id: 'background'
-          label: string
-          value: string
-          execute: (style: string) => void
-      }
-    | {
-          id: 'settings'
-          label: string
-          execute: () => void
-      }
+export type DrawingActionMap = {
+    delete: {
+        label: string
+        execute: () => void
+    }
+
+    color: {
+        label: string
+        value: string
+        execute: (value: string) => void
+    }
+
+    'line-width': {
+        label: string
+        value: number
+        execute: (value: number) => void
+    }
+
+    style: {
+        label: string
+        value: string
+        execute: (value: string) => void
+    }
+
+    background: {
+        label: string
+        value: string
+        execute: (value: string) => void
+    }
+
+    settings: {
+        label: string
+        execute: () => void
+    }
+}
+
+export type DrawingAction = {
+    [K in keyof DrawingActionMap]: {
+        id: K
+    } & DrawingActionMap[K]
+}[keyof DrawingActionMap]
