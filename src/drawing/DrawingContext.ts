@@ -18,26 +18,31 @@ import { TrendLineTool } from './tools/TrendLineTool'
 import { HorizontalLineTool } from './tools/HorizontalLineTool'
 import { VerticalLineTool } from './tools/VerticalLineTool'
 import { RectangleTool } from './tools/RectangleTool'
+import { LongPositionTool } from './tools/LongPositionTool'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
 import { VerticalLineRenderer } from './renderer/VerticalLinerenderer'
 import { RectangleRenderer } from './renderer/RectangleRenderer'
+import { LongPositionRenderer } from './renderer/LongPositionRenderer'
 
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
 import { VerticalLineHitTester } from './hitTest/VerticalLineHitTester'
 import { RectangleHitTester } from './hitTest/RectangleHitTester'
+import { LongPositionHitTester } from './hitTest/LongPositionHitTester'
 
 import { LineActionProvider } from './actions/LineActionProvider'
 import { HorizontalLineActionProvider } from './actions/HorizontalLineActionProvider'
 import { VerticalLineActionProvider } from './actions/VerticalLineActionProvider'
 import { RectangleActionProvider } from './actions/RectangleActionProvider'
+import { LongPositionActionProvider } from './actions/LongPositionActionProvider'
 
 import { TrendLineEditor } from './editor/TrendLineEditor'
 import { HorizontalLineEditor } from './editor/HorizontalLineEditor'
 import { VerticalLineEditor } from './editor/VerticalLineEditor'
 import { RectangleEditor } from './editor/RectangleEditor'
+import { LongPositionEditor } from './editor/LongPositionEditor'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -72,11 +77,13 @@ export class DrawingContext {
         this.rendererManager.register(new HorizontalLineRenderer())
         this.rendererManager.register(new VerticalLineRenderer())
         this.rendererManager.register(new RectangleRenderer())
+        this.rendererManager.register(new LongPositionRenderer())
 
         this.hitTestManager.register(new TrendLineHitTester())
         this.hitTestManager.register(new HorizontalLineHitTester())
         this.hitTestManager.register(new VerticalLineHitTester())
         this.hitTestManager.register(new RectangleHitTester())
+        this.hitTestManager.register(new LongPositionHitTester())
 
         this.toolManager.selectByType(ToolType.Pan)
     }
@@ -94,6 +101,15 @@ export class DrawingContext {
 
         this.toolManager.register(
             new RectangleTool(this.drawingManager, this.previewDrawingManager, this.drawingStateManager),
+        )
+
+        this.toolManager.register(
+            new LongPositionTool(
+                this.drawingManager,
+                this.previewDrawingManager,
+                this.drawingStateManager,
+                transformer,
+            ),
         )
     }
 
@@ -113,6 +129,10 @@ export class DrawingContext {
         this.drawingActionManager.register(
             new RectangleActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
         )
+
+        this.drawingActionManager.register(
+            new LongPositionActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+        )
     }
 
     public registerEditor(timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
@@ -120,5 +140,6 @@ export class DrawingContext {
         this.editorManager.register(new HorizontalLineEditor())
         this.editorManager.register(new VerticalLineEditor())
         this.editorManager.register(new RectangleEditor())
+        this.editorManager.register(new LongPositionEditor())
     }
 }

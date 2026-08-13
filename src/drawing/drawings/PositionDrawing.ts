@@ -1,0 +1,26 @@
+import { DrawingObject } from './DrawingObject'
+import { DrawingType } from './DrawingType'
+import type { DrawingAnchor } from '../models/DrawingAnchor'
+
+export enum PositionDirection {
+    Long = 'long',
+    Short = 'short',
+}
+
+export abstract class PositionDrawing extends DrawingObject {
+    public profitColor = '#26a69a44'
+    public lossColor = '#ef535044'
+    public lineColor = '#2962ff'
+
+    constructor(
+        id: string,
+        type: DrawingType,
+        public start: DrawingAnchor,
+        public end: DrawingAnchor,
+        public top: DrawingAnchor,
+        public bottom: DrawingAnchor,
+        public direction = PositionDirection.Long,
+    ) {
+        super(id, type)
+    }
+}

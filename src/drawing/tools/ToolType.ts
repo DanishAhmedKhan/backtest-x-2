@@ -9,4 +9,6 @@ export enum ToolType {
     VerticalLine = 'vertical-line',
     Rectangle = 'rectangle',
     Crossline = 'crossline',
+    LongPosition = 'LongPosition',
+    ShortPosition = 'ShortPosition',
 }

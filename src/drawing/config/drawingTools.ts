@@ -33,4 +33,14 @@ export const drawingTools: DrawingToolConfig[] = [
         icon: svg.tool.rectangle,
         label: 'Rectangle',
     },
+    {
+        type: ToolType.LongPosition,
+        icon: svg.tool.longPosition,
+        label: 'Long Position',
+    },
+    {
+        type: ToolType.ShortPosition,
+        icon: svg.tool.shortPosition,
+        label: 'Short Position',
+    },
 ]

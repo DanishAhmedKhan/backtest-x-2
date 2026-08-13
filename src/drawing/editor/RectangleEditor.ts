@@ -1,7 +1,7 @@
-import type { Drawing } from '../drawings/Drawing'
 import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 import { RectangleHandle } from '../hitTest/RectangleHitTester'
 
+import type { Drawing } from '../drawings/Drawing'
 import type { DrawingEditor } from './DrawingEditor'
 import { DrawingType } from '../drawings/DrawingType'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'

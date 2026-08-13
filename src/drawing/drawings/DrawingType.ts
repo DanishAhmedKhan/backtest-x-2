@@ -8,4 +8,6 @@ export enum DrawingType {
     VerticalLine = 'vertical-line',
     Rectangle = 'rectangle',
     Crossline = 'crossline',
+    LongPosition = 'long-position',
+    ShortPosition = 'short-position',
 }
