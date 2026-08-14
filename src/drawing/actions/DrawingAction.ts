@@ -39,3 +39,7 @@ export type DrawingAction = {
         id: K
     } & DrawingActionMap[K]
 }[keyof DrawingActionMap]
+
+export type ValueActionId = {
+    [K in keyof DrawingActionMap]: DrawingActionMap[K] extends { value: unknown } ? K : never
+}[keyof DrawingActionMap]

@@ -8,6 +8,7 @@ import type { DrawingActionProvider } from './DrawingActionProvider'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 
+import type { DrawingActionFactory } from './DrawinActionFactory'
 import { StrokeActions } from './StrokeActions'
 import { CommonDrawingActions } from './CommonDrawingActions'
 
@@ -16,6 +17,7 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
         private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly renderInvalidator: RenderInvalidator,
+        private readonly actionFactory: DrawingActionFactory,
     ) {}
 
     public canProvideActions(drawing: Drawing): drawing is RectangleDrawing {
@@ -24,7 +26,7 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
 
     public getActions(drawing: RectangleDrawing): DrawingAction[] {
         return [
-            StrokeActions.color(drawing, this.drawingStateManager, this.renderInvalidator),
+            StrokeActions.color(drawing, this.actionFactory),
 
             {
                 id: 'background',
@@ -38,23 +40,10 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
                 },
             },
 
-            StrokeActions.width(drawing, this.drawingStateManager, this.renderInvalidator),
-            StrokeActions.style(drawing, this.drawingStateManager, this.renderInvalidator),
+            StrokeActions.width(drawing, this.actionFactory),
+            StrokeActions.style(drawing, this.actionFactory),
 
-            {
-                id: 'settings',
-                label: 'Settings',
-                execute: () => {
-                    console.log('Open Rectangle Settings')
-                },
-            },
-
-            ...CommonDrawingActions.getActions(
-                drawing,
-                this.drawingManager,
-                this.drawingStateManager,
-                this.renderInvalidator,
-            ),
+            ...CommonDrawingActions.getActions(drawing, this.drawingManager, this.actionFactory),
         ]
     }
 }

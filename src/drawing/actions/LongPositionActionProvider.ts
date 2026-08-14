@@ -8,6 +8,7 @@ import type { DrawingActionProvider } from './DrawingActionProvider'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 
+import type { DrawingActionFactory } from './DrawinActionFactory'
 import { CommonDrawingActions } from './CommonDrawingActions'
 
 export class LongPositionActionProvider implements DrawingActionProvider<LongPositionDrawing> {
@@ -15,6 +16,7 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
         private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly renderInvalidator: RenderInvalidator,
+        private readonly actionFactory: DrawingActionFactory,
     ) {}
 
     public canProvideActions(drawing: Drawing): drawing is LongPositionDrawing {
@@ -47,12 +49,7 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
                 },
             },
 
-            ...CommonDrawingActions.getActions(
-                drawing,
-                this.drawingManager,
-                this.drawingStateManager,
-                this.renderInvalidator,
-            ),
+            ...CommonDrawingActions.getActions(drawing, this.drawingManager, this.actionFactory),
         ]
     }
 }

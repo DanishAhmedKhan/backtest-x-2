@@ -1,6 +1,5 @@
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { DrawingAction } from './DrawingAction'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+import type { DrawingActionFactory } from './DrawinActionFactory'
 
 type StrokeDrawing = {
     color: string
@@ -9,69 +8,29 @@ type StrokeDrawing = {
 }
 
 export class StrokeActions {
-    public static color(
-        drawing: StrokeDrawing,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
-    ): DrawingAction {
-        return {
-            id: 'color',
-            label: 'Border Color',
-            value: drawing.color,
-            execute: (color) => {
-                drawing.color = color
-
-                drawingStateManager.refresh()
-                renderInvalidator.invalidate()
-            },
-        }
+    public static color(drawing: StrokeDrawing, factory: DrawingActionFactory): DrawingAction {
+        return factory.create('color', 'Border Color', drawing.color, (color) => {
+            drawing.color = color
+        })
     }
 
-    public static width(
-        drawing: StrokeDrawing,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
-    ): DrawingAction {
-        return {
-            id: 'line-width',
-            label: 'Line Width',
-            value: drawing.width,
-            execute: (width) => {
-                drawing.width = width
-
-                drawingStateManager.refresh()
-                renderInvalidator.invalidate()
-            },
-        }
+    public static width(drawing: StrokeDrawing, factory: DrawingActionFactory): DrawingAction {
+        return factory.create('line-width', 'Line Width', drawing.width, (width) => {
+            drawing.width = width
+        })
     }
 
-    public static style(
-        drawing: StrokeDrawing,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
-    ): DrawingAction {
-        return {
-            id: 'style',
-            label: 'Style',
-            value: drawing.style,
-            execute: (style) => {
-                drawing.style = style
-
-                drawingStateManager.refresh()
-                renderInvalidator.invalidate()
-            },
-        }
+    public static style(drawing: StrokeDrawing, factory: DrawingActionFactory): DrawingAction {
+        return factory.create('style', 'Style', drawing.style, (style) => {
+            drawing.style = style
+        })
     }
 
-    public static getActions(
-        drawing: StrokeDrawing,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
-    ): DrawingAction[] {
+    public static getActions(drawing: StrokeDrawing, factory: DrawingActionFactory): DrawingAction[] {
         return [
-            StrokeActions.color(drawing, drawingStateManager, renderInvalidator),
-            StrokeActions.width(drawing, drawingStateManager, renderInvalidator),
-            StrokeActions.style(drawing, drawingStateManager, renderInvalidator),
+            StrokeActions.color(drawing, factory),
+            StrokeActions.width(drawing, factory),
+            StrokeActions.style(drawing, factory),
         ]
     }
 }

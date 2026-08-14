@@ -12,6 +12,7 @@ import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
 import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
 import type { TimeCoordinateResolver } from './renderer/TimeCoordinateResolver'
+import { DrawingActionFactory } from './actions/DrawinActionFactory'
 
 import { PanTool } from './drawings/PanTool'
 import { TrendLineTool } from './tools/TrendLineTool'
@@ -114,24 +115,30 @@ export class DrawingContext {
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
+        const drawingActionFactory = new DrawingActionFactory(this.drawingStateManager, renderInvalidator)
+
+        this.drawingActionManager.register(new LineActionProvider(this.drawingManager, drawingActionFactory))
+
+        this.drawingActionManager.register(new HorizontalLineActionProvider(this.drawingManager, drawingActionFactory))
+
+        this.drawingActionManager.register(new VerticalLineActionProvider(this.drawingManager, drawingActionFactory))
+
         this.drawingActionManager.register(
-            new LineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+            new RectangleActionProvider(
+                this.drawingManager,
+                this.drawingStateManager,
+                renderInvalidator,
+                drawingActionFactory,
+            ),
         )
 
         this.drawingActionManager.register(
-            new HorizontalLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
-        )
-
-        this.drawingActionManager.register(
-            new VerticalLineActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
-        )
-
-        this.drawingActionManager.register(
-            new RectangleActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
-        )
-
-        this.drawingActionManager.register(
-            new LongPositionActionProvider(this.drawingManager, this.drawingStateManager, renderInvalidator),
+            new LongPositionActionProvider(
+                this.drawingManager,
+                this.drawingStateManager,
+                renderInvalidator,
+                drawingActionFactory,
+            ),
         )
     }
 

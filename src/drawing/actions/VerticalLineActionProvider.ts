@@ -4,17 +4,15 @@ import type { Drawing } from '../drawings/Drawing'
 import type { DrawingManager } from '../managers/DrawingManager'
 import type { DrawingAction } from './DrawingAction'
 import type { DrawingActionProvider } from './DrawingActionProvider'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
-
 import { CommonDrawingActions } from './CommonDrawingActions'
+
+import type { DrawingActionFactory } from './DrawinActionFactory'
 import { StrokeActions } from './StrokeActions'
 
 export class VerticalLineActionProvider implements DrawingActionProvider<VerticalLineDrawing> {
     constructor(
         private readonly drawingManager: DrawingManager,
-        private readonly drawingStateManager: DrawingStateManager,
-        private readonly renderInvalidator: RenderInvalidator,
+        private readonly actionFactory: DrawingActionFactory,
     ) {}
 
     public canProvideActions(drawing: Drawing): drawing is VerticalLineDrawing {
@@ -23,22 +21,8 @@ export class VerticalLineActionProvider implements DrawingActionProvider<Vertica
 
     public getActions(drawing: VerticalLineDrawing): DrawingAction[] {
         return [
-            ...StrokeActions.getActions(drawing, this.drawingStateManager, this.renderInvalidator),
-
-            {
-                id: 'settings',
-                label: 'Settings',
-                execute: () => {
-                    console.log('Open Vertical Line Settings')
-                },
-            },
-
-            ...CommonDrawingActions.getActions(
-                drawing,
-                this.drawingManager,
-                this.drawingStateManager,
-                this.renderInvalidator,
-            ),
+            ...StrokeActions.getActions(drawing, this.actionFactory),
+            ...CommonDrawingActions.getActions(drawing, this.drawingManager, this.actionFactory),
         ]
     }
 }

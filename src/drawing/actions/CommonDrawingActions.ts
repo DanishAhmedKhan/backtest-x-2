@@ -1,27 +1,24 @@
 import type { Drawing } from '../drawings/Drawing'
 import type { DrawingManager } from '../managers/DrawingManager'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { DrawingAction } from './DrawingAction'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
+
+import type { DrawingActionFactory } from './DrawinActionFactory'
 
 export class CommonDrawingActions {
     public static getActions(
         drawing: Drawing,
         drawingManager: DrawingManager,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
+        factory: DrawingActionFactory,
     ): DrawingAction[] {
         return [
             {
-                id: 'delete',
-                label: 'Delete',
+                id: 'settings',
+                label: 'Settings',
                 execute: () => {
-                    drawingManager.removeDrawing(drawing.id)
-
-                    drawingStateManager.clearSelection()
-                    renderInvalidator.invalidate()
+                    console.log('Open Rectangle Settings')
                 },
             },
+            factory.delete(drawing, drawingManager),
         ]
     }
 }

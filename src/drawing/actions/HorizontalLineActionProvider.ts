@@ -4,17 +4,15 @@ import type { Drawing } from '../drawings/Drawing'
 import type { DrawingManager } from '../managers/DrawingManager'
 import type { DrawingAction } from './DrawingAction'
 import type { DrawingActionProvider } from './DrawingActionProvider'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
-import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 
+import type { DrawingActionFactory } from './DrawinActionFactory'
 import { CommonDrawingActions } from './CommonDrawingActions'
 import { StrokeActions } from './StrokeActions'
 
 export class HorizontalLineActionProvider implements DrawingActionProvider<HorizontalLineDrawing> {
     constructor(
         private readonly drawingManager: DrawingManager,
-        private readonly drawingStateManager: DrawingStateManager,
-        private readonly renderInvalidator: RenderInvalidator,
+        private readonly actionFactory: DrawingActionFactory,
     ) {}
 
     public canProvideActions(drawing: Drawing): drawing is HorizontalLineDrawing {
@@ -23,22 +21,8 @@ export class HorizontalLineActionProvider implements DrawingActionProvider<Horiz
 
     public getActions(drawing: HorizontalLineDrawing): DrawingAction[] {
         return [
-            ...StrokeActions.getActions(drawing, this.drawingStateManager, this.renderInvalidator),
-
-            ...CommonDrawingActions.getActions(
-                drawing,
-                this.drawingManager,
-                this.drawingStateManager,
-                this.renderInvalidator,
-            ),
-
-            {
-                id: 'settings',
-                label: 'Settings',
-                execute: () => {
-                    console.log('Open Horizontal Line Settings')
-                },
-            },
+            ...StrokeActions.getActions(drawing, this.actionFactory),
+            ...CommonDrawingActions.getActions(drawing, this.drawingManager, this.actionFactory),
         ]
     }
 }

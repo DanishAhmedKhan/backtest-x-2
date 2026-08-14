@@ -1,6 +1,8 @@
+import type { Drawing } from '../drawings/Drawing'
+import type { DrawingManager } from '../managers/DrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { RenderInvalidator } from '../renderer/RenderInvalidator'
-import type { DrawingAction, DrawingActionMap } from './DrawingAction'
+import type { DrawingAction, DrawingActionMap, ValueActionId } from './DrawingAction'
 
 export class DrawingActionFactory {
     constructor(
@@ -27,7 +29,7 @@ export class DrawingActionFactory {
         } as DrawingAction
     }
 
-    public create<K extends keyof DrawingActionMap>(
+    public create<K extends ValueActionId>(
         id: K,
         label: string,
         value: DrawingActionMap[K] extends { value: infer V } ? V : never,
@@ -36,8 +38,6 @@ export class DrawingActionFactory {
         }
             ? (value: V) => void
             : never,
-        drawingStateManager: DrawingStateManager,
-        renderInvalidator: RenderInvalidator,
     ): DrawingAction {
         return {
             id,
@@ -45,9 +45,35 @@ export class DrawingActionFactory {
             value,
             execute: (value) => {
                 action(value)
-                drawingStateManager.refresh()
-                renderInvalidator.invalidate()
+                this.drawingStateManager.refresh()
+                this.renderInvalidator.invalidate()
             },
         } as DrawingAction
+    }
+
+    public command<K extends keyof DrawingActionMap>(id: K, label: string, action: () => void): DrawingAction {
+        return {
+            id,
+            label,
+            execute: () => {
+                action()
+
+                this.drawingStateManager.refresh()
+                this.renderInvalidator.invalidate()
+            },
+        } as DrawingAction
+    }
+
+    public delete(drawing: Drawing, drawingManager: DrawingManager): DrawingAction {
+        return {
+            id: 'delete',
+            label: 'Delete',
+            execute: () => {
+                drawingManager.removeDrawing(drawing.id)
+
+                this.drawingStateManager.clearSelection()
+                this.renderInvalidator.invalidate()
+            },
+        }
     }
 }
