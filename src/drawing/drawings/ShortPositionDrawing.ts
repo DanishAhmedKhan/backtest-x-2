@@ -2,20 +2,20 @@ import { PositionDirection, PositionDrawing } from './PositionDrawing'
 import { DrawingType } from './DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 
-export class LongPositionDrawing extends PositionDrawing {
+export class ShortPositionDrawing extends PositionDrawing {
     constructor(
         id: string,
         public start: DrawingAnchor,
         public end: DrawingAnchor,
         public target: DrawingAnchor,
         public stoploss: DrawingAnchor,
-        public direction = PositionDirection.Long,
+        public direction = PositionDirection.Short,
     ) {
-        super(id, DrawingType.LongPosition, start, end, target, stoploss, PositionDirection.Long)
+        super(id, DrawingType.ShortPosition, start, end, target, stoploss, PositionDirection.Long)
     }
 
     public clone(): PositionDrawing {
-        const clone = new LongPositionDrawing(
+        const clone = new ShortPositionDrawing(
             this.id,
             { ...this.start },
             { ...this.end },

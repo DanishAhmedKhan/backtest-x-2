@@ -1,4 +1,4 @@
-import type { LongPositionDrawing } from '../drawings/LongPositionDrawing'
+import type { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -11,7 +11,7 @@ import type { RenderInvalidator } from '../renderer/RenderInvalidator'
 import type { DrawingActionFactory } from './DrawinActionFactory'
 import { CommonDrawingActions } from './CommonDrawingActions'
 
-export class LongPositionActionProvider implements DrawingActionProvider<LongPositionDrawing> {
+export class ShortPositionActionProvider implements DrawingActionProvider<ShortPositionDrawing> {
     constructor(
         private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
@@ -19,11 +19,11 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
         private readonly actionFactory: DrawingActionFactory,
     ) {}
 
-    public canProvideActions(drawing: Drawing): drawing is LongPositionDrawing {
-        return drawing.type === DrawingType.LongPosition
+    public canProvideActions(drawing: Drawing): drawing is ShortPositionDrawing {
+        return drawing.type === DrawingType.ShortPosition
     }
 
-    public getActions(drawing: LongPositionDrawing): DrawingAction[] {
+    public getActions(drawing: ShortPositionDrawing): DrawingAction[] {
         return [
             {
                 id: 'background',

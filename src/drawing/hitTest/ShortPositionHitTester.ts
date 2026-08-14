@@ -1,4 +1,4 @@
-import type { LongPositionDrawing } from '../drawings/LongPositionDrawing'
+import type { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
 
 import type { DrawingHitTester } from './DrawingHitTester'
 import { HitTarget } from './HitTarget'
@@ -11,20 +11,20 @@ import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 import { CursorType } from '../../core/cursor/CursorType'
 import { RectangleGeometry } from '../geometry/RectangleGeometry'
 
-export enum LongPositionHandle {
+export enum ShortPositionHandle {
     Start = 'start',
     End = 'end',
-    Target = 'target',
+    Target = 'taget',
     Stoploss = 'stoploss',
 }
 
-export class LongPositionHitTester implements DrawingHitTester<LongPositionDrawing, LongPositionHandle> {
-    public canHitTest(drawing: Drawing): drawing is LongPositionDrawing {
-        return drawing.type === DrawingType.LongPosition
+export class ShortPositionHitTester implements DrawingHitTester<ShortPositionDrawing, ShortPositionHandle> {
+    public canHitTest(drawing: Drawing): drawing is ShortPositionDrawing {
+        return drawing.type === DrawingType.ShortPosition
     }
 
     public hitTest(
-        drawing: LongPositionDrawing,
+        drawing: ShortPositionDrawing,
         point: DrawingAnchor,
         transformer: CoordinateTransformer,
         tolerance: number,
@@ -41,22 +41,22 @@ export class LongPositionHitTester implements DrawingHitTester<LongPositionDrawi
 
         const handles = [
             {
-                handle: LongPositionHandle.Start,
+                handle: ShortPositionHandle.Start,
                 point: start,
                 cursor: CursorType.Move,
             },
             {
-                handle: LongPositionHandle.End,
+                handle: ShortPositionHandle.End,
                 point: end,
                 cursor: CursorType.EW,
             },
             {
-                handle: LongPositionHandle.Target,
+                handle: ShortPositionHandle.Target,
                 point: target,
                 cursor: CursorType.NS,
             },
             {
-                handle: LongPositionHandle.Stoploss,
+                handle: ShortPositionHandle.Stoploss,
                 point: stoploss,
                 cursor: CursorType.NS,
             },

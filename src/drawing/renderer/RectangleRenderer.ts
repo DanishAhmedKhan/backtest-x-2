@@ -35,7 +35,7 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
         const width = right - left
         const height = bottom - top
 
-        DrawingPrimitives.rectangle(
+        DrawingPrimitives.drawRectangle(
             ctx,
             left,
             top,

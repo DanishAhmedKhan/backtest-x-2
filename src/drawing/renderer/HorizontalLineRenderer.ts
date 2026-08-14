@@ -26,7 +26,7 @@ export class HorizontalLineRenderer implements DrawingRenderer<HorizontalLineDra
 
         const width = ctx.canvas.clientWidth
 
-        DrawingPrimitives.line(
+        DrawingPrimitives.drawLine(
             ctx,
             { x: 0, y: anchor.y },
             { x: width, y: anchor.y },

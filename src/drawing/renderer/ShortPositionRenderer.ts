@@ -1,4 +1,4 @@
-import type { LongPositionDrawing } from '../drawings/LongPositionDrawing'
+import type { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
 
 import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
@@ -9,13 +9,13 @@ import type { CoordinateTransformer } from './CoordinateTransformer'
 import { DrawingPositions } from './DawingPositions'
 import { DrawingHandles } from './DrawingHandles'
 
-export class LongPositionRenderer implements DrawingRenderer<LongPositionDrawing> {
-    public canRender(drawing: Drawing): drawing is LongPositionDrawing {
-        return drawing.type === DrawingType.LongPosition
+export class ShortPositionRenderer implements DrawingRenderer<ShortPositionDrawing> {
+    public canRender(drawing: Drawing): drawing is ShortPositionDrawing {
+        return drawing.type === DrawingType.ShortPosition
     }
 
     public render(
-        drawing: LongPositionDrawing,
+        drawing: ShortPositionDrawing,
         ctx: CanvasRenderingContext2D,
         transformer: CoordinateTransformer,
         state: DrawingRenderState,
@@ -25,11 +25,12 @@ export class LongPositionRenderer implements DrawingRenderer<LongPositionDrawing
         const target = transformer.toPoint(drawing.target)
         const stoploss = transformer.toPoint(drawing.stoploss)
 
-        if (!start || !end || !top || !stoploss) return
+        if (!start || !end || !target || !stoploss) return
+
         const left = Math.min(start.x, end.x)
         const right = Math.max(start.x, end.x)
 
-        DrawingPositions.long(
+        DrawingPositions.short(
             ctx,
             left,
             right,
@@ -52,7 +53,7 @@ export class LongPositionRenderer implements DrawingRenderer<LongPositionDrawing
 
             DrawingPositions.labels(
                 ctx,
-                true,
+                false,
                 start,
                 end,
                 target,
@@ -72,5 +73,5 @@ export class LongPositionRenderer implements DrawingRenderer<LongPositionDrawing
         }
     }
 
-    public destroy(_drawing: LongPositionDrawing) {}
+    public destroy(_drawing: ShortPositionDrawing) {}
 }

@@ -1,4 +1,4 @@
-import { LongPositionDrawing } from '../drawings/LongPositionDrawing'
+import { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
 
 import type { Tool } from './Tool'
 import { ToolType } from './ToolType'
@@ -11,12 +11,12 @@ import type { PreviewDrawingManager } from '../renderer/PreviewDrawingManager'
 import { eventBus } from '../../event/EventBus'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
-export class LongPositionTool implements Tool {
-    public readonly type = ToolType.LongPosition
+export class ShortPositionTool implements Tool {
+    public readonly type = ToolType.ShortPosition
     public readonly allowsViewportInteraction = false
     public readonly allowsSelection = false
 
-    private preview: LongPositionDrawing | null = null
+    private preview: ShortPositionDrawing | null = null
 
     constructor(
         private readonly drawingManager: DrawingManager,
@@ -45,12 +45,12 @@ export class LongPositionTool implements Tool {
 
         const target = {
             x: start.x,
-            y: start.y - 150,
+            y: start.y + 150,
         }
 
         const stoploss = {
             x: start.x,
-            y: start.y + 100,
+            y: start.y - 100,
         }
 
         const startAnchor = { ...event.anchor }
@@ -63,7 +63,7 @@ export class LongPositionTool implements Tool {
             return
         }
 
-        this.preview = new LongPositionDrawing(
+        this.preview = new ShortPositionDrawing(
             crypto.randomUUID(),
             startAnchor,
             endAnchor,

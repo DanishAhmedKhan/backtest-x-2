@@ -20,30 +20,35 @@ import { HorizontalLineTool } from './tools/HorizontalLineTool'
 import { VerticalLineTool } from './tools/VerticalLineTool'
 import { RectangleTool } from './tools/RectangleTool'
 import { LongPositionTool } from './tools/LongPositionTool'
+import { ShortPositionTool } from './tools/ShortPositionTool'
 
 import { TrendLineRenderer } from './renderer/TrendLineRenderer'
 import { HorizontalLineRenderer } from './renderer/HorizontalLineRenderer'
 import { VerticalLineRenderer } from './renderer/VerticalLinerenderer'
 import { RectangleRenderer } from './renderer/RectangleRenderer'
 import { LongPositionRenderer } from './renderer/LongPositionRenderer'
+import { ShortPositionRenderer } from './renderer/ShortPositionRenderer'
 
 import { TrendLineHitTester } from './hitTest/TrendLineHitTester'
 import { HorizontalLineHitTester } from './hitTest/HorizontalLineHitTester'
 import { VerticalLineHitTester } from './hitTest/VerticalLineHitTester'
 import { RectangleHitTester } from './hitTest/RectangleHitTester'
 import { LongPositionHitTester } from './hitTest/LongPositionHitTester'
+import { ShortPositionHitTester } from './hitTest/ShortPositionHitTester'
 
 import { LineActionProvider } from './actions/LineActionProvider'
 import { HorizontalLineActionProvider } from './actions/HorizontalLineActionProvider'
 import { VerticalLineActionProvider } from './actions/VerticalLineActionProvider'
 import { RectangleActionProvider } from './actions/RectangleActionProvider'
 import { LongPositionActionProvider } from './actions/LongPositionActionProvider'
+import { ShortPositionActionProvider } from './actions/ShortPositionActionProvider'
 
 import { TrendLineEditor } from './editor/TrendLineEditor'
 import { HorizontalLineEditor } from './editor/HorizontalLineEditor'
 import { VerticalLineEditor } from './editor/VerticalLineEditor'
 import { RectangleEditor } from './editor/RectangleEditor'
 import { LongPositionEditor } from './editor/LongPositionEditor'
+import { ShortPositionEditor } from './editor/ShortPositionEditor'
 
 export class DrawingContext {
     public readonly drawingManager = new DrawingManager()
@@ -79,12 +84,14 @@ export class DrawingContext {
         this.rendererManager.register(new VerticalLineRenderer())
         this.rendererManager.register(new RectangleRenderer())
         this.rendererManager.register(new LongPositionRenderer())
+        this.rendererManager.register(new ShortPositionRenderer())
 
         this.hitTestManager.register(new TrendLineHitTester())
         this.hitTestManager.register(new HorizontalLineHitTester())
         this.hitTestManager.register(new VerticalLineHitTester())
         this.hitTestManager.register(new RectangleHitTester())
         this.hitTestManager.register(new LongPositionHitTester())
+        this.hitTestManager.register(new ShortPositionHitTester())
 
         this.toolManager.selectByType(ToolType.Pan)
     }
@@ -106,6 +113,15 @@ export class DrawingContext {
 
         this.toolManager.register(
             new LongPositionTool(
+                this.drawingManager,
+                this.previewDrawingManager,
+                this.drawingStateManager,
+                transformer,
+            ),
+        )
+
+        this.toolManager.register(
+            new ShortPositionTool(
                 this.drawingManager,
                 this.previewDrawingManager,
                 this.drawingStateManager,
@@ -140,6 +156,15 @@ export class DrawingContext {
                 drawingActionFactory,
             ),
         )
+
+        this.drawingActionManager.register(
+            new ShortPositionActionProvider(
+                this.drawingManager,
+                this.drawingStateManager,
+                renderInvalidator,
+                drawingActionFactory,
+            ),
+        )
     }
 
     public registerEditor(timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
@@ -148,5 +173,6 @@ export class DrawingContext {
         this.editorManager.register(new VerticalLineEditor())
         this.editorManager.register(new RectangleEditor())
         this.editorManager.register(new LongPositionEditor())
+        this.editorManager.register(new ShortPositionEditor())
     }
 }

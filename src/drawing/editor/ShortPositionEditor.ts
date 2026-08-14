@@ -1,5 +1,5 @@
-import type { LongPositionDrawing } from '../drawings/LongPositionDrawing'
-import { LongPositionHandle } from '../hitTest/LongPositionHitTester'
+import type { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
+import { ShortPositionHandle } from '../hitTest/ShortPositionHitTester'
 
 import type { Drawing } from '../drawings/Drawing'
 import type { DrawingEditor } from './DrawingEditor'
@@ -8,9 +8,9 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { EditingSession } from './EditingSession'
 import { HitTarget } from '../hitTest/HitTarget'
 
-export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
-    public canEdit(drawing: Drawing): drawing is LongPositionDrawing {
-        return drawing.type === DrawingType.LongPosition
+export class ShortPositionEditor implements DrawingEditor<ShortPositionDrawing> {
+    public canEdit(drawing: Drawing): drawing is ShortPositionDrawing {
+        return drawing.type === DrawingType.ShortPosition
     }
 
     public beginEdit(_session: EditingSession, _event: ChartPointerEvent) {}
@@ -20,8 +20,8 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
 
         if (!target) return
 
-        const drawing = target.drawing as LongPositionDrawing
-        const original = session.getOriginalDrawing() as LongPositionDrawing
+        const drawing = target.drawing as ShortPositionDrawing
+        const original = session.getOriginalDrawing() as ShortPositionDrawing
 
         if (!original) return
 
@@ -35,19 +35,19 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         }
 
         switch (target.handle) {
-            case LongPositionHandle.Start:
+            case ShortPositionHandle.Start:
                 this.moveStart(drawing, original, event)
                 break
 
-            case LongPositionHandle.End:
+            case ShortPositionHandle.End:
                 this.moveEnd(drawing, original, event)
                 break
 
-            case LongPositionHandle.Target:
+            case ShortPositionHandle.Target:
                 this.moveTarget(drawing, original, event)
                 break
 
-            case LongPositionHandle.Stoploss:
+            case ShortPositionHandle.Stoploss:
                 this.moveStoploss(drawing, original, event)
                 break
         }
@@ -55,7 +55,7 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
 
     public endEdit(_session: EditingSession) {}
 
-    private moveStart(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveStart(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         const topPrice = Math.max(original.target.price, original.stoploss.price)
         const bottomPrice = Math.min(original.target.price, original.stoploss.price)
 
@@ -69,7 +69,7 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         drawing.end = { ...original.end, price }
     }
 
-    private moveEnd(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveEnd(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         const logical = Math.max(event.anchor.logical, original.start.logical)
 
         drawing.end = { ...original.end, logical }
@@ -78,11 +78,11 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         drawing.stoploss = { ...original.stoploss }
     }
 
-    private moveTarget(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveTarget(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         drawing.target = {
             ...original.target,
             logical: original.target.logical,
-            price: Math.max(event.anchor.price, original.start.price),
+            price: Math.min(event.anchor.price, original.start.price),
         }
 
         drawing.start = { ...original.start }
@@ -90,11 +90,11 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         drawing.stoploss = { ...original.stoploss }
     }
 
-    private moveStoploss(drawing: LongPositionDrawing, original: LongPositionDrawing, event: ChartPointerEvent) {
+    private moveStoploss(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         drawing.stoploss = {
             ...original.stoploss,
             logical: original.stoploss.logical,
-            price: Math.min(event.anchor.price, original.start.price),
+            price: Math.max(event.anchor.price, original.start.price),
         }
 
         drawing.start = { ...original.start }
@@ -103,8 +103,8 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
     }
 
     private moveBody(
-        drawing: LongPositionDrawing,
-        original: LongPositionDrawing,
+        drawing: ShortPositionDrawing,
+        original: ShortPositionDrawing,
         session: EditingSession,
         event: ChartPointerEvent,
     ) {

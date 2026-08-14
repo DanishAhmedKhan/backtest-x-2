@@ -17,8 +17,8 @@ export abstract class PositionDrawing extends DrawingObject {
         type: DrawingType,
         public start: DrawingAnchor,
         public end: DrawingAnchor,
-        public top: DrawingAnchor,
-        public bottom: DrawingAnchor,
+        public target: DrawingAnchor,
+        public stoploss: DrawingAnchor,
         public direction = PositionDirection.Long,
     ) {
         super(id, type)

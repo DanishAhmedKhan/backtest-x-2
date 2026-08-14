@@ -26,7 +26,7 @@ export class VerticalLineRenderer implements DrawingRenderer<VerticalLineDrawing
 
         const height = ctx.canvas.clientHeight
 
-        DrawingPrimitives.line(
+        DrawingPrimitives.drawLine(
             ctx,
             { x: anchor.x, y: 0 },
             { x: anchor.x, y: height },

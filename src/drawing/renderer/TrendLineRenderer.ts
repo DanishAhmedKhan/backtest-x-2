@@ -25,7 +25,7 @@ export class TrendLineRenderer implements DrawingRenderer<TrendLineDrawing> {
 
         if (!start || !end) return
 
-        DrawingPrimitives.line(ctx, start, end, drawing.color, drawing.width, drawing.style)
+        DrawingPrimitives.drawLine(ctx, start, end, drawing.color, drawing.width, drawing.style)
 
         if (state.active) {
             DrawingHandles.circle(ctx, start, state.selected)

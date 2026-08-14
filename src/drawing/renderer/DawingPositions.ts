@@ -9,17 +9,19 @@ export class DrawingPositions {
         left: number,
         right: number,
         entryY: number,
-        topY: number,
-        bottomY: number,
+        targetY: number,
+        stoplossY: number,
         profitColor: string,
         lossColor: string,
         lineColor: string,
     ) {
-        DrawingPrimitives.rectangle(ctx, left, topY, right - left, entryY - topY, profitColor, 0, 'solid', profitColor)
+        const width = right - left
+        const targetHeight = Math.abs(entryY - targetY)
+        const stoplossHeight = Math.abs(stoplossY - entryY)
 
-        DrawingPrimitives.rectangle(ctx, left, entryY, right - left, bottomY - entryY, lossColor, 0, 'solid', lossColor)
-
-        DrawingPrimitives.line(ctx, { x: left, y: entryY }, { x: right, y: entryY }, lineColor, 1, 'solid')
+        DrawingPrimitives.fillRectangle(ctx, left, targetY, width, targetHeight, profitColor)
+        DrawingPrimitives.fillRectangle(ctx, left, entryY, width, stoplossHeight, lossColor)
+        DrawingPrimitives.drawLine(ctx, { x: left, y: entryY }, { x: right, y: entryY }, lineColor, 1, 'solid')
     }
 
     public static short(
@@ -27,27 +29,19 @@ export class DrawingPositions {
         left: number,
         right: number,
         entryY: number,
-        topY: number,
-        bottomY: number,
+        targetY: number,
+        stoplossY: number,
         profitColor: string,
         lossColor: string,
         lineColor: string,
     ) {
-        DrawingPrimitives.rectangle(ctx, left, topY, right - left, entryY - topY, lineColor, 0, 'solid', lossColor)
+        const width = right - left
+        const targetHeight = Math.abs(targetY - entryY)
+        const stoplossHeight = Math.abs(entryY - stoplossY)
 
-        DrawingPrimitives.rectangle(
-            ctx,
-            left,
-            entryY,
-            right - left,
-            bottomY - entryY,
-            lineColor,
-            0,
-            'solid',
-            profitColor,
-        )
-
-        DrawingPrimitives.line(ctx, { x: left, y: entryY }, { x: right, y: entryY }, lineColor, 1, 'solid')
+        DrawingPrimitives.fillRectangle(ctx, left, entryY, width, targetHeight, profitColor)
+        DrawingPrimitives.fillRectangle(ctx, left, stoplossY, width, stoplossHeight, lossColor)
+        DrawingPrimitives.drawLine(ctx, { x: left, y: entryY }, { x: right, y: entryY }, lineColor, 1, 'solid')
     }
 
     static LABEL_PADDING_X = 5
@@ -87,6 +81,7 @@ export class DrawingPositions {
 
     public static labels(
         ctx: CanvasRenderingContext2D,
+        long: boolean,
         start: Point,
         end: Point,
         top: Point,
@@ -114,10 +109,12 @@ export class DrawingPositions {
         const threshold = 30
         const drawingWidth = right - left
         const isNarrow = drawingWidth < maxLabelWidth + threshold
+        const isOneToOne = riskReward > 1.1
+        const factor = long ? -1 : 1
 
-        const targetY = top.y + (isNarrow ? -offset : 0) + 1
-        const rewardY = entryY + (isNarrow ? offset * (riskReward > 1.1 ? -1 : 1) : 0)
-        const stopY = bottom.y + (isNarrow ? offset : 0)
+        const targetY = top.y + (isNarrow ? offset * factor : 0) + 1
+        const rewardY = entryY + (isNarrow ? -offset * factor * (isOneToOne ? -1 : 1) : 0)
+        const stopY = bottom.y + (isNarrow ? -offset * factor : 0)
 
         DrawingPositions.label(ctx, targetText, centerX, targetY, removeAlpha(profitColor))
         DrawingPositions.label(ctx, rewardText, centerX, rewardY, removeAlpha(lossColor))

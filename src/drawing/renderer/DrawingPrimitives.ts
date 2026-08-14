@@ -1,7 +1,7 @@
 import type { Point } from '../geometry/Point'
 
 export class DrawingPrimitives {
-    public static line(
+    public static drawLine(
         ctx: CanvasRenderingContext2D,
         start: Point,
         end: Point,
@@ -34,7 +34,13 @@ export class DrawingPrimitives {
         ctx.restore()
     }
 
-    public static circle(ctx: CanvasRenderingContext2D, center: Point, radius: number, fill?: string, stroke?: string) {
+    public static drawCircle(
+        ctx: CanvasRenderingContext2D,
+        center: Point,
+        radius: number,
+        fill?: string,
+        stroke?: string,
+    ) {
         ctx.save()
 
         ctx.beginPath()
@@ -53,7 +59,7 @@ export class DrawingPrimitives {
         ctx.restore()
     }
 
-    public static rectangle(
+    public static drawRectangle(
         ctx: CanvasRenderingContext2D,
         x: number,
         y: number,
@@ -85,7 +91,22 @@ export class DrawingPrimitives {
         ctx.restore()
     }
 
-    public static square(
+    public static fillRectangle(
+        ctx: CanvasRenderingContext2D,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        color: string,
+    ) {
+        ctx.save()
+
+        ctx.fillStyle = color
+        ctx.fillRect(x, y, width, height)
+        ctx.restore()
+    }
+
+    public static drawSquare(
         ctx: CanvasRenderingContext2D,
         center: Point,
         size: number,
