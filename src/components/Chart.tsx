@@ -273,7 +273,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     useEffect(() => {
         const unsubscribe = eventBus.on('drawingCompleted', () => {
-            toolStore.select(ToolType.Pan)
+            toolStore.select(ToolType.Pan, false)
         })
 
         return unsubscribe

@@ -2,19 +2,12 @@ import type { IChartApi } from 'lightweight-charts'
 
 import type { ToolType } from './ToolType'
 import type { ToolManager } from './ToolManager'
-import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import type { ViewportInteractionController } from '../controller/ViewportInterationController'
 
 export class ToolController implements ViewportInteractionController {
-    constructor(
-        private readonly toolManager: ToolManager,
-        private readonly drawingStateManager: DrawingStateManager,
-        private readonly chart: IChartApi,
-    ) {}
+    constructor(private readonly toolManager: ToolManager, private readonly chart: IChartApi) {}
 
     public setTool(type: ToolType) {
-        this.drawingStateManager.clearSelection()
-
         this.toolManager.selectByType(type)
         this.updateChartInteraction()
     }

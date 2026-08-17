@@ -34,6 +34,7 @@ type EventMap = {
 
     toolChanged: {
         tool: ToolType
+        clearSelection?: boolean
     }
 
     drawingCompleted: void

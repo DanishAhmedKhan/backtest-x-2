@@ -101,7 +101,7 @@ export class ChartRuntime {
             this.renderLoop,
         )
 
-        this.toolController = new ToolController(drawingContext.toolManager, drawingContext.drawingStateManager, chart)
+        this.toolController = new ToolController(drawingContext.toolManager, chart)
 
         const editController = new EditController(
             drawingContext.drawingStateManager,
@@ -126,6 +126,10 @@ export class ChartRuntime {
 
     public getDrawingToolbarManager() {
         return this.params.drawingContext.drawingToolbarManager
+    }
+
+    public getDrawingStateManager() {
+        return this.params.drawingContext.drawingStateManager
     }
 
     public getToolController() {

@@ -20,7 +20,7 @@ class ToolStore {
         }
     }
 
-    public select(tool: ToolType) {
+    public select(tool: ToolType, clearSelection = true) {
         if (this.selectedTool === tool) {
             return
         }
@@ -33,6 +33,7 @@ class ToolStore {
 
         eventBus.emit('toolChanged', {
             tool,
+            clearSelection,
         })
     }
 }

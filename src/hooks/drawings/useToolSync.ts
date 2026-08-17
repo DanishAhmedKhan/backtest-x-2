@@ -9,7 +9,11 @@ type Params = {
 
 export function useToolSync({ runtimeRef }: Params) {
     useEffect(() => {
-        return eventBus.on('toolChanged', ({ tool }) => {
+        return eventBus.on('toolChanged', ({ tool, clearSelection = true }) => {
+            if (clearSelection) {
+                runtimeRef.current.getDrawingStateManager().clearSelection()
+            }
+
             runtimeRef?.current.toolController.setTool(tool)
         })
     }, [runtimeRef])
