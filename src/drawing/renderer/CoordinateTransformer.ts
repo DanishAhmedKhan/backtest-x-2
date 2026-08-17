@@ -15,8 +15,28 @@ export class CoordinateTransformer {
         private readonly timeResolver: TimeCoordinateResolver,
     ) {}
 
+    // public toPoint(anchor: DrawingAnchor): ScreenPoint | null {
+    //     const logical = this.timeResolver.timeToContinuousLogical(anchor.time)
+
+    //     if (logical == null) {
+    //         return null
+    //     }
+
+    //     const x = this.timeResolver.logicalToCoordinate(logical)
+    //     const y = this.series.priceToCoordinate(anchor.price)
+
+    //     if (x == null || y == null) {
+    //         return null
+    //     }
+
+    //     return {
+    //         x,
+    //         y,
+    //     }
+    // }
+
     public toPoint(anchor: DrawingAnchor): ScreenPoint | null {
-        const logical = this.timeResolver.timeToContinuousLogical(anchor.time)
+        const logical = this.timeResolver.timeToCandleLogical(anchor.time)
 
         if (logical == null) {
             return null

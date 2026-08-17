@@ -67,6 +67,43 @@ export class TimeCoordinateResolver {
         return leftTime + (rightTime - leftTime) * fraction
     }
 
+    public timeToCandleLogical(time: number): number | null {
+        const times = this.timesRef.current
+
+        if (times.length === 0) {
+            return null
+        }
+
+        if (time < times[0]) {
+            return (time - times[0]) / this.timeframeSeconds
+        }
+
+        const lastIndex = times.length - 1
+
+        if (time >= times[lastIndex]) {
+            return lastIndex + (time - times[lastIndex]) / this.timeframeSeconds
+        }
+
+        let left = 0
+        let right = lastIndex
+
+        while (left <= right) {
+            const mid = (left + right) >> 1
+
+            if (times[mid] === time) {
+                return mid
+            }
+
+            if (times[mid] < time) {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+
+        return right
+    }
+
     public timeToContinuousLogical(time: number): number | null {
         const times = this.timesRef.current
 
@@ -151,7 +188,7 @@ export class TimeCoordinateResolver {
     }
 
     public timeToCoordinate(time: number): number | null {
-        const logical = this.timeToLogical(time)
+        const logical = this.timeToCandleLogical(time)
 
         if (logical == null) {
             return null
