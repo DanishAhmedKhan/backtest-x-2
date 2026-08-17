@@ -15,6 +15,7 @@ export class LongPositionTool implements Tool {
     public readonly type = ToolType.LongPosition
     public readonly allowsViewportInteraction = false
     public readonly allowsSelection = false
+    public readonly createsDrawing = true
 
     private preview: LongPositionDrawing | null = null
 

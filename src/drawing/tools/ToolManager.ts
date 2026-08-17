@@ -1,5 +1,5 @@
 import type { Tool } from './Tool'
-import type { ToolType } from './ToolType'
+import { ToolType } from './ToolType'
 
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 
@@ -8,8 +8,24 @@ export class ToolManager {
 
     private currentTool: Tool | null = null
 
+    private readonly toolChangeListeners = new Set<() => void>()
+
     public register(tool: Tool) {
         this.tools.set(tool.type, tool)
+    }
+
+    public subscribeToolChange(listener: () => void) {
+        this.toolChangeListeners.add(listener)
+
+        return () => {
+            this.toolChangeListeners.delete(listener)
+        }
+    }
+
+    private notifyToolChange() {
+        for (const listener of this.toolChangeListeners) {
+            listener()
+        }
     }
 
     public selectByType(type: ToolType) {
@@ -28,6 +44,8 @@ export class ToolManager {
         this.currentTool?.deactivate()
         this.currentTool = tool
         this.currentTool?.activate()
+
+        this.notifyToolChange()
     }
 
     public clear() {
@@ -48,6 +66,14 @@ export class ToolManager {
 
     public handlePointerLeave() {
         this.currentTool?.handlePointerLeave()
+    }
+
+    public hasActiveTool() {
+        return this.currentTool !== null
+    }
+
+    public hasActiveDrawingTool() {
+        return this.currentTool?.createsDrawing ?? false
     }
 
     public allowsViewportInteraction(): boolean {

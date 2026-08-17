@@ -8,6 +8,8 @@ export interface Tool {
 
     readonly allowsSelection: boolean
 
+    readonly createsDrawing: boolean
+
     activate(): void
 
     deactivate(): void

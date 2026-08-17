@@ -10,6 +10,8 @@ export class PanTool implements Tool {
 
     public readonly allowsSelection = true
 
+    public readonly createsDrawing = false
+
     constructor(protected readonly drawingManager: DrawingManager) {}
 
     public activate(): void {}

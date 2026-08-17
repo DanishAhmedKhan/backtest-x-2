@@ -88,6 +88,12 @@ export class ChartRuntime {
             this.cursorController,
         )
 
+        drawingContext.toolManager.subscribeToolChange(() => {
+            if (drawingContext.toolManager.hasActiveDrawingTool()) {
+                hoverController.clear()
+            }
+        })
+
         const selectionController = new SelectionController(
             drawingContext.drawingStateManager,
             drawingContext.hitTestManager,
@@ -95,7 +101,7 @@ export class ChartRuntime {
             this.renderLoop,
         )
 
-        this.toolController = new ToolController(drawingContext.toolManager, chart)
+        this.toolController = new ToolController(drawingContext.toolManager, drawingContext.drawingStateManager, chart)
 
         const editController = new EditController(
             drawingContext.drawingStateManager,

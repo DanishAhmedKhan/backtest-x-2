@@ -14,6 +14,7 @@ export class RectangleTool implements Tool {
     public readonly type = ToolType.Rectangle
     public readonly allowsViewportInteraction = false
     public readonly allowsSelection = false
+    public readonly createsDrawing = true
 
     private preview: RectangleDrawing | null = null
 

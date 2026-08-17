@@ -11,10 +11,9 @@ import { eventBus } from '../../event/EventBus'
 
 export class VerticalLineTool implements Tool {
     public readonly type = ToolType.VerticalLine
-
     public readonly allowsViewportInteraction = false
-
     public readonly allowsSelection = false
+    public readonly createsDrawing = true
 
     constructor(
         private readonly drawingManager: DrawingManager,

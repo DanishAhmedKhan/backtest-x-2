@@ -74,7 +74,7 @@
 }
 
 .opacity-title {
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 12px;
     color: #666;
 }
@@ -83,7 +83,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 7px;
+    margin-top: 2px;
 }
 
 .opacity-bar {

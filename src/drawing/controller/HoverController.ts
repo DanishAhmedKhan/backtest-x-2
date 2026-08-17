@@ -39,4 +39,10 @@ export class HoverController {
         this.cursorController.clear(CursorSource.Hover)
         this.renderInvalidator.invalidate()
     }
+
+    public clear() {
+        this.drawingStateManager.setHovered(null)
+        this.cursorController.clear(CursorSource.Hover)
+        this.renderInvalidator.invalidate()
+    }
 }

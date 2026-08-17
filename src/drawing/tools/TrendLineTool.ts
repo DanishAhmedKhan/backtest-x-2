@@ -18,6 +18,8 @@ export class TrendLineTool implements Tool {
 
     public readonly allowsSelection = false
 
+    public readonly createsDrawing = true
+
     private preview: TrendLineDrawing | null = null
 
     private readonly snapper: TrendLineSnapper

@@ -11,10 +11,9 @@ import { eventBus } from '../../event/EventBus'
 
 export class HorizontalLineTool implements Tool {
     public readonly type = ToolType.HorizontalLine
-
     public readonly allowsViewportInteraction = false
-
     public readonly allowsSelection = false
+    public readonly createsDrawing = true
 
     constructor(
         private readonly drawingManager: DrawingManager,

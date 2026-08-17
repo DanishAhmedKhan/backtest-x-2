@@ -44,7 +44,10 @@ export class PointerController {
             return
         }
 
-        this.hoverController.handlePointerMove(converted)
+        if (!this.toolManager.hasActiveDrawingTool()) {
+            this.hoverController.handlePointerMove(converted)
+        }
+
         this.toolManager.handlePointerMove(converted)
     }
 

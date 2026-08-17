@@ -15,6 +15,7 @@ export class ShortPositionTool implements Tool {
     public readonly type = ToolType.ShortPosition
     public readonly allowsViewportInteraction = false
     public readonly allowsSelection = false
+    public readonly createsDrawing = true
 
     private preview: ShortPositionDrawing | null = null
 
