@@ -5,13 +5,11 @@ import { ToolType } from './tools/ToolType'
 import { PreviewDrawingManager } from './renderer/PreviewDrawingManager'
 import { DrawingStateManager } from './managers/DrawingStateManager'
 import { HitTestManager } from './hitTest/HitTestManager'
-import { EditingSession } from './editor/EditingSession'
 import { EditorManager } from './editor/EditorManager'
 import { DrawingActionManager } from './actions/DrawingActionManager'
 import { DrawingToolbarManager } from './toolbar/DrawingToolbarManager'
 import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
-import type { TimeCoordinateResolver } from './renderer/TimeCoordinateResolver'
 import { DrawingActionFactory } from './actions/DrawinActionFactory'
 
 import { PanTool } from './drawings/PanTool'
@@ -62,8 +60,6 @@ export class DrawingContext {
     public readonly drawingStateManager = new DrawingStateManager()
 
     public readonly hitTestManager = new HitTestManager(this.drawingManager, this.drawingStateManager)
-
-    public readonly editingSession = new EditingSession()
 
     public readonly editorManager = new EditorManager(this.drawingStateManager)
 
@@ -167,8 +163,8 @@ export class DrawingContext {
         )
     }
 
-    public registerEditor(timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
-        this.editorManager.register(new TrendLineEditor(timeResolver, transformer))
+    public registerEditor(transformer: CoordinateTransformer) {
+        this.editorManager.register(new TrendLineEditor(transformer))
         this.editorManager.register(new HorizontalLineEditor())
         this.editorManager.register(new VerticalLineEditor())
         this.editorManager.register(new RectangleEditor())

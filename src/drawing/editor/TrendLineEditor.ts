@@ -8,13 +8,12 @@ import { DrawingType } from '../drawings/DrawingType'
 import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { EditingSession } from './EditingSession'
 import { HitTarget } from '../hitTest/HitTarget'
-import type { TimeCoordinateResolver } from '../renderer/TimeCoordinateResolver'
 import type { CoordinateTransformer } from '../renderer/CoordinateTransformer'
 
 export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     private readonly snapper: TrendLineSnapper
 
-    constructor(private readonly timeResolver: TimeCoordinateResolver, transformer: CoordinateTransformer) {
+    constructor(transformer: CoordinateTransformer) {
         this.snapper = new TrendLineSnapper(transformer)
     }
 
@@ -27,20 +26,18 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) return
+        if (!target) {
+            return
+        }
 
         const drawing = target.drawing as TrendLineDrawing
 
         switch (target.target) {
             case HitTarget.Handle:
-                switch (target.handle) {
-                    case TrendLineHandle.Start:
-                        this.moveStartHandle(drawing, event)
-                        break
-
-                    case TrendLineHandle.End:
-                        this.moveEndHandle(drawing, event)
-                        break
+                if (target.handle === TrendLineHandle.Start) {
+                    this.moveStartHandle(drawing, session, event)
+                } else if (target.handle === TrendLineHandle.End) {
+                    this.moveEndHandle(drawing, session, event)
                 }
                 break
 
@@ -52,53 +49,37 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
 
     public endEdit(_session: EditingSession) {}
 
-    private moveStartHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
-        // drawing.start = {
-        //     ...event.anchor,
-        // }
+    private moveStartHandle(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
+        const pointerAnchor = session.getAnchorAtPointer(event)
 
-        drawing.start = this.snapper.snap(drawing.end, event)
+        if (!pointerAnchor) {
+            return
+        }
+
+        drawing.start = this.snapper.snap(drawing.end, pointerAnchor, event.screen, event.shiftKey)
     }
 
-    private moveEndHandle(drawing: TrendLineDrawing, event: ChartPointerEvent) {
-        // drawing.end = {
-        //     ...event.anchor,
-        // }
+    private moveEndHandle(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
+        const pointerAnchor = session.getAnchorAtPointer(event)
 
-        drawing.end = this.snapper.snap(drawing.start, event)
+        if (!pointerAnchor) {
+            return
+        }
+
+        drawing.end = this.snapper.snap(drawing.start, pointerAnchor, event.screen, event.shiftKey)
     }
 
     private moveBody(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
         const original = session.getOriginalDrawing() as TrendLineDrawing
-        const startPointer = session.getStartPointer()
 
-        if (!original || !startPointer) {
+        const start = session.getMovedAnchor(original.start, event)
+        const end = session.getMovedAnchor(original.end, event)
+
+        if (!start || !end) {
             return
         }
 
-        const logicalDelta = event.anchor.logical - startPointer.logical
-        const priceDelta = event.anchor.price - startPointer.price
-
-        const startLogical = original.start.logical + logicalDelta
-        const endLogical = original.end.logical + logicalDelta
-
-        const startTime = this.timeResolver.logicalToTime(startLogical)
-        const endTime = this.timeResolver.logicalToTime(endLogical)
-
-        if (startTime == null || endTime == null) {
-            return
-        }
-
-        drawing.start = {
-            logical: startLogical,
-            time: startTime,
-            price: original.start.price + priceDelta,
-        }
-
-        drawing.end = {
-            logical: endLogical,
-            time: endTime,
-            price: original.end.price + priceDelta,
-        }
+        drawing.start = start
+        drawing.end = end
     }
 }

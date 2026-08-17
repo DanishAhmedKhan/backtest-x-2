@@ -2,6 +2,7 @@ import type { ISeriesApi } from 'lightweight-charts'
 
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import { TimeCoordinateResolver } from './TimeCoordinateResolver'
+import type { PointerAnchor } from '../models/PointerAnchor'
 
 export type ScreenPoint = {
     x: number
@@ -15,7 +16,13 @@ export class CoordinateTransformer {
     ) {}
 
     public toPoint(anchor: DrawingAnchor): ScreenPoint | null {
-        const x = this.timeResolver.logicalToCoordinate(anchor.logical)
+        const logical = this.timeResolver.timeToContinuousLogical(anchor.time)
+
+        if (logical == null) {
+            return null
+        }
+
+        const x = this.timeResolver.logicalToCoordinate(logical)
         const y = this.series.priceToCoordinate(anchor.price)
 
         if (x == null || y == null) {
@@ -28,7 +35,7 @@ export class CoordinateTransformer {
         }
     }
 
-    public toAnchor(x: number, y: number): DrawingAnchor | null {
+    public toAnchor(x: number, y: number): PointerAnchor | null {
         const anchor = this.timeResolver.coordinateToAnchor(x)
 
         if (!anchor) {

@@ -77,7 +77,7 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         }
 
         if (target.target === HitTarget.Handle && target.handle !== null) {
-            this.resize(drawing, original, target.handle, event)
+            this.resize(drawing, original, target.handle, event, session)
         }
     }
 
@@ -88,11 +88,13 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         original: RectangleDrawing,
         handle: RectangleHandle,
         event: ChartPointerEvent,
+        session: EditingSession,
     ) {
         const axes = rectangleHandleAxes[handle]
 
-        const originalLeft = Math.min(original.start.logical, original.end.logical)
-        const originalRight = Math.max(original.start.logical, original.end.logical)
+        const originalLeft = Math.min(original.start.time, original.end.time)
+        const originalRight = Math.max(original.start.time, original.end.time)
+
         const originalTop = Math.max(original.start.price, original.end.price)
         const originalBottom = Math.min(original.start.price, original.end.price)
 
@@ -101,31 +103,37 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         let top = originalTop
         let bottom = originalBottom
 
+        const pointerAnchor = session.getAnchorAtPointer(event)
+
+        if (!pointerAnchor) {
+            return
+        }
+
         if (axes.horizontal === 'left') {
-            left = event.anchor.logical
+            left = pointerAnchor.time
         }
 
         if (axes.horizontal === 'right') {
-            right = event.anchor.logical
+            right = pointerAnchor.time
         }
 
         if (axes.vertical === 'top') {
-            top = event.anchor.price
+            top = pointerAnchor.price
         }
 
         if (axes.vertical === 'bottom') {
-            bottom = event.anchor.price
+            bottom = pointerAnchor.price
         }
 
         drawing.start = {
             ...drawing.start,
-            logical: left,
+            time: left,
             price: top,
         }
 
         drawing.end = {
             ...drawing.end,
-            logical: right,
+            time: right,
             price: bottom,
         }
     }
@@ -136,25 +144,14 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         session: EditingSession,
         event: ChartPointerEvent,
     ) {
-        const startPointer = session.getStartPointer()
+        const start = session.getMovedAnchor(original.start, event)
+        const end = session.getMovedAnchor(original.end, event)
 
-        if (!startPointer) {
+        if (!start || !end) {
             return
         }
 
-        const dx = event.anchor.logical - startPointer.logical
-        const dy = event.anchor.price - startPointer.price
-
-        drawing.start = {
-            ...original.start,
-            logical: original.start.logical + dx,
-            price: original.start.price + dy,
-        }
-
-        drawing.end = {
-            ...original.end,
-            logical: original.end.logical + dx,
-            price: original.end.price + dy,
-        }
+        drawing.start = start
+        drawing.end = end
     }
 }

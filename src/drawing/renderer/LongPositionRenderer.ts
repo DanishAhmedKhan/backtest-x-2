@@ -25,7 +25,7 @@ export class LongPositionRenderer implements DrawingRenderer<LongPositionDrawing
         const target = transformer.toPoint(drawing.target)
         const stoploss = transformer.toPoint(drawing.stoploss)
 
-        if (!start || !end || !top || !stoploss) return
+        if (!start || !end || !target || !stoploss) return
         const left = Math.min(start.x, end.x)
         const right = Math.max(start.x, end.x)
 

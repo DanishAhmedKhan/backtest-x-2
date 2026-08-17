@@ -13,11 +13,8 @@ import { eventBus } from '../../event/EventBus'
 
 export class TrendLineTool implements Tool {
     public readonly type = ToolType.TrendLine
-
     public readonly allowsViewportInteraction = false
-
     public readonly allowsSelection = false
-
     public readonly createsDrawing = true
 
     private preview: TrendLineDrawing | null = null
@@ -48,7 +45,7 @@ export class TrendLineTool implements Tool {
             return
         }
 
-        this.preview.end = this.snapper.snap(this.preview.start, event)
+        this.preview.end = this.snapper.snap(this.preview.start, event.anchor, event.screen, event.shiftKey)
 
         this.drawingManager.addDrawing(this.preview)
         this.previewDrawingManager.clear()
@@ -64,7 +61,7 @@ export class TrendLineTool implements Tool {
             return
         }
 
-        this.preview.end = this.snapper.snap(this.preview.start, event)
+        this.preview.end = this.snapper.snap(this.preview.start, event.anchor, event.screen, event.shiftKey)
 
         this.previewDrawingManager.set(this.preview)
     }

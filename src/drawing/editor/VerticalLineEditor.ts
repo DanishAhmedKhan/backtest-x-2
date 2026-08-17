@@ -17,11 +17,12 @@ export class VerticalLineEditor implements DrawingEditor<VerticalLineDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) return
+        if (!target) {
+            return
+        }
 
         const drawing = target.drawing as VerticalLineDrawing
 
-        drawing.anchor.logical = event.anchor.logical
         drawing.anchor.time = event.anchor.time
     }
 

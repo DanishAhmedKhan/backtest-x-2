@@ -1,6 +1,6 @@
 import type { IChartApi, Logical } from 'lightweight-charts'
-import type { DrawingAnchor } from '../models/DrawingAnchor'
 import type { Timeframe } from '../../core/Timeframe'
+import type { PointerAnchor } from '../models/PointerAnchor'
 
 export class TimeCoordinateResolver {
     private readonly timeframeSeconds: number
@@ -13,14 +13,12 @@ export class TimeCoordinateResolver {
         this.timeframeSeconds = timeframe.toSeconds()
     }
 
-    public coordinateToAnchor(x: number): DrawingAnchor | null {
+    public coordinateToAnchor(x: number): PointerAnchor | null {
         const logical = this.chart.timeScale().coordinateToLogical(x)
 
         if (logical == null) {
             return null
         }
-
-        const rounded = Math.round(logical)
 
         const times = this.timesRef.current
 
@@ -28,32 +26,97 @@ export class TimeCoordinateResolver {
             return null
         }
 
-        if (rounded < 0) {
-            const delta = rounded
+        const time = this.logicalToContinuousTime(logical)
 
-            return {
-                logical,
-                time: times[0] + delta * this.timeframeSeconds,
-                price: 0,
-            }
-        }
-
-        if (rounded >= times.length) {
-            const lastLogical = times.length - 1
-            const delta = rounded - lastLogical
-
-            return {
-                logical,
-                time: times[lastLogical] + delta * this.timeframeSeconds,
-                price: 0,
-            }
+        if (time == null) {
+            return null
         }
 
         return {
             logical,
-            time: times[rounded],
+            time,
             price: 0,
         }
+    }
+
+    private logicalToContinuousTime(logical: number): number | null {
+        const times = this.timesRef.current
+
+        if (times.length === 0) {
+            return null
+        }
+
+        if (logical <= 0) {
+            return times[0] + logical * this.timeframeSeconds
+        }
+
+        const lastIndex = times.length - 1
+
+        if (logical >= lastIndex) {
+            return times[lastIndex] + (logical - lastIndex) * this.timeframeSeconds
+        }
+
+        const leftIndex = Math.floor(logical)
+        const rightIndex = leftIndex + 1
+
+        const leftTime = times[leftIndex]
+        const rightTime = times[rightIndex]
+
+        const fraction = logical - leftIndex
+
+        return leftTime + (rightTime - leftTime) * fraction
+    }
+
+    public timeToContinuousLogical(time: number): number | null {
+        const times = this.timesRef.current
+
+        if (times.length === 0) {
+            return null
+        }
+
+        if (time <= times[0]) {
+            return (time - times[0]) / this.timeframeSeconds
+        }
+
+        const lastIndex = times.length - 1
+        const lastTime = times[lastIndex]
+
+        if (time >= lastTime) {
+            return lastIndex + (time - lastTime) / this.timeframeSeconds
+        }
+
+        let left = 0
+        let right = lastIndex
+
+        while (left <= right) {
+            const mid = (left + right) >> 1
+
+            if (times[mid] === time) {
+                return mid
+            }
+
+            if (times[mid] < time) {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+
+        const leftIndex = right
+        const rightIndex = left
+
+        const leftTime = times[leftIndex]
+        const rightTime = times[rightIndex]
+
+        const timeRange = rightTime - leftTime
+
+        if (timeRange <= 0) {
+            return leftIndex
+        }
+
+        const fraction = (time - leftTime) / timeRange
+
+        return leftIndex + fraction
     }
 
     public timeToLogical(time: number): number | null {
@@ -87,25 +150,18 @@ export class TimeCoordinateResolver {
         return right
     }
 
-    public logicalToTime(logical: number): number | null {
-        const times = this.timesRef.current
+    public timeToCoordinate(time: number): number | null {
+        const logical = this.timeToLogical(time)
 
-        if (times.length === 0) {
+        if (logical == null) {
             return null
         }
 
-        const rounded = Math.round(logical)
+        return this.logicalToCoordinate(logical)
+    }
 
-        if (rounded < 0) {
-            return times[0] + rounded * this.timeframeSeconds
-        }
-
-        if (rounded >= times.length) {
-            const lastLogical = times.length - 1
-            return times[lastLogical] + (rounded - lastLogical) * this.timeframeSeconds
-        }
-
-        return times[rounded]
+    public logicalToTime(logical: number): number | null {
+        return this.logicalToContinuousTime(logical)
     }
 
     public logicalToCoordinate(logical: number): number | null {

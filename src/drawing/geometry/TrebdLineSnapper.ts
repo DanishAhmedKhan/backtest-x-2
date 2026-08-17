@@ -1,28 +1,30 @@
-import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import { CoordinateTransformer, type ScreenPoint } from '../renderer/CoordinateTransformer'
 
 export class TrendLineSnapper {
     constructor(private readonly transformer: CoordinateTransformer) {}
 
-    public snap(start: DrawingAnchor, event: ChartPointerEvent): DrawingAnchor {
-        if (!event.shiftKey) {
-            return event.anchor
+    public snap(
+        start: DrawingAnchor,
+        pointerAnchor: DrawingAnchor,
+        screen: ScreenPoint,
+        shiftKey: boolean,
+    ): DrawingAnchor {
+        if (!shiftKey) {
+            return pointerAnchor
         }
 
         const startPoint = this.transformer.toPoint(start)
 
         if (!startPoint) {
-            return event.anchor
+            return pointerAnchor
         }
 
-        const currentPoint = event.screen
-
-        const dx = currentPoint.x - startPoint.x
-        const dy = currentPoint.y - startPoint.y
+        const dx = screen.x - startPoint.x
+        const dy = screen.y - startPoint.y
 
         if (dx === 0 && dy === 0) {
-            return event.anchor
+            return pointerAnchor
         }
 
         const angle = Math.atan2(dy, dx)
@@ -37,6 +39,6 @@ export class TrendLineSnapper {
             y: startPoint.y + Math.sin(snappedAngle) * distance,
         }
 
-        return this.transformer.toAnchor(snappedPoint.x, snappedPoint.y) ?? event.anchor
+        return this.transformer.toAnchor(snappedPoint.x, snappedPoint.y) ?? pointerAnchor
     }
 }

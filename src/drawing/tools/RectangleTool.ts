@@ -32,7 +32,17 @@ export class RectangleTool implements Tool {
 
     public handlePointerDown(event: ChartPointerEvent) {
         if (!this.preview) {
-            this.preview = new RectangleDrawing(crypto.randomUUID(), { ...event.anchor }, { ...event.anchor })
+            this.preview = new RectangleDrawing(
+                crypto.randomUUID(),
+                {
+                    time: event.anchor.time,
+                    price: event.anchor.price,
+                },
+                {
+                    time: event.anchor.time,
+                    price: event.anchor.price,
+                },
+            )
 
             this.previewDrawingManager.set(this.preview)
 

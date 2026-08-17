@@ -18,12 +18,16 @@ export class ShortPositionEditor implements DrawingEditor<ShortPositionDrawing> 
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) return
+        if (!target) {
+            return
+        }
 
         const drawing = target.drawing as ShortPositionDrawing
         const original = session.getOriginalDrawing() as ShortPositionDrawing
 
-        if (!original) return
+        if (!original) {
+            return
+        }
 
         if (target.target === HitTarget.Body) {
             this.moveBody(drawing, original, session, event)
@@ -57,49 +61,92 @@ export class ShortPositionEditor implements DrawingEditor<ShortPositionDrawing> 
 
     private moveStart(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         const topPrice = Math.max(original.target.price, original.stoploss.price)
+
         const bottomPrice = Math.min(original.target.price, original.stoploss.price)
 
         const price = Math.max(bottomPrice, Math.min(topPrice, event.anchor.price))
 
-        const logical = event.anchor.logical
+        const time = event.anchor.time
 
-        drawing.start = { ...original.start, logical, price }
-        drawing.target = { ...original.target, logical }
-        drawing.stoploss = { ...original.stoploss, logical }
-        drawing.end = { ...original.end, price }
+        drawing.start = {
+            ...original.start,
+            time,
+            price,
+        }
+
+        drawing.target = {
+            ...original.target,
+            time,
+        }
+
+        drawing.stoploss = {
+            ...original.stoploss,
+            time,
+        }
+
+        drawing.end = {
+            ...original.end,
+            price,
+        }
     }
 
     private moveEnd(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
-        const logical = Math.max(event.anchor.logical, original.start.logical)
+        const time = Math.max(event.anchor.time, original.start.time)
 
-        drawing.end = { ...original.end, logical }
-        drawing.start = { ...original.start }
-        drawing.target = { ...original.target }
-        drawing.stoploss = { ...original.stoploss }
+        drawing.end = {
+            ...original.end,
+            time,
+        }
+
+        drawing.start = {
+            ...original.start,
+        }
+
+        drawing.target = {
+            ...original.target,
+        }
+
+        drawing.stoploss = {
+            ...original.stoploss,
+        }
     }
 
     private moveTarget(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         drawing.target = {
             ...original.target,
-            logical: original.target.logical,
             price: Math.min(event.anchor.price, original.start.price),
         }
 
-        drawing.start = { ...original.start }
-        drawing.end = { ...original.end }
-        drawing.stoploss = { ...original.stoploss }
+        drawing.start = {
+            ...original.start,
+        }
+
+        drawing.end = {
+            ...original.end,
+        }
+
+        drawing.stoploss = {
+            ...original.stoploss,
+        }
     }
 
     private moveStoploss(drawing: ShortPositionDrawing, original: ShortPositionDrawing, event: ChartPointerEvent) {
         drawing.stoploss = {
             ...original.stoploss,
-            logical: original.stoploss.logical,
             price: Math.max(event.anchor.price, original.start.price),
         }
 
-        drawing.start = { ...original.start }
-        drawing.end = { ...original.end }
-        drawing.target = { ...original.target }
+        drawing.start = {
+            ...original.start,
+        }
+
+        drawing.end = {
+            ...original.end,
+        }
+
+        drawing.target = {
+            ...original.target,
+        }
     }
 
     private moveBody(
@@ -108,37 +155,18 @@ export class ShortPositionEditor implements DrawingEditor<ShortPositionDrawing> 
         session: EditingSession,
         event: ChartPointerEvent,
     ) {
-        const startPointer = session.getStartPointer()
+        const start = session.getMovedAnchor(original.start, event)
+        const end = session.getMovedAnchor(original.end, event)
+        const target = session.getMovedAnchor(original.target, event)
+        const stoploss = session.getMovedAnchor(original.stoploss, event)
 
-        if (!startPointer) {
+        if (!start || !end || !target || !stoploss) {
             return
         }
 
-        const logicalDelta = event.anchor.logical - startPointer.logical
-        const priceDelta = event.anchor.price - startPointer.price
-
-        drawing.start = {
-            ...original.start,
-            logical: original.start.logical + logicalDelta,
-            price: original.start.price + priceDelta,
-        }
-
-        drawing.end = {
-            ...original.end,
-            logical: original.end.logical + logicalDelta,
-            price: original.end.price + priceDelta,
-        }
-
-        drawing.target = {
-            ...original.target,
-            logical: original.target.logical + logicalDelta,
-            price: original.target.price + priceDelta,
-        }
-
-        drawing.stoploss = {
-            ...original.stoploss,
-            logical: original.stoploss.logical + logicalDelta,
-            price: original.stoploss.price + priceDelta,
-        }
+        drawing.start = start
+        drawing.end = end
+        drawing.target = target
+        drawing.stoploss = stoploss
     }
 }

@@ -18,6 +18,7 @@ import { SelectionController } from '../controller/SelectionController'
 import { ToolController } from '../tools/ToolController'
 import { EditController } from '../controller/EditController'
 import { CursorController } from '../../core/cursor/CursorController'
+import { EditingSession } from '../editor/EditingSession'
 
 type Params = {
     chart: IChartApi
@@ -59,7 +60,7 @@ export class ChartRuntime {
         this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
         drawingContext.registerTools(this.transformer)
-        drawingContext.registerEditor(this.timeResolver, this.transformer)
+        drawingContext.registerEditor(this.transformer)
 
         this.drawingCanvasRenderer = new DrawingCanvasRenderer(
             drawingContext.drawingManager,
@@ -103,10 +104,12 @@ export class ChartRuntime {
 
         this.toolController = new ToolController(drawingContext.toolManager, chart)
 
+        const editingSession = new EditingSession(this.timeResolver)
+
         const editController = new EditController(
             drawingContext.drawingStateManager,
             drawingContext.editorManager,
-            drawingContext.editingSession,
+            editingSession,
             this.renderLoop,
             this.toolController,
         )
