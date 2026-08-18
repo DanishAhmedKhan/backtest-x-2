@@ -28,6 +28,7 @@ import { ChartRuntime } from '../drawing/runtime/ChartRuntime'
 import { ToolType } from '../drawing/tools/ToolType'
 import { DrawingContext } from '../drawing/DrawingContext'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
+import { DrawingPersistence } from '../drawing/persistence/DrawingPersistence'
 import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 import { toolStore } from '../drawing/tools/ToolStore'
 
@@ -100,6 +101,9 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const drawingContextRef = useRef<DrawingContext | null>(null)
     const runtimeRef = useRef<ChartRuntime | null>(null)
+
+    const drawingPersistenceRef = useRef<DrawingPersistence | null>(null)
+    const drawingPersistenceTickerRef = useRef<string | null>(null)
 
     const paneGeometryRef = useRef<PaneGeometry | null>(null)
 
@@ -219,6 +223,19 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
         const drawingContext = drawingContextRef.current
 
+        if (drawingPersistenceTickerRef.current !== ticker.toKey()) {
+            drawingPersistenceRef.current?.stop()
+
+            drawingContext.drawingManager.clearDrawing()
+
+            const persistence = new DrawingPersistence(drawingContext.drawingManager, ticker.toKey())
+
+            drawingPersistenceRef.current = persistence
+            drawingPersistenceTickerRef.current = ticker.toKey()
+
+            persistence.start()
+        }
+
         paneGeometryRef.current = new PaneGeometry(container)
 
         runtimeRef.current = new ChartRuntime({
@@ -237,6 +254,10 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
 
         return () => {
+            drawingPersistenceRef.current?.stop()
+            drawingPersistenceRef.current = null
+            drawingPersistenceTickerRef.current = null
+
             runtimeRef.current?.dispose()
             runtimeRef.current = null
         }

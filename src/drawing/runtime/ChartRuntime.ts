@@ -107,6 +107,7 @@ export class ChartRuntime {
         const editingSession = new EditingSession(this.timeResolver)
 
         const editController = new EditController(
+            drawingContext.drawingManager,
             drawingContext.drawingStateManager,
             drawingContext.editorManager,
             editingSession,

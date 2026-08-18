@@ -21,9 +21,21 @@ export class DrawingManager {
         }
     }
 
+    public notifyChanged() {
+        this.notify()
+    }
+
     public addDrawing(drawing: Drawing) {
         this.drawings.set(drawing.id, drawing)
+        this.notify()
+    }
 
+    public updateDrawing(drawing: Drawing) {
+        if (!this.drawings.has(drawing.id)) {
+            return
+        }
+
+        this.drawings.set(drawing.id, drawing)
         this.notify()
     }
 
@@ -35,9 +47,7 @@ export class DrawingManager {
         }
 
         drawing.destroy()
-
         this.drawings.delete(id)
-
         this.notify()
     }
 
@@ -47,7 +57,6 @@ export class DrawingManager {
         }
 
         this.drawings.clear()
-
         this.notify()
     }
 

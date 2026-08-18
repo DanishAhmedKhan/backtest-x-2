@@ -1,3 +1,4 @@
+import type { DrawingManager } from '../managers/DrawingManager'
 import type { DrawingStateManager } from '../managers/DrawingStateManager'
 import { EditingSession } from '../editor/EditingSession'
 import type { EditorManager } from '../editor/EditorManager'
@@ -11,6 +12,7 @@ export class EditController {
     private startScreenPoint: Point | null = null
 
     constructor(
+        private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly editorManager: EditorManager,
         private readonly editingSession: EditingSession,
@@ -69,7 +71,13 @@ export class EditController {
             return
         }
 
+        const target = this.editingSession.getTarget()
+
         this.editorManager.endEdit(this.editingSession)
+
+        if (target) {
+            this.drawingManager.updateDrawing(target.drawing)
+        }
 
         this.viewportInteraction.enableViewportInteraction()
 
