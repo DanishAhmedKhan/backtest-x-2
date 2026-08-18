@@ -1,9 +1,9 @@
-import type { IndicatorConfig } from './Indicator'
+import { Indicator, type IndicatorConfig } from './Indicator'
 
 type Listener = () => void
 
 class IndicatorStore {
-    private indicators: IndicatorConfig[] = []
+    private indicators: Indicator[] = []
     private listeners = new Set<Listener>()
 
     public subscribe(listener: Listener) {
@@ -14,8 +14,12 @@ class IndicatorStore {
         }
     }
 
-    public getAll(): IndicatorConfig[] {
+    public getAll(): Indicator[] {
         return this.indicators
+    }
+
+    public get(id: string): Indicator | undefined {
+        return this.indicators.find((indicator) => indicator.id === id)
     }
 
     public add(config: IndicatorConfig) {
@@ -23,31 +27,63 @@ class IndicatorStore {
             return
         }
 
-        this.indicators.push(config)
+        const indicator = new Indicator(config)
+
+        this.indicators = [...this.indicators, indicator]
 
         this.notify()
     }
 
     public remove(id: string) {
-        const index = this.indicators.findIndex((indicator) => indicator.id === id)
+        const exists = this.indicators.some((indicator) => indicator.id === id)
 
-        if (index === -1) {
+        if (!exists) {
             return
         }
 
-        this.indicators.splice(index, 1)
+        this.indicators = this.indicators.filter((indicator) => indicator.id !== id)
 
         this.notify()
     }
 
-    public update(id: string, changes: Partial<Omit<IndicatorConfig, 'id'>>) {
-        const indicator = this.indicators.find((item) => item.id === id)
+    public update(id: string, changes: Partial<Omit<IndicatorConfig, 'id' | 'type'>>) {
+        const indicator = this.get(id)
 
         if (!indicator) {
             return
         }
 
-        Object.assign(indicator, changes)
+        indicator.update(changes)
+
+        this.indicators = [...this.indicators]
+
+        this.notify()
+    }
+
+    public setVisible(id: string, visible: boolean) {
+        const indicator = this.get(id)
+
+        if (!indicator) {
+            return
+        }
+
+        indicator.setVisible(visible)
+
+        this.indicators = [...this.indicators]
+
+        this.notify()
+    }
+
+    public toggleVisibility(id: string) {
+        const indicator = this.get(id)
+
+        if (!indicator) {
+            return
+        }
+
+        indicator.setVisible(!indicator.isVisible())
+
+        this.indicators = [...this.indicators]
 
         this.notify()
     }

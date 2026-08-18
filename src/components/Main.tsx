@@ -154,6 +154,7 @@ export default function Main() {
             <div className="main-drawingtoolbar">
                 <DrawingToolbar />
             </div>
+
             <ChartWindow
                 charts={charts}
                 activeChartId={activeChartId}
@@ -161,6 +162,7 @@ export default function Main() {
                 layout={layout}
                 onDrawingToolbarManagerReady={setDrawingToolbarManager}
             />
+
             <JumpToDialog
                 open={jumpOpen}
                 onClose={() => setJumpOpen(false)}

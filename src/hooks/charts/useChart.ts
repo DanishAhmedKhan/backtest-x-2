@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { createChart, CandlestickSeries, type IChartApi, type ISeriesApi } from 'lightweight-charts'
 
-import { IndicatorRenderer } from '../../indicators/rendering/Indicatorrenderer'
-
 import { DEFAULT_CHART_CONFIG } from '../../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../../config/default/TimeSeriesConfig'
+import { IndicatorRenderer } from '../../indicators/rendering/IndicatorRenderer'
 
 export function useChart(containerRef: React.RefObject<HTMLDivElement | null>) {
     const chartRef = useRef<IChartApi | null>(null)

@@ -15,6 +15,8 @@ export class IndicatorRenderer {
 
         const series = this.chart.addSeries(LineSeries, {
             lineWidth: 2,
+            priceLineVisible: false,
+            crosshairMarkerVisible: false,
             ...options,
         })
 
@@ -36,6 +38,18 @@ export class IndicatorRenderer {
                 value: value.value,
             })),
         )
+    }
+
+    public setVisible(id: string, visible: boolean) {
+        const series = this.series.get(id)
+
+        if (!series) {
+            return
+        }
+
+        series.applyOptions({
+            visible,
+        })
     }
 
     public remove(id: string) {

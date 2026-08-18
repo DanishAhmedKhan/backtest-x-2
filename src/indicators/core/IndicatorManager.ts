@@ -1,35 +1,27 @@
-import { LineSeries, type IChartApi, type ISeriesApi, type Time } from 'lightweight-charts'
-
 import type { Candle } from '../../core/Candle'
-import type { IndicatorConfig } from './Indicator'
+import type { Indicator } from './Indicator'
 import { calculateIndicator } from './indicatorCalculator'
-
-type IndicatorInstance = {
-    config: IndicatorConfig
-    line: ISeriesApi<'Line'>
-}
+import type { IndicatorRenderer } from '../rendering/IndicatorRenderer'
 
 export class IndicatorManager {
-    private readonly indicators = new Map<string, IndicatorInstance>()
+    private readonly indicators = new Map<string, Indicator>()
 
-    constructor(private readonly chart: IChartApi) {}
+    constructor(private readonly renderer: IndicatorRenderer) {}
 
-    public sync(configs: IndicatorConfig[]) {
+    public sync(indicators: Indicator[]) {
         const incomingIds = new Set<string>()
 
-        for (const config of configs) {
-            incomingIds.add(config.id)
+        for (const indicator of indicators) {
+            incomingIds.add(indicator.id)
 
-            const existing = this.indicators.get(config.id)
+            const existing = this.indicators.get(indicator.id)
 
             if (!existing) {
-                this.create(config)
+                this.create(indicator)
                 continue
             }
 
-            if (!this.isSameConfig(existing.config, config)) {
-                this.updateConfig(config.id, config)
-            }
+            this.renderer.setVisible(indicator.id, indicator.isVisible())
         }
 
         for (const id of this.indicators.keys()) {
@@ -41,7 +33,13 @@ export class IndicatorManager {
 
     public update(candles: Candle[]) {
         for (const indicator of this.indicators.values()) {
-            this.updateIndicator(indicator, candles)
+            const config = indicator.getConfig()
+
+            const values = calculateIndicator(candles, config)
+
+            this.renderer.setData(indicator.id, values)
+
+            this.renderer.setVisible(indicator.id, indicator.isVisible())
         }
     }
 
@@ -52,57 +50,27 @@ export class IndicatorManager {
             return
         }
 
-        this.chart.removeSeries(indicator.line)
+        this.renderer.remove(id)
 
         this.indicators.delete(id)
     }
 
     public clear() {
-        for (const id of [...this.indicators.keys()]) {
-            this.remove(id)
-        }
+        this.indicators.clear()
+        this.renderer.clear()
     }
 
     public dispose() {
         this.clear()
     }
 
-    private create(config: IndicatorConfig) {
-        const line = this.chart.addSeries(LineSeries, {
+    private create(indicator: Indicator) {
+        this.renderer.createLine(indicator.id, {
             lineWidth: 1,
         })
 
-        const instance: IndicatorInstance = {
-            config: { ...config },
-            line,
-        }
+        this.indicators.set(indicator.id, indicator)
 
-        this.indicators.set(config.id, instance)
-    }
-
-    private updateConfig(id: string, config: IndicatorConfig) {
-        const existing = this.indicators.get(id)
-
-        if (!existing) {
-            this.create(config)
-            return
-        }
-
-        existing.config = { ...config }
-    }
-
-    private updateIndicator(instance: IndicatorInstance, candles: Candle[]) {
-        const values = calculateIndicator(candles, instance.config)
-
-        instance.line.setData(
-            values.map((value) => ({
-                time: value.time as Time,
-                value: value.value as number,
-            })),
-        )
-    }
-
-    private isSameConfig(a: IndicatorConfig, b: IndicatorConfig): boolean {
-        return a.id === b.id && a.type === b.type && a.period === b.period && a.source === b.source
+        this.renderer.setVisible(indicator.id, indicator.isVisible())
     }
 }

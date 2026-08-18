@@ -1,4 +1,4 @@
-import type { IndicatorType } from './Indicator'
+import type { IndicatorConfig, IndicatorType } from './Indicator'
 import type { IndicatorSource } from './indicatorSource'
 
 export type IndicatorDefinition = {
@@ -11,6 +11,7 @@ export type IndicatorDefinition = {
         period: number
         source?: IndicatorSource
     }
+    createName: (config: IndicatorConfig) => string
 }
 
 class IndicatorRegistry {
@@ -50,6 +51,9 @@ class IndicatorRegistry {
                 period: 20,
                 source: 'close',
             },
+            createName: (config) => {
+                return `SMA ${config.period} ${config.source}`
+            },
         })
 
         this.register({
@@ -61,6 +65,9 @@ class IndicatorRegistry {
                 period: 20,
                 source: 'close',
             },
+            createName: (config) => {
+                return `EMA ${config.period} ${config.source}`
+            },
         })
 
         this.register({
@@ -71,16 +78,8 @@ class IndicatorRegistry {
             defaultConfig: {
                 period: 14,
             },
-        })
-
-        this.register({
-            type: 'rsi',
-            name: 'Relative Strength Index',
-            description: 'Measures the speed and magnitude of price movements.',
-            display: 'pane',
-            defaultConfig: {
-                period: 14,
-                source: 'close',
+            createName: (config) => {
+                return `ATR ${config.period}`
             },
         })
     }

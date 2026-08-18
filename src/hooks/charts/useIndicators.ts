@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import type { CandlestickData, IChartApi, Time } from 'lightweight-charts'
 
+import { IndicatorRenderer } from '../../indicators/rendering/IndicatorRenderer'
 import { IndicatorManager } from '../../indicators/core/IndicatorManager'
 import { indicatorStore } from '../../indicators/core/IndicatorStore'
 import { toIndicatorCandles } from '../../indicators/core/toIndicatorCandles'
@@ -24,7 +25,8 @@ export function useIndicators({ chartRef, displayedCandlesRef, chartReady }: Pro
             return
         }
 
-        const manager = new IndicatorManager(chart)
+        const renderer = new IndicatorRenderer(chart)
+        const manager = new IndicatorManager(renderer)
 
         managerRef.current = manager
 
@@ -37,9 +39,9 @@ export function useIndicators({ chartRef, displayedCandlesRef, chartReady }: Pro
         }
 
         const syncIndicators = () => {
-            const configs = indicatorStore.getAll()
+            const indicators = indicatorStore.getAll()
 
-            manager.sync(configs)
+            manager.sync(indicators)
 
             updateData()
         }

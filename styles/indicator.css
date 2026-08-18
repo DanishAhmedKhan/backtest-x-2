@@ -4,6 +4,12 @@
     padding-bottom: 20px;
 }
 
+.indicator-selector-list svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 .indicator-selector-item {
     display: flex;
     align-items: center;
@@ -26,6 +32,27 @@
     z-index: 20;
 }
 
+.chart-indicator-list svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 .chart-indicator-item {
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-indicator-item .name {
     font-size: 12px;
+}
+
+.chart-indicator-item .action {
+    display: none;
+}
+
+.chart-indicator-item:hover .action {
+    display: flex;
 }
