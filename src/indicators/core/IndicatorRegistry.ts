@@ -1,6 +1,8 @@
 import type { IndicatorConfig, IndicatorType } from './Indicator'
 import type { IndicatorSource } from './indicatorSource'
 
+export type IndicatorDisplay = 'overlay' | 'pane'
+
 export type IndicatorDefinition = {
     type: IndicatorType
     name: string

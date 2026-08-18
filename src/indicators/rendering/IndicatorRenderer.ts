@@ -1,24 +1,32 @@
-import { LineSeries, type IChartApi, type ISeriesApi, type LineSeriesOptions, type Time } from 'lightweight-charts'
+import type { IChartApi, ISeriesApi, LineSeriesOptions, Time } from 'lightweight-charts'
+import { LineSeries } from 'lightweight-charts'
 import type { IndicatorValue } from '../core/indicatorSource'
+import type { IndicatorDisplay } from '../core/IndicatorRegistry'
 
 export class IndicatorRenderer {
     private readonly series = new Map<string, ISeriesApi<'Line'>>()
 
     constructor(private readonly chart: IChartApi) {}
 
-    public createLine(id: string, options?: Partial<LineSeriesOptions>): ISeriesApi<'Line'> {
+    public createLine(id: string, display: IndicatorDisplay, options?: Partial<LineSeriesOptions>): ISeriesApi<'Line'> {
         const existing = this.series.get(id)
 
         if (existing) {
             return existing
         }
 
-        const series = this.chart.addSeries(LineSeries, {
-            lineWidth: 2,
-            priceLineVisible: false,
-            crosshairMarkerVisible: false,
-            ...options,
-        })
+        const paneIndex = display === 'overlay' ? 0 : 1
+
+        const series = this.chart.addSeries(
+            LineSeries,
+            {
+                lineWidth: 2,
+                priceLineVisible: false,
+                crosshairMarkerVisible: false,
+                ...options,
+            },
+            paneIndex,
+        )
 
         this.series.set(id, series)
 

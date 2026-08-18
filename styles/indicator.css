@@ -39,10 +39,17 @@
 }
 
 .chart-indicator-item {
-    height: 18px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0px 3px;
+}
+
+.chart-indicator-item:hover {
+    border-color: #dbdbdb;
 }
 
 .chart-indicator-item .name {
@@ -50,9 +57,20 @@
 }
 
 .chart-indicator-item .action {
-    display: none;
+    display: flex;
 }
 
 .chart-indicator-item:hover .action {
     display: flex;
+}
+
+.chart-indicator-item .action-button {
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-indicator-item .action-button:hover {
+    background-color: #f2f2f2;
 }

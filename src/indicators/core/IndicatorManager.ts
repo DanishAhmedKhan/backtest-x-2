@@ -65,7 +65,7 @@ export class IndicatorManager {
     }
 
     private create(indicator: Indicator) {
-        this.renderer.createLine(indicator.id, {
+        this.renderer.createLine(indicator.id, indicator.getDisplay(), {
             lineWidth: 1,
         })
 

@@ -69,4 +69,14 @@ export class Indicator {
 
         return definition.createName(this.getConfig())
     }
+
+    public getDisplay(): 'overlay' | 'pane' {
+        const definition = indicatorRegistry.get(this.type)
+
+        if (!definition) {
+            throw new Error(`Indicator definition "${this.type}" does not exist`)
+        }
+
+        return definition.display
+    }
 }
