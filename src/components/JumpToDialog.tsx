@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { ToolIcon } from './ui/ToolbarIcon'
+import { ToolbarIcon } from './ui/ToolbarIcon'
 import CalendarPicker from './CalendarPicker'
 
 import svg from '../svg/svg'
@@ -60,7 +60,8 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
                     <div className="go-to-title">Go to</div>
 
                     <button type="button" className="go-to-close" onClick={onClose} aria-label="Close">
-                        <div style={{ width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: svg.close }} />
+                        {/* <div style={{ width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: svg.close }} /> */}
+                        <ToolbarIcon width={18} height={18} svg={svg.close}></ToolbarIcon>
                     </button>
                 </div>
 
@@ -95,7 +96,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
                                 />
 
                                 <button type="button" className="go-to-input-icon">
-                                    <ToolIcon svg={svg.calendar} />
+                                    <ToolbarIcon svg={svg.calendar} />
                                 </button>
                             </div>
 
@@ -109,7 +110,7 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
                                 />
 
                                 <button type="button" className="go-to-input-icon">
-                                    <ToolIcon svg={svg.clock} />
+                                    <ToolbarIcon svg={svg.clock} />
                                 </button>
                             </div>
                         </div>

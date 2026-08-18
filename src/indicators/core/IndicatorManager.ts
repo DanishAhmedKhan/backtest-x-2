@@ -2,8 +2,7 @@ import { LineSeries, type IChartApi, type ISeriesApi, type Time } from 'lightwei
 
 import type { Candle } from '../../core/Candle'
 import type { IndicatorConfig } from './Indicator'
-
-import { calculateSMA } from '../calculations/sma'
+import { calculateIndicator } from './indicatorCalculator'
 
 type IndicatorInstance = {
     config: IndicatorConfig
@@ -70,7 +69,7 @@ export class IndicatorManager {
 
     private create(config: IndicatorConfig) {
         const line = this.chart.addSeries(LineSeries, {
-            lineWidth: 2,
+            lineWidth: 1,
         })
 
         const instance: IndicatorInstance = {
@@ -93,28 +92,14 @@ export class IndicatorManager {
     }
 
     private updateIndicator(instance: IndicatorInstance, candles: Candle[]) {
-        const { config, line } = instance
+        const values = calculateIndicator(candles, instance.config)
 
-        switch (config.type) {
-            case 'sma': {
-                const values = calculateSMA(candles, {
-                    period: config.period,
-                    source: config.source ?? 'close',
-                })
-
-                line.setData(
-                    values.map((value) => ({
-                        time: value.time as Time,
-                        value: value.value,
-                    })),
-                )
-
-                break
-            }
-
-            default:
-                break
-        }
+        instance.line.setData(
+            values.map((value) => ({
+                time: value.time as Time,
+                value: value.value as number,
+            })),
+        )
     }
 
     private isSameConfig(a: IndicatorConfig, b: IndicatorConfig): boolean {

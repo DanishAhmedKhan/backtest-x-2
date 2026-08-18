@@ -1,5 +1,5 @@
 import svg from '../../svg/svg'
-import { ToolIcon } from './ToolbarIcon'
+import { ToolbarIcon } from './ToolbarIcon'
 import { ToolbarDropdown } from './ToolbarDropdown'
 import type { ToolbarDropdownOption } from './types'
 
@@ -24,7 +24,7 @@ export function ToolbarArrowDropdown({ selectedId, options, width, tooltip, onCh
                     className={`toolbar-trigger toolbar-arrow-trigger ${open ? 'active' : ''}`}
                     onClick={toggleDropdown}
                 >
-                    <ToolIcon className="toolbar-arrow" svg={svg.dropdown} width={8} height={4} />
+                    <ToolbarIcon className="toolbar-arrow" svg={svg.dropdown} width={8} height={4} />
                 </div>
             )}
         />

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Toolbar } from './ui/Toolbar'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
-import { ToolIcon } from './ui/ToolbarIcon'
+import { ToolbarIcon } from './ui/ToolbarIcon'
 
 import { toolStore } from '../drawing/tools/ToolStore'
 import { drawingTools } from '../drawing/config/drawingTools'
@@ -21,7 +21,7 @@ export default function DrawingToolbar() {
                 {drawingTools.map((tool) => (
                     <ToolbarButton
                         key={tool.type}
-                        icon={<ToolIcon svg={tool.icon} />}
+                        icon={<ToolbarIcon svg={tool.icon} />}
                         active={selectedTool === tool.type}
                         onClick={() => {
                             toolStore.select(tool.type)

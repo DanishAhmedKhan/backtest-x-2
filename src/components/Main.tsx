@@ -14,7 +14,6 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 
 import type { ChartState } from '../types/ChartState'
 import { LAYOUTS, type LayoutType } from '../types/Layout'
-import { replayStore } from '../replay/ReplayStore'
 import { LocalStorageProvider } from '../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../storage/key'
 import type { AppConfig, ChartConfig } from '../types/AppConfig'
@@ -22,7 +21,11 @@ import { eventBus } from '../event/EventBus'
 import { useReplayController } from '../hooks/charts/useReplayController'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 
+import { replayStore } from '../replay/ReplayStore'
+import { indicatorStore } from '../indicators/core/IndicatorStore'
+
 import '../../styles/index.css'
+import IndicatorList from './IndicatorList'
 
 const storage = new LocalStorageProvider()
 
@@ -138,6 +141,13 @@ export default function Main() {
                     onTickerChange={(t) => updateActiveChart({ ticker: t })}
                     onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
                     onLayoutChange={handleLayoutChange}
+                    onIndicatorClick={() => {
+                        indicatorStore.add({
+                            id: 'ema-20',
+                            type: 'ema',
+                            period: 20,
+                        })
+                    }}
                     onReplayClick={() => {
                         replayStore.isSelecting = true
                         setShowReplayToolbar(false)
@@ -145,11 +155,9 @@ export default function Main() {
                     onJumpToClick={() => setJumpOpen(true)}
                 />
             </div>
-
             <div className="main-drawingtoolbar">
                 <DrawingToolbar />
             </div>
-
             <ChartWindow
                 charts={charts}
                 activeChartId={activeChartId}
@@ -157,7 +165,6 @@ export default function Main() {
                 layout={layout}
                 onDrawingToolbarManagerReady={setDrawingToolbarManager}
             />
-
             <JumpToDialog
                 open={jumpOpen}
                 onClose={() => setJumpOpen(false)}
@@ -170,8 +177,9 @@ export default function Main() {
                 }}
             />
 
-            {showReplayToolbar && <ReplayToolbar />}
+            {/* <IndicatorList open={true} onClose={() => console.log('as')}></IndicatorList> */}
 
+            {showReplayToolbar && <ReplayToolbar />}
             <DrawingPropertiesToolbar manager={drawingToolbarManager} />
         </div>
     )

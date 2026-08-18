@@ -8,7 +8,7 @@ import { TimeframeRegistry } from '../core/TimeframeRegistry'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarDropdown } from './ui/ToolbarDropdown'
 import { ToolbarButton } from './ui/ToolbarButton'
-import { ToolIcon } from './ui/ToolbarIcon'
+import { ToolbarIcon } from './ui/ToolbarIcon'
 import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ToolbarFill } from './ui/ToolbarFill'
 import { ToolbarArrowDropdown } from './ui/ToolbarArrowDropdown'
@@ -26,6 +26,7 @@ type Props = {
     onTickerChange: (t: Ticker) => void
     onTimeframeChange: (t: Timeframe) => void
     onLayoutChange: (l: LayoutType) => void
+    onIndicatorClick: () => void
     onReplayClick: () => void
     onJumpToClick: () => void
 }
@@ -37,6 +38,7 @@ export default function TopToolbar({
     onTickerChange,
     onTimeframeChange,
     onLayoutChange,
+    onIndicatorClick,
     onReplayClick,
     onJumpToClick,
 }: Props) {
@@ -52,7 +54,7 @@ export default function TopToolbar({
 
     const layoutButtons = LAYOUT_TYPES.map((layoutType) => ({
         id: `l-${layoutType}`,
-        icon: <ToolIcon width={21} height={19} svg={svg.layout[layoutType]} />,
+        icon: <ToolbarIcon width={21} height={19} svg={svg.layout[layoutType]} />,
     }))
 
     const layoutGroups: ToolbarButtonItem[][] = [[], [], [], []]
@@ -112,8 +114,9 @@ export default function TopToolbar({
             <ToolbarSeparator />
 
             <ToolbarGroup>
-                <ToolbarButton icon={<ToolIcon svg={svg.replay.replay} />} onClick={onReplayClick} />
-                <ToolbarButton icon={<ToolIcon svg={svg.goTo} />} onClick={onJumpToClick} />
+                <ToolbarButton icon={<ToolbarIcon svg={svg.indicator} />} onClick={onIndicatorClick}></ToolbarButton>
+                <ToolbarButton icon={<ToolbarIcon svg={svg.replay.replay} />} onClick={onReplayClick} />
+                <ToolbarButton icon={<ToolbarIcon svg={svg.goTo} />} onClick={onJumpToClick} />
             </ToolbarGroup>
 
             <ToolbarFill />
@@ -128,7 +131,7 @@ export default function TopToolbar({
                             className={`toolbar-trigger ${open ? 'active' : ''}`}
                             onClick={toggleDropdown}
                         >
-                            <ToolIcon svg={svg.layout[layout]} width={21} height={19} />
+                            <ToolbarIcon svg={svg.layout[layout]} width={21} height={19} />
                         </button>
                     )}
                     dropdown={({ select }) => (
@@ -147,8 +150,8 @@ export default function TopToolbar({
                     )}
                 />
 
-                <ToolbarButton icon={<ToolIcon svg={svg.settings} />} />
-                <ToolbarButton icon={<ToolIcon svg={svg.snapshot} />} />
+                <ToolbarButton icon={<ToolbarIcon svg={svg.settings} />} />
+                <ToolbarButton icon={<ToolbarIcon svg={svg.snapshot} />} />
             </ToolbarGroup>
         </Toolbar>
     )

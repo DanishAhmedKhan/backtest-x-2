@@ -1,6 +1,8 @@
 @import './main.css';
 @import './toolbar.css';
+@import './popup.css';
 @import './jump-to.css';
+@import './indicator-list.css';
 @import './chart.css';
 @import './color-picker.css';
 @import './drawing-properties-toolbar.css';

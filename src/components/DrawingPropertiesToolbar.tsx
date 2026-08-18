@@ -6,7 +6,7 @@ import { ToolbarItemType, type ToolbarItem } from '../drawing/toolbar/ToolbarIte
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
 import { ToolbarDropdown } from './ui/ToolbarDropdown'
-import { ToolIcon } from './ui/ToolbarIcon'
+import { ToolbarIcon } from './ui/ToolbarIcon'
 import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ColorPicker } from './common/ColorPicker'
 
@@ -91,7 +91,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                 onClick={toggleDropdown}
                                             >
                                                 <div className="drawing-color-trigger">
-                                                    <ToolIcon
+                                                    <ToolbarIcon
                                                         className="drawing-color-icon"
                                                         width={16}
                                                         height={16}
@@ -145,7 +145,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                 onClick={toggleDropdown}
                                             >
                                                 <div className="drawing-color-trigger">
-                                                    <ToolIcon
+                                                    <ToolbarIcon
                                                         className="drawing-color-icon"
                                                         width={16}
                                                         height={16}
@@ -203,7 +203,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                         title={item.tooltip}
                                                         onClick={toggleDropdown}
                                                     >
-                                                        <ToolIcon
+                                                        <ToolbarIcon
                                                             svg={svg.line[`line${width}`]}
                                                             width={18}
                                                             height={width}
@@ -237,7 +237,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             }}
                                                         >
                                                             <span className="drawing-width-option-icon">
-                                                                <ToolIcon
+                                                                <ToolbarIcon
                                                                     width={18}
                                                                     height={width}
                                                                     svg={svg.line[`line${width}`]}
@@ -292,7 +292,7 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                     title={item.tooltip}
                                                     onClick={toggleDropdown}
                                                 >
-                                                    <ToolIcon svg={icon} />
+                                                    <ToolbarIcon svg={icon} />
                                                 </button>
                                             )
                                         }}
@@ -311,7 +311,10 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <ToolIcon className="line-style-icon" svg={svg.style.solid} />
+                                                        <ToolbarIcon
+                                                            className="line-style-icon"
+                                                            svg={svg.style.solid}
+                                                        />
 
                                                         <span>Line</span>
                                                     </button>
@@ -326,7 +329,10 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <ToolIcon className="line-style-icon" svg={svg.style.dashed} />
+                                                        <ToolbarIcon
+                                                            className="line-style-icon"
+                                                            svg={svg.style.dashed}
+                                                        />
 
                                                         <span>Dashed line</span>
                                                     </button>
@@ -341,7 +347,10 @@ export function DrawingPropertiesToolbar({ manager }: Props) {
                                                             close()
                                                         }}
                                                     >
-                                                        <ToolIcon className="line-style-icon" svg={svg.style.dotted} />
+                                                        <ToolbarIcon
+                                                            className="line-style-icon"
+                                                            svg={svg.style.dotted}
+                                                        />
 
                                                         <span>Dotted line</span>
                                                     </button>

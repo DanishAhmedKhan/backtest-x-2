@@ -1,15 +1,19 @@
 import { useEffect, useRef } from 'react'
 
-type PopupPlacement = 'bottom' | 'top' | 'left' | 'right'
+import { ToolbarIcon } from '../ui/ToolbarIcon'
+
+import svg from '../../svg/svg'
 
 type Props = {
     open: boolean
-    placement?: PopupPlacement
+    width?: number
+    height?: number
+    title?: string
     onClose: () => void
-    children: React.ReactNode
+    content: React.ReactNode
 }
 
-export function Popup({ open, placement = 'bottom', onClose, children }: Props) {
+export function Popup({ open, width, height, title, onClose, content }: Props) {
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -34,60 +38,27 @@ export function Popup({ open, placement = 'bottom', onClose, children }: Props) 
         return null
     }
 
-    const position = getPlacementStyle(placement)
+    const size: React.CSSProperties = {}
+
+    if (width) {
+        size.width = `${width}px`
+    }
+
+    if (height) {
+        size.height = `${height}px`
+    }
 
     return (
-        <div
-            ref={ref}
-            style={{
-                position: 'absolute',
+        <div ref={ref} className="popup" style={size}>
+            <div className="popup-header">
+                <div className="popup-title">{title ?? 'Popup Header'}</div>
 
-                ...position,
+                <button type="button" className="popup-close" onClick={onClose} aria-label="Close">
+                    <ToolbarIcon width={18} height={18} svg={svg.close} />
+                </button>
+            </div>
 
-                background: '#1f1f1f',
-                border: '1px solid #444',
-                borderRadius: 6,
-
-                padding: 4,
-
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-
-                boxShadow: '0 4px 12px rgba(0,0,0,.4)',
-
-                zIndex: 1000,
-            }}
-        >
-            {children}
+            <div className="popup-content">{content}</div>
         </div>
     )
-}
-
-function getPlacementStyle(placement: PopupPlacement): React.CSSProperties {
-    switch (placement) {
-        case 'bottom':
-            return {
-                top: '110%',
-                left: 0,
-            }
-
-        case 'top':
-            return {
-                bottom: '110%',
-                left: 0,
-            }
-
-        case 'left':
-            return {
-                right: '110%',
-                top: 0,
-            }
-
-        case 'right':
-            return {
-                left: '110%',
-                top: 0,
-            }
-    }
 }

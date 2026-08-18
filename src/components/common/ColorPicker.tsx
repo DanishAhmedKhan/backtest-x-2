@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-import { ToolIcon } from '../ui/ToolbarIcon'
+import { ToolbarIcon } from '../ui/ToolbarIcon'
 
 import { getColorOpacity, hexToHsv, hexToRgba, hsvToHex, rgbaToHex } from '../../helper/color'
 import svg from '../../svg/svg'
@@ -288,7 +288,7 @@ export function ColorPicker({ selected, onSelect, onChange }: Props) {
                                 onClick={() => setShowCustomPicker(false)}
                                 aria-label="Back"
                             >
-                                <ToolIcon svg={svg.left} />
+                                <ToolbarIcon svg={svg.left} />
                             </button>
 
                             <button type="button" className="custom-color-add" onClick={handleAddCustomColor}>
