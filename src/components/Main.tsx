@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import TopToolbar from './TopToolbar'
 import ChartWindow from './ChartWindow'
 import JumpToDialog from './JumpToDialog'
+import IndicatorSelector from './IndicatorSelector'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
 import { DrawingPropertiesToolbar } from './DrawingPropertiesToolbar'
@@ -25,7 +26,7 @@ import { replayStore } from '../replay/ReplayStore'
 import { indicatorStore } from '../indicators/core/IndicatorStore'
 
 import '../../styles/index.css'
-import IndicatorList from './IndicatorList'
+import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
 
 const storage = new LocalStorageProvider()
 
@@ -72,6 +73,7 @@ export default function Main() {
     const [activeChartId, setActiveChartId] = useState(initialCharts[0]?.id ?? '')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
     const [jumpOpen, setJumpOpen] = useState(false)
+    const [indicatorListOpen, setIndicatorListOpen] = useState(false)
 
     const [drawingToolbarManager, setDrawingToolbarManager] = useState<DrawingToolbarManager | null>(null)
 
@@ -141,13 +143,7 @@ export default function Main() {
                     onTickerChange={(t) => updateActiveChart({ ticker: t })}
                     onTimeframeChange={(tf) => updateActiveChart({ timeframe: tf })}
                     onLayoutChange={handleLayoutChange}
-                    onIndicatorClick={() => {
-                        indicatorStore.add({
-                            id: 'ema-20',
-                            type: 'ema',
-                            period: 20,
-                        })
-                    }}
+                    onIndicatorClick={() => setIndicatorListOpen(true)}
                     onReplayClick={() => {
                         replayStore.isSelecting = true
                         setShowReplayToolbar(false)
@@ -177,7 +173,21 @@ export default function Main() {
                 }}
             />
 
-            {/* <IndicatorList open={true} onClose={() => console.log('as')}></IndicatorList> */}
+            <IndicatorSelector
+                open={indicatorListOpen}
+                onClose={() => setIndicatorListOpen(false)}
+                onIndicatorClick={(indicator) => {
+                    const definition = indicatorRegistry.get(indicator.type)
+
+                    if (definition) {
+                        indicatorStore.add({
+                            id: definition.type + '-' + crypto.randomUUID(),
+                            type: definition.type,
+                            ...definition.defaultConfig,
+                        })
+                    }
+                }}
+            />
 
             {showReplayToolbar && <ReplayToolbar />}
             <DrawingPropertiesToolbar manager={drawingToolbarManager} />

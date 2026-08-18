@@ -1,29 +1,20 @@
-import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
-import { Popup } from './common/Popup'
+import { indicatorStore } from '../indicators/core/IndicatorStore'
 
-type Props = {
-    open: boolean
-    onClose: () => void
-}
-
-export default function IndicatorList({ open, onClose }: Props) {
+export default function IndicatorList() {
     return (
-        <Popup
-            open={open}
-            width={400}
-            title="Indicator"
-            onClose={onClose}
-            content={
-                <div className="indicator-list">
-                    {indicatorRegistry.getAll().map((indicator) => {
-                        return (
-                            <div className="indicator-item" key={indicator.type}>
-                                {indicator.name}
-                            </div>
-                        )
-                    })}
-                </div>
-            }
-        />
+        <div className="chart-indicator-list">
+            {indicatorStore.getAll().map((indicator) => {
+                return (
+                    <div className="chart-indicator-item" key={indicator.id}>
+                        <div className="name">{indicator.type}</div>
+                        <div className="action">
+                            <div className="hide"></div>
+                            <div className="setting"></div>
+                            <div className="delete"></div>
+                        </div>
+                    </div>
+                )
+            })}
+        </div>
     )
 }

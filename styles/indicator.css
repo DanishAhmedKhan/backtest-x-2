@@ -1,0 +1,31 @@
+.indicator-selector-list {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+}
+
+.indicator-selector-item {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0px 10px;
+    font-size: 14px;
+    border-radius: 8px;
+}
+
+.indicator-selector-item:hover {
+    background-color: #f2f2f2;
+}
+
+.chart-indicator-list {
+    position: absolute;
+    top: 35px;
+    left: 8px;
+    width: auto;
+    background-color: transparent;
+    z-index: 20;
+}
+
+.chart-indicator-item {
+    font-size: 12px;
+}

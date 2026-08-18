@@ -43,6 +43,7 @@ import { binarySearch } from '../helper/binarySearch'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import { CursorType } from '../core/cursor/CursorType'
 import { CursorSource } from '../core/cursor/CursorSource'
+import IndicatorList from './IndicatorList'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -381,6 +382,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     return (
         <div className="chart">
             {chartDataStatus !== 'no-data' && <ChartOHLC ohlc={ohlc} />}
+            {chartDataStatus !== 'no-data' && <IndicatorList />}
 
             <div
                 className="chart-container"
