@@ -24,6 +24,7 @@ type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+    displayedCandlesRef: React.RefObject<CandlestickData<Time>[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     raw1mRef: React.RefObject<Raw1mData>
@@ -43,6 +44,7 @@ export function useChartData({
     chartRef,
     seriesRef,
     candlesRef,
+    displayedCandlesRef,
     candleMapRef,
     timesRef,
     raw1mRef,
@@ -89,6 +91,7 @@ export function useChartData({
             series.setData([])
 
             candlesRef.current = []
+            displayedCandlesRef.current = []
             candleMapRef.current.clear()
             timesRef.current = []
 
@@ -132,7 +135,17 @@ export function useChartData({
                     skipSeriesUpdate: replayStore.enabled,
                 })
 
+                displayedCandlesRef.current = result.chartCandles.map((c) => ({
+                    time: c.time as Time,
+                    open: c.open,
+                    high: c.high,
+                    low: c.low,
+                    close: c.close,
+                }))
+
                 runtimeRef.current?.onChartDataChanged()
+
+                eventBus.emit('chartDataChanged')
 
                 if (replayStore.enabled) {
                     const seconds = timeframe.toSeconds()

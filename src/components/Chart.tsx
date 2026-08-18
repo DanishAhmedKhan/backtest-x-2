@@ -23,6 +23,8 @@ import { useOHLCOverlay } from '../hooks/charts/useOHLCOverlay'
 import { useDrawingTools } from '../hooks/charts/useDrawingTool'
 import { useToolSync } from '../hooks/drawings/useToolSync'
 import { useDrawingCanvas } from '../hooks/drawings/useDrawingCanvas'
+import { useChartRuntime } from '../hooks/charts/useChartRuntime'
+import { useIndicators } from '../hooks/charts/useIndicators'
 
 import { ChartRuntime } from '../drawing/runtime/ChartRuntime'
 import { ToolType } from '../drawing/tools/ToolType'
@@ -41,7 +43,6 @@ import { binarySearch } from '../helper/binarySearch'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import { CursorType } from '../core/cursor/CursorType'
 import { CursorSource } from '../core/cursor/CursorSource'
-import { useChartRuntime } from '../hooks/charts/useChartRuntime'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -62,6 +63,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
     const candlesRef = useRef<CandlestickData<Time>[]>([])
+    const displayedCandlesRef = useRef<CandlestickData<Time>[]>([])
     const candleMapRef = useRef<Map<number, CandlestickData<Time>>>(new Map())
     const timesRef = useRef<number[]>([])
 
@@ -120,6 +122,12 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
     })
 
+    useIndicators({
+        chartRef,
+        displayedCandlesRef,
+        chartReady,
+    })
+
     const ohlc = useOHLCOverlay({
         chartRef,
         seriesRef,
@@ -139,6 +147,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
+        displayedCandlesRef,
         candleMapRef,
         timesRef,
         ticker,
@@ -169,6 +178,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
+        displayedCandlesRef,
         candleMapRef,
         timesRef,
         raw1mRef,
@@ -188,6 +198,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
+        displayedCandlesRef,
         viewportRef,
         replayViewportRef,
     })

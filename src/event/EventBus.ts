@@ -32,6 +32,8 @@ type EventMap = {
 
     chartDragEnded: void
 
+    chartDataChanged: void
+
     toolChanged: {
         tool: ToolType
         clearSelection?: boolean

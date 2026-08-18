@@ -19,6 +19,7 @@ type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+    displayedCandlesRef: React.RefObject<CandlestickData<Time>[]>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     ticker: Ticker
@@ -38,6 +39,7 @@ export function useInfiniteScroll({
     chartRef,
     seriesRef,
     candlesRef,
+    displayedCandlesRef,
     candleMapRef,
     timesRef,
     ticker,
@@ -104,10 +106,12 @@ export function useInfiniteScroll({
                     const result = await loadWindow('older')
 
                     if (result.loaded) {
+                        displayedCandlesRef.current = candlesRef.current
+
                         runtimeRef.current?.onChartDataChanged()
+                        eventBus.emit('chartDataChanged')
 
                         timeScale.scrollPosition()
-
                         timeScale.scrollToPosition(beforeScroll, false)
 
                         return
@@ -118,7 +122,10 @@ export function useInfiniteScroll({
                     const result = await loadWindow('newer')
 
                     if (result.loaded) {
+                        displayedCandlesRef.current = candlesRef.current
+
                         runtimeRef.current?.onChartDataChanged()
+                        eventBus.emit('chartDataChanged')
                     }
                 }
             } catch (err) {
@@ -157,5 +164,6 @@ export function useInfiniteScroll({
         viewportRef,
         runtimeRef,
         raw1mRef,
+        displayedCandlesRef,
     ])
 }

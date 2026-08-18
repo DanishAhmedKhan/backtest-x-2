@@ -16,11 +16,20 @@ type Props = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+    displayedCandlesRef: React.RefObject<CandlestickData<Time>[]>
     viewportRef: React.RefObject<ViewportState>
     replayViewportRef: React.RefObject<ViewportState>
 }
 
-export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, viewportRef, replayViewportRef }: Props) {
+export function useReplaySync({
+    timeframe,
+    chartRef,
+    seriesRef,
+    candlesRef,
+    displayedCandlesRef,
+    viewportRef,
+    replayViewportRef,
+}: Props) {
     useEffect(() => {
         const chart = chartRef.current
         const series = seriesRef.current
@@ -77,6 +86,10 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, view
 
             series.setData(formatted)
 
+            displayedCandlesRef.current = formatted
+
+            eventBus.emit('chartDataChanged')
+
             restoreViewport({
                 chart,
                 series,
@@ -102,6 +115,10 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, view
 
             series.setData(candlesRef.current)
 
+            displayedCandlesRef.current = candlesRef.current
+
+            eventBus.emit('chartDataChanged')
+
             restoreViewport({
                 chart,
                 series,
@@ -114,5 +131,5 @@ export function useReplaySync({ timeframe, chartRef, seriesRef, candlesRef, view
             unsubPositionChanged()
             unsubStop()
         }
-    }, [timeframe, chartRef, seriesRef, candlesRef, viewportRef, replayViewportRef])
+    }, [timeframe, chartRef, seriesRef, candlesRef, viewportRef, replayViewportRef, displayedCandlesRef])
 }

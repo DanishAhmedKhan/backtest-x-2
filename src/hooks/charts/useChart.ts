@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { createChart, CandlestickSeries, type IChartApi, type ISeriesApi } from 'lightweight-charts'
+
+import { IndicatorRenderer } from '../../indicators/rendering/Indicatorrenderer'
+
 import { DEFAULT_CHART_CONFIG } from '../../config/default/ChartConfig'
 import { TIME_SERIES_CONFIG } from '../../config/default/TimeSeriesConfig'
 
 export function useChart(containerRef: React.RefObject<HTMLDivElement | null>) {
     const chartRef = useRef<IChartApi | null>(null)
     const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
+    const indicatorRendererRef = useRef<IndicatorRenderer | null>(null)
 
     const [chartReady, setChartReady] = useState(false)
 
@@ -20,9 +24,14 @@ export function useChart(containerRef: React.RefObject<HTMLDivElement | null>) {
         chartRef.current = chart
         seriesRef.current = series
 
+        indicatorRendererRef.current = new IndicatorRenderer(chart)
+
         setChartReady(true)
 
         return () => {
+            indicatorRendererRef.current?.dispose()
+            indicatorRendererRef.current = null
+
             chart.remove()
 
             chartRef.current = null
@@ -35,6 +44,7 @@ export function useChart(containerRef: React.RefObject<HTMLDivElement | null>) {
     return {
         chartRef,
         seriesRef,
+        indicatorRendererRef,
         chartReady,
     }
 }
