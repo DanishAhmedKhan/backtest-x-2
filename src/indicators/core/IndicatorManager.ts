@@ -1,38 +1,49 @@
 import { LineSeries, type IChartApi, type ISeriesApi, type Time } from 'lightweight-charts'
 
 import type { Candle } from '../../core/Candle'
-import type { IndicatorSource } from './indicatorSource'
+import type { IndicatorConfig } from './Indicator'
+
 import { calculateSMA } from '../calculations/sma'
 
-type SMAIndicator = {
-    id: string
-    type: 'sma'
-    period: number
-    source: IndicatorSource
+type IndicatorInstance = {
+    config: IndicatorConfig
     line: ISeriesApi<'Line'>
 }
 
 export class IndicatorManager {
-    private readonly indicators = new Map<string, SMAIndicator>()
+    private readonly indicators = new Map<string, IndicatorInstance>()
 
     constructor(private readonly chart: IChartApi) {}
 
-    public addSMA(id: string, period: number, source: IndicatorSource = 'close') {
-        if (this.indicators.has(id)) {
-            return
+    public sync(configs: IndicatorConfig[]) {
+        const incomingIds = new Set<string>()
+
+        for (const config of configs) {
+            incomingIds.add(config.id)
+
+            const existing = this.indicators.get(config.id)
+
+            if (!existing) {
+                this.create(config)
+                continue
+            }
+
+            if (!this.isSameConfig(existing.config, config)) {
+                this.updateConfig(config.id, config)
+            }
         }
 
-        const line = this.chart.addSeries(LineSeries, {
-            lineWidth: 1,
-        })
+        for (const id of this.indicators.keys()) {
+            if (!incomingIds.has(id)) {
+                this.remove(id)
+            }
+        }
+    }
 
-        this.indicators.set(id, {
-            id,
-            type: 'sma',
-            period,
-            source,
-            line,
-        })
+    public update(candles: Candle[]) {
+        for (const indicator of this.indicators.values()) {
+            this.updateIndicator(indicator, candles)
+        }
     }
 
     public remove(id: string) {
@@ -47,33 +58,66 @@ export class IndicatorManager {
         this.indicators.delete(id)
     }
 
-    public update(candles: Candle[]) {
-        for (const indicator of this.indicators.values()) {
-            if (indicator.type === 'sma') {
+    public clear() {
+        for (const id of [...this.indicators.keys()]) {
+            this.remove(id)
+        }
+    }
+
+    public dispose() {
+        this.clear()
+    }
+
+    private create(config: IndicatorConfig) {
+        const line = this.chart.addSeries(LineSeries, {
+            lineWidth: 2,
+        })
+
+        const instance: IndicatorInstance = {
+            config: { ...config },
+            line,
+        }
+
+        this.indicators.set(config.id, instance)
+    }
+
+    private updateConfig(id: string, config: IndicatorConfig) {
+        const existing = this.indicators.get(id)
+
+        if (!existing) {
+            this.create(config)
+            return
+        }
+
+        existing.config = { ...config }
+    }
+
+    private updateIndicator(instance: IndicatorInstance, candles: Candle[]) {
+        const { config, line } = instance
+
+        switch (config.type) {
+            case 'sma': {
                 const values = calculateSMA(candles, {
-                    period: indicator.period,
-                    source: indicator.source,
+                    period: config.period,
+                    source: config.source ?? 'close',
                 })
 
-                indicator.line.setData(
+                line.setData(
                     values.map((value) => ({
                         time: value.time as Time,
                         value: value.value,
                     })),
                 )
+
+                break
             }
+
+            default:
+                break
         }
     }
 
-    public clear() {
-        for (const indicator of this.indicators.values()) {
-            this.chart.removeSeries(indicator.line)
-        }
-
-        this.indicators.clear()
-    }
-
-    public dispose() {
-        this.clear()
+    private isSameConfig(a: IndicatorConfig, b: IndicatorConfig): boolean {
+        return a.id === b.id && a.type === b.type && a.period === b.period && a.source === b.source
     }
 }
