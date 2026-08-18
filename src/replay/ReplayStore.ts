@@ -9,19 +9,14 @@ export class ReplayStore {
     public isPlaying = false
 
     public startIndex: number | null = null
-
     public replayStartIndex: number | null = null
-
     public processedIndex: number | null = null
-
     public displayIndex: number | null = null
 
     public raw1mCandles: Candle[] = []
 
     public chartTimeframeSeconds = 60
-
     public updateIntervalSeconds = 60
-
     public pendingStepSeconds: number | null = null
 
     public previewTime: number | null = null
@@ -32,9 +27,7 @@ export class ReplayStore {
         this.raw1mCandles = raw1mCandles
 
         this.startIndex = startIndex
-
         const replayBucket = Math.floor(raw1mCandles[startIndex].time / chartTimeframeSeconds) * chartTimeframeSeconds
-
         let replayStartIndex = startIndex
 
         while (replayStartIndex > 0 && raw1mCandles[replayStartIndex - 1].time >= replayBucket) {
@@ -42,9 +35,7 @@ export class ReplayStore {
         }
 
         this.replayStartIndex = replayStartIndex
-
         const lastVisibleTime = raw1mCandles[startIndex].time + chartTimeframeSeconds - 60
-
         let replayIndex = startIndex
 
         while (replayIndex < raw1mCandles.length - 1 && raw1mCandles[replayIndex + 1].time <= lastVisibleTime) {
@@ -79,9 +70,7 @@ export class ReplayStore {
         this.previewTime = null
 
         this.updateIntervalSeconds = 60
-
         this.chartTimeframeSeconds = 60
-
         this.pendingStepSeconds = null
 
         this.isSelecting = true

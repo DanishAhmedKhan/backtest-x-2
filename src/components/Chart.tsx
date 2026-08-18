@@ -41,6 +41,7 @@ import { binarySearch } from '../helper/binarySearch'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import { CursorType } from '../core/cursor/CursorType'
 import { CursorSource } from '../core/cursor/CursorSource'
+import { useChartRuntime } from '../hooks/charts/useChartRuntime'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -208,61 +209,22 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         canvasRef: drawingCanvasRef,
     })
 
-    useEffect(() => {
-        const chart = chartRef.current
-        const series = seriesRef.current
-        const canvas = drawingCanvasRef.current
-        const container = containerRef.current
-
-        if (!chart || !series || !canvas) return
-        if (!container) return
-
-        if (!drawingContextRef.current) {
-            drawingContextRef.current = new DrawingContext()
-        }
-
-        const drawingContext = drawingContextRef.current
-
-        if (drawingPersistenceTickerRef.current !== ticker.toKey()) {
-            drawingPersistenceRef.current?.stop()
-
-            drawingContext.drawingManager.clearDrawing()
-
-            const persistence = new DrawingPersistence(drawingContext.drawingManager, ticker.toKey())
-
-            drawingPersistenceRef.current = persistence
-            drawingPersistenceTickerRef.current = ticker.toKey()
-
-            persistence.start()
-        }
-
-        paneGeometryRef.current = new PaneGeometry(container)
-
-        runtimeRef.current = new ChartRuntime({
-            chart,
-            series,
-            canvas,
-            container,
-            drawingContext,
-            timesRef,
-            timeframe,
-            paneGeometry: paneGeometryRef.current,
-        })
-
-        runtimeRef.current.start()
-
-        onDrawingToolbarManagerReady?.(runtimeRef.current.getDrawingToolbarManager())
-
-        return () => {
-            drawingPersistenceRef.current?.stop()
-            drawingPersistenceRef.current = null
-            drawingPersistenceTickerRef.current = null
-
-            runtimeRef.current?.dispose()
-            runtimeRef.current = null
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chartReady])
+    useChartRuntime({
+        ticker,
+        timeframe,
+        chartRef,
+        seriesRef,
+        drawingCanvasRef,
+        containerRef,
+        timesRef,
+        onDrawingToolbarManagerReady,
+        chartReady,
+        drawingPersistenceRef,
+        drawingPersistenceTickerRef,
+        paneGeometryRef,
+        drawingContextRef,
+        runtimeRef,
+    })
 
     useDrawingTools({
         chartRef,
