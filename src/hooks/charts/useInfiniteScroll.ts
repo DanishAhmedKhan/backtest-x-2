@@ -13,7 +13,7 @@ import { CandleService } from '../../core/CandleService'
 import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 import type { Raw1mData } from '../../components/Chart'
 
-import { loadChartAndRawAdjacentWindow } from '../utilities/loadChartAndRawAdjacentWindow'
+import { loadAdjacentWindow } from '../utilities/loadAdjacentWindow'
 
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
@@ -79,7 +79,7 @@ export function useInfiniteScroll({
 
             try {
                 const loadWindow = (direction: 'older' | 'newer') =>
-                    loadChartAndRawAdjacentWindow({
+                    loadAdjacentWindow({
                         series,
                         candlesRef,
                         raw1mRef,

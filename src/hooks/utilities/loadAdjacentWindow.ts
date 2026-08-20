@@ -1,19 +1,19 @@
 import type { CandlestickData, ISeriesApi, Time } from 'lightweight-charts'
 
-import { Ticker } from '../../core/Ticker'
-import { Timeframe } from '../../core/Timeframe'
+import type { Ticker } from '../../core/Ticker'
+import type { Timeframe } from '../../core/Timeframe'
 import { CandleService } from '../../core/CandleService'
 
+import type { Raw1mData } from '../../components/Chart'
 import type { LoadedWindow } from '../../types/LoadedWindow'
+import { setRaw1mData } from './setRaw1mData'
 
-export type LoadAdjacentWindowResult = {
-    loaded: boolean
-    addedBars: number
-}
+import { replayStore } from '../../replay/ReplayStore'
 
 type Params = {
     series: ISeriesApi<'Candlestick'>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+    raw1mRef: React.RefObject<Raw1mData>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     ticker: Ticker
@@ -24,9 +24,15 @@ type Params = {
     fileCount: number
 }
 
+export type LoadAdjacentWindowResult = {
+    loaded: boolean
+    addedBars: number
+}
+
 export async function loadAdjacentWindow({
     series,
     candlesRef,
+    raw1mRef,
     candleMapRef,
     timesRef,
     ticker,
@@ -41,33 +47,38 @@ export async function loadAdjacentWindow({
 
     if (direction === 'older') {
         if (loadedWindowRef.current.oldestFile <= 0) {
-            return { loaded: false, addedBars: 0 }
+            return {
+                loaded: false,
+                addedBars: 0,
+            }
         }
 
         actualFileCount = Math.min(fileCount, loadedWindowRef.current.oldestFile)
-
         startIndex = loadedWindowRef.current.oldestFile - actualFileCount
     } else {
         const remaining = totalFilesRef.current - loadedWindowRef.current.latestFile - 1
+
         if (remaining <= 0) {
-            return { loaded: false, addedBars: 0 }
+            return {
+                loaded: false,
+                addedBars: 0,
+            }
         }
 
         actualFileCount = Math.min(fileCount, remaining)
-
         startIndex = loadedWindowRef.current.latestFile + 1
     }
 
-    const candles = await CandleService.getCandlesWindow(ticker, timeframe, startIndex, actualFileCount)
+    const result = await CandleService.getChartAndRawWindow(ticker, timeframe, startIndex, actualFileCount)
 
-    if (!candles.length) {
+    if (!result.chartCandles.length) {
         return {
             loaded: false,
             addedBars: 0,
         }
     }
 
-    const formatted: CandlestickData<Time>[] = candles.map((c) => ({
+    const formatted: CandlestickData<Time>[] = result.chartCandles.map((c) => ({
         time: c.time as Time,
         open: c.open,
         high: c.high,
@@ -78,20 +89,30 @@ export async function loadAdjacentWindow({
     if (direction === 'older') {
         candlesRef.current = [...formatted, ...candlesRef.current]
         loadedWindowRef.current.oldestFile = startIndex
+        setRaw1mData(raw1mRef, [...result.rawCandles, ...raw1mRef.current.candles])
     } else {
         candlesRef.current = [...candlesRef.current, ...formatted]
         loadedWindowRef.current.latestFile = startIndex + actualFileCount - 1
+
+        const updatedRawCandles = [...raw1mRef.current.candles, ...result.rawCandles]
+        setRaw1mData(raw1mRef, updatedRawCandles)
+
+        if (replayStore.enabled) {
+            replayStore.appendRaw1mCandles(result.rawCandles)
+        }
     }
 
     candleMapRef.current.clear()
 
-    candlesRef.current.forEach((c) => {
-        candleMapRef.current.set(Number(c.time), c)
-    })
+    for (const candle of candlesRef.current) {
+        candleMapRef.current.set(Number(candle.time), candle)
+    }
 
     timesRef.current = candlesRef.current.map((c) => Number(c.time))
 
-    series.setData(candlesRef.current)
+    if (!replayStore.enabled) {
+        series.setData(candlesRef.current)
+    }
 
     return {
         loaded: true,
