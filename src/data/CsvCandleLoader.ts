@@ -2,51 +2,9 @@ import { Candle } from '../core/Candle'
 
 type FolderName = 'M' | 'H' | 'D'
 
-interface FileRange {
-    file: string
-    firstTime: number
-    lastTime: number
-}
-
 const ROOT_DATA_FOLDER_NAME = 'ticker-data'
 
 export class CsvCandleLoader {
-    private static fileRangesCache = new Map<string, FileRange[]>()
-
-    private static async getFileRanges(ticker: string): Promise<FileRange[]> {
-        const cached = this.fileRangesCache.get(ticker)
-
-        if (cached) {
-            return cached
-        }
-
-        const files = await this.getSortedFiles(ticker)
-
-        const ranges: FileRange[] = []
-
-        for (const file of files) {
-            const url = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/M/${file}`
-
-            const text = await fetch(url).then((res) => res.text())
-
-            const candles = this.parseCsv(text)
-
-            if (candles.length === 0) {
-                continue
-            }
-
-            ranges.push({
-                file,
-                firstTime: candles[0].time,
-                lastTime: candles[candles.length - 1].time,
-            })
-        }
-
-        this.fileRangesCache.set(ticker, ranges)
-
-        return ranges
-    }
-
     private static async getSortedFiles(ticker: string): Promise<string[]> {
         try {
             const manifestUrl = `/${ROOT_DATA_FOLDER_NAME}/${ticker}/manifest.json`
@@ -99,26 +57,66 @@ export class CsvCandleLoader {
         return candles
     }
 
-    public static async findFileIndex(ticker: string, timestamp: number): Promise<number> {
-        const ranges = await this.getFileRanges(ticker)
+    public static getYearWeek(timestamp: number) {
+        const date: Date = new Date(timestamp * 1000)
 
-        let left = 0
-        let right = ranges.length - 1
+        date.setHours(0, 0, 0, 0)
 
-        while (left <= right) {
-            const mid = Math.floor((left + right) / 2)
-            const range = ranges[mid]
+        const dayNum = date.getDay() || 7
+        date.setDate(date.getDate() + 4 - dayNum)
 
-            if (timestamp < range.firstTime) {
-                right = mid - 1
-            } else if (timestamp > range.lastTime) {
-                left = mid + 1
-            } else {
-                return mid
+        const yearStart = new Date(date.getFullYear(), 0, 1)
+
+        const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+        const year = date.getFullYear()
+
+        return { year, week }
+    }
+
+    public static getBeforeYearWeek(year: number, week: number) {
+        let newYear, newWeek
+
+        if (week === 1) {
+            newYear = year - 1
+            newWeek = 52
+        } else {
+            newYear = year
+            newWeek = week - 1
+        }
+
+        return { year: newYear, week: newWeek }
+    }
+
+    public static getFilename(year: number, week: number) {
+        return `${year}-${week}.csv`
+    }
+
+    public static async getFileIndex(ticker: string, timestamp: number) {
+        const files = await this.getSortedFiles(ticker)
+
+        return this.findFileIndex(timestamp, files)
+    }
+
+    public static findFileIndex(timestamp: number, files: string[]) {
+        const loopCount = 5
+        let index = -1
+
+        let { year, week } = this.getYearWeek(timestamp)
+
+        for (let i = 0; i < loopCount; i++) {
+            const fileName = this.getFilename(year, week)
+            console.log(fileName)
+
+            index = files.indexOf(fileName)
+
+            if (index < 0) {
+                const newYearWeek = this.getBeforeYearWeek(year, week)
+                year = newYearWeek.year
+                week = newYearWeek.week
             }
         }
 
-        return -1
+        return index
     }
 
     public static async getFileCount(ticker: string): Promise<number> {
