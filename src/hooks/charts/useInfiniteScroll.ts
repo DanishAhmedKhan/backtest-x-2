@@ -63,9 +63,7 @@ export function useInfiniteScroll({
         const timeScale = chart.timeScale()
 
         const handleRangeChange = async () => {
-            if (replayStore.showToolbar) {
-                return
-            }
+            if (replayStore.isSelecting) return
 
             if (
                 isChangingTimeframeRef.current ||

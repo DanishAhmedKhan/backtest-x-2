@@ -11,7 +11,7 @@ export class CandleService {
         '5m': { initial: 8, adjacent: 3 },
         '15m': { initial: 12, adjacent: 5 },
         '30m': { initial: 16, adjacent: 8 },
-        '1h': { initial: 20, adjacent: 10 },
+        '1h': { initial: 20, adjacent: 3 },
         '4h': { initial: 24, adjacent: 12 },
         '1d': { initial: 30, adjacent: 15 },
     } as const

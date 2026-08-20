@@ -99,7 +99,11 @@ export default function ReplayToolbar() {
                 <ToolbarSeparator />
 
                 <ToolbarGroup>
-                    <ToolbarButton icon={<ToolbarIcon svg={svg.replay.play} />} onClick={handleTogglePlay} />
+                    {replayStore.isPlaying ? (
+                        <ToolbarButton icon={<ToolbarIcon svg={svg.replay.pause} />} onClick={handleTogglePlay} />
+                    ) : (
+                        <ToolbarButton icon={<ToolbarIcon svg={svg.replay.play} />} onClick={handleTogglePlay} />
+                    )}
 
                     <ToolbarButton icon={<ToolbarIcon svg={svg.replay.forward} />} onClick={handleForward} />
                 </ToolbarGroup>

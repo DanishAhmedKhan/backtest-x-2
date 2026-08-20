@@ -105,7 +105,6 @@ export class CsvCandleLoader {
 
         for (let i = 0; i < loopCount; i++) {
             const fileName = this.getFilename(year, week)
-            console.log(fileName)
 
             index = files.indexOf(fileName)
 
