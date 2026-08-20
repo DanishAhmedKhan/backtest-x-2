@@ -1,10 +1,14 @@
 import type { CandlestickData, ISeriesApi, Time } from 'lightweight-charts'
-import type { Raw1mData } from '../../components/Chart'
+
 import type { Ticker } from '../../core/Ticker'
 import type { Timeframe } from '../../core/Timeframe'
-import type { LoadedWindow } from '../../types/LoadedWindow'
 import { CandleService } from '../../core/CandleService'
+
+import type { Raw1mData } from '../../components/Chart'
+import type { LoadedWindow } from '../../types/LoadedWindow'
 import { setRaw1mData } from './setRaw1mData'
+
+import { replayStore } from '../../replay/ReplayStore'
 
 type Params = {
     series: ISeriesApi<'Candlestick'>
@@ -89,7 +93,13 @@ export async function loadChartAndRawAdjacentWindow({
     } else {
         candlesRef.current = [...candlesRef.current, ...formatted]
         loadedWindowRef.current.latestFile = startIndex + actualFileCount - 1
-        setRaw1mData(raw1mRef, [...raw1mRef.current.candles, ...result.rawCandles])
+
+        const updatedRawCandles = [...raw1mRef.current.candles, ...result.rawCandles]
+        setRaw1mData(raw1mRef, updatedRawCandles)
+
+        if (replayStore.enabled) {
+            replayStore.appendRaw1mCandles(result.rawCandles)
+        }
     }
 
     candleMapRef.current.clear()
@@ -100,7 +110,9 @@ export async function loadChartAndRawAdjacentWindow({
 
     timesRef.current = candlesRef.current.map((c) => Number(c.time))
 
-    series.setData(candlesRef.current)
+    if (!replayStore.enabled) {
+        series.setData(candlesRef.current)
+    }
 
     return {
         loaded: true,

@@ -77,6 +77,10 @@ export class ReplayStore {
         this.isPlaying = false
     }
 
+    public appendRaw1mCandles(candles: Candle[]) {
+        this.raw1mCandles = [...this.raw1mCandles, ...candles]
+    }
+
     public seek(index: number) {
         if (!this.raw1mCandles.length) {
             return

@@ -65,12 +65,7 @@ export function useInfiniteScroll({
         const handleRangeChange = async () => {
             if (replayStore.isSelecting) return
 
-            if (
-                isChangingTimeframeRef.current ||
-                replayStore.enabled ||
-                isLoadingDataRef.current ||
-                isViewportInteractionRef.current
-            ) {
+            if (isChangingTimeframeRef.current || isLoadingDataRef.current || isViewportInteractionRef.current) {
                 return
             }
 
