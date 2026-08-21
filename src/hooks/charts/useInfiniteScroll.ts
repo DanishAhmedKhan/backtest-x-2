@@ -94,6 +94,8 @@ export function useInfiniteScroll({
                     })
 
                 if (range.from < threshold) {
+                    if (replayStore.enabled) return
+
                     const beforeScroll = timeScale.scrollPosition()
 
                     const result = await loadWindow('older')

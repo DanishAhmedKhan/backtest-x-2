@@ -47,7 +47,14 @@ export default function JumpToDialog({ open, initialDate = new Date(), onClose, 
     const handleGo = () => {
         if (isNaN(selectedDate.getTime())) return
 
-        onGo(selectedDate.getTime() / 1000)
+        const setDebiggingDate = false
+        if (setDebiggingDate) {
+            const date = fromDateTime('2025-04-01', time)
+            onGo(date.getTime() / 1000)
+        } else {
+            onGo(selectedDate.getTime() / 1000)
+        }
+
         onClose()
     }
 

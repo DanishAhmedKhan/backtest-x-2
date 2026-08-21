@@ -46,15 +46,17 @@ export function useReplaySync({
             }
 
             let replayCandles: Candle[] = []
-            let historicalCandles: CandlestickData<Time>[] = []
+            let historicalCandles: Candle[] = []
 
             if (tfSeconds === 60) {
                 replayCandles = replayStore.replayCandles
             } else {
-                const replayBucket =
-                    Math.floor(replayStore.raw1mCandles[replayStore.startIndex].time / tfSeconds) * tfSeconds
-
-                historicalCandles = candlesRef.current.filter((c) => Number(c.time) < replayBucket)
+                historicalCandles = CandleAggregator.aggregateReplay(
+                    replayStore.raw1mCandles,
+                    0,
+                    replayStore.replayStartIndex! - 1,
+                    tfSeconds,
+                )
 
                 replayCandles = CandleAggregator.aggregateReplay(
                     replayStore.raw1mCandles,
@@ -64,25 +66,15 @@ export function useReplaySync({
                 )
             }
 
-            const formatted: CandlestickData<Time>[] =
-                tfSeconds === 60
-                    ? replayCandles.map((c) => ({
-                          time: c.time as Time,
-                          open: c.open,
-                          high: c.high,
-                          low: c.low,
-                          close: c.close,
-                      }))
-                    : [
-                          ...historicalCandles,
-                          ...replayCandles.map((c) => ({
-                              time: c.time as Time,
-                              open: c.open,
-                              high: c.high,
-                              low: c.low,
-                              close: c.close,
-                          })),
-                      ]
+            const candles = [...historicalCandles, ...replayCandles]
+
+            const formatted: CandlestickData<Time>[] = candles.map((c) => ({
+                time: c.time as Time,
+                open: c.open,
+                high: c.high,
+                low: c.low,
+                close: c.close,
+            }))
 
             series.setData(formatted)
 
