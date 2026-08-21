@@ -73,7 +73,7 @@ export function useReplaySync({
                 )
             }
 
-            const candles = [...historicalCandles, ...replayCandles]
+            const candles = replayStore.limitDisplayCandles(historicalCandles, replayCandles)
 
             const formatted: CandlestickData<Time>[] = candles.map((c) => ({
                 time: c.time as Time,

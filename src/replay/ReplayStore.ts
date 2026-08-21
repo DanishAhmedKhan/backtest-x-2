@@ -2,10 +2,10 @@ import type { Candle } from '../core/Candle'
 import { CandleAggregator } from '../data/CandleAggregator'
 
 export class ReplayStore {
+    public static readonly MAX_DISPLAY_CANDLES = 20_000
+
     public enabled = false
-
     public showToolbar = false
-
     public isSelecting = false
     public isPlaying = false
 
@@ -13,6 +13,7 @@ export class ReplayStore {
     public replayStartIndex: number | null = null
     public processedIndex: number | null = null
     public displayIndex: number | null = null
+    public replayDisplayStartIndex: number | null = null
 
     public raw1mCandles: Candle[] = []
     public historicalCandles: Candle[] = []
@@ -56,6 +57,7 @@ export class ReplayStore {
 
         this.processedIndex = replayIndex
         this.displayIndex = replayIndex
+        this.replayDisplayStartIndex = null
 
         this.chartTimeframeSeconds = chartTimeframeSeconds
         this.updateIntervalSeconds = chartTimeframeSeconds
@@ -76,6 +78,7 @@ export class ReplayStore {
 
         this.processedIndex = null
         this.displayIndex = null
+        this.replayDisplayStartIndex = null
 
         this.raw1mCandles = []
         this.historicalCandles = []
@@ -134,6 +137,24 @@ export class ReplayStore {
         }
 
         return replayStartIndex
+    }
+
+    public limitDisplayCandles(historicalCandles: Candle[], replayCandles: Candle[]): Candle[] {
+        const max = ReplayStore.MAX_DISPLAY_CANDLES
+
+        const total = historicalCandles.length + replayCandles.length
+
+        if (total <= max) {
+            return [...historicalCandles, ...replayCandles]
+        }
+
+        if (replayCandles.length >= max) {
+            return replayCandles.slice(-max)
+        }
+
+        const historicalNeeded = max - replayCandles.length
+
+        return [...historicalCandles.slice(-historicalNeeded), ...replayCandles]
     }
 
     public setPlaying(value: boolean) {
