@@ -1,4 +1,5 @@
 import type { Candle } from '../core/Candle'
+import { CandleAggregator } from '../data/CandleAggregator'
 
 export class ReplayStore {
     public enabled = false
@@ -14,6 +15,8 @@ export class ReplayStore {
     public displayIndex: number | null = null
 
     public raw1mCandles: Candle[] = []
+    public historicalCandles: Candle[] = []
+    public historicalCandlesTimeframeSeconds: number | null = null
 
     public chartTimeframeSeconds = 60
     public updateIntervalSeconds = 60
@@ -27,15 +30,24 @@ export class ReplayStore {
         this.raw1mCandles = raw1mCandles
 
         this.startIndex = startIndex
-        const replayBucket = Math.floor(raw1mCandles[startIndex].time / chartTimeframeSeconds) * chartTimeframeSeconds
-        let replayStartIndex = startIndex
 
-        while (replayStartIndex > 0 && raw1mCandles[replayStartIndex - 1].time >= replayBucket) {
-            replayStartIndex--
+        this.replayStartIndex = this.calculateReplayStartIndex(chartTimeframeSeconds)
+
+        if (chartTimeframeSeconds === 60) {
+            this.historicalCandles = raw1mCandles.slice(0, this.replayStartIndex)
+        } else {
+            this.historicalCandles = CandleAggregator.aggregateReplay(
+                raw1mCandles,
+                0,
+                this.replayStartIndex - 1,
+                chartTimeframeSeconds,
+            )
         }
 
-        this.replayStartIndex = replayStartIndex
+        this.historicalCandlesTimeframeSeconds = chartTimeframeSeconds
+
         const lastVisibleTime = raw1mCandles[startIndex].time + chartTimeframeSeconds - 60
+
         let replayIndex = startIndex
 
         while (replayIndex < raw1mCandles.length - 1 && raw1mCandles[replayIndex + 1].time <= lastVisibleTime) {
@@ -66,6 +78,8 @@ export class ReplayStore {
         this.displayIndex = null
 
         this.raw1mCandles = []
+        this.historicalCandles = []
+        this.historicalCandlesTimeframeSeconds = null
 
         this.previewTime = null
 
@@ -94,6 +108,32 @@ export class ReplayStore {
 
     public setChartTimeframeSeconds(seconds: number) {
         this.chartTimeframeSeconds = seconds
+
+        if (this.startIndex === null || !this.raw1mCandles.length) return
+
+        this.replayStartIndex = this.calculateReplayStartIndex(seconds)
+
+        this.historicalCandles = []
+        this.historicalCandlesTimeframeSeconds = null
+    }
+
+    private calculateReplayStartIndex(chartTimeframeSeconds: number): number {
+        if (this.startIndex === null) return
+
+        const startCandle = this.raw1mCandles[this.startIndex]
+
+        if (!startCandle) {
+            return this.startIndex
+        }
+
+        const replayBucket = Math.floor(startCandle.time / chartTimeframeSeconds) * chartTimeframeSeconds
+        let replayStartIndex = this.startIndex
+
+        while (replayStartIndex > 0 && this.raw1mCandles[replayStartIndex - 1].time >= replayBucket) {
+            replayStartIndex--
+        }
+
+        return replayStartIndex
     }
 
     public setPlaying(value: boolean) {
@@ -125,7 +165,7 @@ export class ReplayStore {
         return this.currentCandle?.time ?? null
     }
 
-    public get replayCandles(): Candle[] {
+    public get visibleRawCandles(): Candle[] {
         if (this.displayIndex === null) {
             return []
         }

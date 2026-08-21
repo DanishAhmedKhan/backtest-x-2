@@ -49,14 +49,21 @@ export function useReplaySync({
             let historicalCandles: Candle[] = []
 
             if (tfSeconds === 60) {
-                replayCandles = replayStore.replayCandles
+                replayCandles = replayStore.visibleRawCandles
             } else {
-                historicalCandles = CandleAggregator.aggregateReplay(
-                    replayStore.raw1mCandles,
-                    0,
-                    replayStore.replayStartIndex! - 1,
-                    tfSeconds,
-                )
+                if (replayStore.historicalCandlesTimeframeSeconds === tfSeconds) {
+                    historicalCandles = replayStore.historicalCandles
+                } else {
+                    historicalCandles = CandleAggregator.aggregateReplay(
+                        replayStore.raw1mCandles,
+                        0,
+                        replayStore.replayStartIndex! - 1,
+                        tfSeconds,
+                    )
+
+                    replayStore.historicalCandles = historicalCandles
+                    replayStore.historicalCandlesTimeframeSeconds = tfSeconds
+                }
 
                 replayCandles = CandleAggregator.aggregateReplay(
                     replayStore.raw1mCandles,
