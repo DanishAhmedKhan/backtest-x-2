@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import TopToolbar from './TopToolbar'
 import ChartWindow from './ChartWindow'
-import JumpToDialog from './JumpToDialog'
+import JumpTo from './JumpTo'
 import IndicatorSelector from './IndicatorSelector'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
@@ -163,7 +163,7 @@ export default function Main() {
                 onDrawingToolbarManagerReady={setDrawingToolbarManager}
             />
 
-            <JumpToDialog
+            <JumpTo
                 open={jumpOpen}
                 onClose={() => setJumpOpen(false)}
                 onGo={(timestamp) => {
