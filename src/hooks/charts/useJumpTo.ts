@@ -20,10 +20,12 @@ type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
     candlesRef: React.RefObject<CandlestickData<Time>[]>
+    displayedCandlesRef: React.RefObject<CandlestickData<Time>[]>
     raw1mRef: React.RefObject<Raw1mData>
     candleMapRef: React.RefObject<Map<number, CandlestickData<Time>>>
     timesRef: React.RefObject<number[]>
     loadedWindowRef: React.RefObject<LoadedWindow>
+    isLoadingDataRef: React.RefObject<boolean>
     viewportRef: React.RefObject<ViewportState>
 }
 
@@ -31,12 +33,14 @@ export function useJumpTo({
     ticker,
     timeframe,
     chartRef,
+    displayedCandlesRef,
     seriesRef,
     candlesRef,
     raw1mRef,
     candleMapRef,
     timesRef,
     loadedWindowRef,
+    isLoadingDataRef,
     viewportRef,
 }: Params) {
     useEffect(() => {
@@ -46,33 +50,46 @@ export function useJumpTo({
 
             if (!chart || !series) return
 
-            const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, timestamp)
+            isLoadingDataRef.current = true
 
-            setRaw1mData(raw1mRef, result.rawCandles)
+            try {
+                const result = await CandleService.getChartAndRawCandlesAroundTime(ticker, timeframe, timestamp)
 
-            loadedWindowRef.current = result.loadedWindow
+                setRaw1mData(raw1mRef, result.rawCandles)
 
-            applyChartData({
-                candles: result.chartCandles,
-                series,
-                candlesRef,
-                candleMapRef,
-                timesRef,
-            })
+                loadedWindowRef.current = result.loadedWindow
 
-            requestAnimationFrame(() => {
-                scrollViewportToTime({
-                    chart,
+                applyChartData({
+                    candles: result.chartCandles,
                     series,
-                    viewport: viewportRef,
-                    timestamp,
-                    align: 'center',
+                    candlesRef,
+                    candleMapRef,
+                    timesRef,
                 })
 
-                chart.priceScale('right').applyOptions({
-                    autoScale: true,
+                displayedCandlesRef.current = candlesRef.current
+
+                eventBus.emit('chartDataChanged')
+
+                requestAnimationFrame(() => {
+                    scrollViewportToTime({
+                        chart,
+                        series,
+                        viewport: viewportRef,
+                        timestamp,
+                        align: 'center',
+                    })
+
+                    chart.priceScale('right').applyOptions({
+                        autoScale: true,
+                    })
+
+                    isLoadingDataRef.current = false
                 })
-            })
+            } catch (error) {
+                isLoadingDataRef.current = false
+                console.error(error)
+            }
         })
 
         return unsubscribe
@@ -87,5 +104,7 @@ export function useJumpTo({
         loadedWindowRef,
         viewportRef,
         raw1mRef,
+        displayedCandlesRef,
+        isLoadingDataRef,
     ])
 }

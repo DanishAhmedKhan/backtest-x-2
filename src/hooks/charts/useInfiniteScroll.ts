@@ -15,6 +15,11 @@ import type { Raw1mData } from '../../components/Chart'
 
 import { loadAdjacentWindow } from '../utilities/loadAdjacentWindow'
 
+enum Direction {
+    OLDER = 'older',
+    NEWER = 'newer',
+}
+
 type Params = {
     chartRef: React.RefObject<IChartApi | null>
     seriesRef: React.RefObject<ISeriesApi<'Candlestick'> | null>
@@ -78,7 +83,7 @@ export function useInfiniteScroll({
             const fileCount = CandleService.getAdjacentLoadFileCount(timeframe)
 
             try {
-                const loadWindow = (direction: 'older' | 'newer') =>
+                const loadWindow = (direction: Direction) =>
                     loadAdjacentWindow({
                         series,
                         candlesRef,
@@ -98,7 +103,7 @@ export function useInfiniteScroll({
 
                     const beforeScroll = timeScale.scrollPosition()
 
-                    const result = await loadWindow('older')
+                    const result = await loadWindow(Direction.OLDER)
 
                     if (result.loaded) {
                         displayedCandlesRef.current = candlesRef.current
@@ -108,13 +113,11 @@ export function useInfiniteScroll({
 
                         timeScale.scrollPosition()
                         timeScale.scrollToPosition(beforeScroll, false)
-
-                        return
                     }
                 }
 
                 if (range.to > candlesRef.current.length - threshold) {
-                    const result = await loadWindow('newer')
+                    const result = await loadWindow(Direction.NEWER)
 
                     if (result.loaded) {
                         displayedCandlesRef.current = candlesRef.current

@@ -210,10 +210,12 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         chartRef,
         seriesRef,
         candlesRef,
+        displayedCandlesRef,
         raw1mRef,
         candleMapRef,
         timesRef,
         loadedWindowRef,
+        isLoadingDataRef,
         viewportRef,
     })
 
