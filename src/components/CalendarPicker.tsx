@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ToolbarIcon } from './ui/ToolbarIcon'
 import svg from '../svg/svg'
 
 type Props = {
@@ -53,7 +54,6 @@ export default function CalendarPicker({ value, onChange }: Props) {
             result.push(new Date(month.getFullYear(), month.getMonth(), day))
         }
 
-        // Always render 6 weeks (42 cells)
         while (result.length < 42) {
             result.push(null)
         }
@@ -79,13 +79,13 @@ export default function CalendarPicker({ value, onChange }: Props) {
         <div className="calendar-picker">
             <div className="calendar-header">
                 <button type="button" className="calendar-nav" onClick={previousMonth} aria-label="Previous month">
-                    <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.left }} />
+                    <ToolbarIcon svg={svg.left}></ToolbarIcon>
                 </button>
 
                 <div className="calendar-month">{formatMonth(month)}</div>
 
                 <button type="button" className="calendar-nav" onClick={nextMonth} aria-label="Next month">
-                    <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: svg.right }} />
+                    <ToolbarIcon svg={svg.right}></ToolbarIcon>
                 </button>
             </div>
 

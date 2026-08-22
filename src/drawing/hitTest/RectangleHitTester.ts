@@ -39,9 +39,7 @@ export class RectangleHitTester implements DrawingHitTester<RectangleDrawing, Re
         const end = transformer.toPoint(drawing.end)
         const mouse = transformer.toPoint(point)
 
-        if (!start || !end || !mouse) {
-            return null
-        }
+        if (!start || !end || !mouse) return
 
         const left = Math.min(start.x, end.x)
         const right = Math.max(start.x, end.x)

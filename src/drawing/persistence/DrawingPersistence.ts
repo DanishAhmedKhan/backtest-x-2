@@ -3,9 +3,13 @@ import type { DrawingManager } from '../managers/DrawingManager'
 
 import { serializeDrawing } from './serializeDrawing'
 import { deserializeDrawing } from './deserializeDrawing'
+import { LocalStorageProvider } from '../../storage/LocalStorageProvider'
+import { STORAGE_KEYS } from '../../storage/storageKeys'
 
 export class DrawingPersistence {
     private unsubscribe: (() => void) | null = null
+
+    private storage = new LocalStorageProvider()
 
     constructor(private readonly drawingManager: DrawingManager, private readonly ticker: string) {}
 
@@ -23,34 +27,26 @@ export class DrawingPersistence {
     }
 
     private getStorageKey() {
-        return `backtest-x:drawings:${this.ticker}`
+        return `${STORAGE_KEYS.DRAWING_ITEMS}:${this.ticker}`
     }
 
     private save() {
         const drawings = this.drawingManager.getDrawings().map((drawing) => serializeDrawing(drawing))
 
-        localStorage.setItem(this.getStorageKey(), JSON.stringify(drawings))
+        this.storage.set(this.getStorageKey(), drawings)
     }
 
     private load() {
-        const raw = localStorage.getItem(this.getStorageKey())
+        const allDrawings = this.storage.get<PersistedDrawing[]>(this.getStorageKey())
 
-        if (!raw) {
-            return
-        }
+        if (!allDrawings) return
 
-        try {
-            const stored = JSON.parse(raw) as PersistedDrawing[]
+        for (const data of allDrawings) {
+            const drawing = deserializeDrawing(data)
 
-            for (const data of stored) {
-                const drawing = deserializeDrawing(data)
-
-                if (drawing) {
-                    this.drawingManager.addDrawing(drawing)
-                }
+            if (drawing) {
+                this.drawingManager.addDrawing(drawing)
             }
-        } catch (error) {
-            console.error('Failed to load drawings:', error)
         }
     }
 }

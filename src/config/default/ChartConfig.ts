@@ -1,4 +1,5 @@
 import { CrosshairMode } from 'lightweight-charts'
+import { formatDate } from '../../helper/dates'
 
 export const DEFAULT_CHART_CONFIG = {
     layout: {
@@ -17,20 +18,7 @@ export const DEFAULT_CHART_CONFIG = {
         mode: CrosshairMode.Normal,
     },
     localization: {
-        timeFormatter: (time) => {
-            const date = new Date(time * 1000)
-
-            const weekday = date.toLocaleString('en-US', { weekday: 'short' })
-            const day = date.toLocaleString('en-US', { day: '2-digit' })
-            const month = date.toLocaleString('en-US', { month: 'short' })
-            const year = date.toLocaleString('en-US', { year: '2-digit' })
-
-            const hours = String(date.getHours()).padStart(2, '0')
-            const minutes = String(date.getMinutes()).padStart(2, '0')
-            const seconds = String(date.getSeconds()).padStart(2, '0')
-
-            return `${weekday} ${day} ${month} '${year}  ${hours}:${minutes}:${seconds}`
-        },
+        timeFormatter: formatDate,
     },
     timeScale: {
         borderColor: 'rgba(0, 0, 0, .2)',

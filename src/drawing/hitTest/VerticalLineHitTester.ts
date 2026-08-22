@@ -24,9 +24,7 @@ export class VerticalLineHitTester implements DrawingHitTester<VerticalLineDrawi
         const line = transformer.toPoint(drawing.anchor)
         const mouse = transformer.toPoint(point)
 
-        if (!line || !mouse) {
-            return null
-        }
+        if (!line || !mouse) return
 
         if (Math.abs(mouse.x - line.x) <= tolerance) {
             return {

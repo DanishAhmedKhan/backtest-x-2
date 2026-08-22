@@ -24,9 +24,7 @@ export class HorizontalLineHitTester implements DrawingHitTester<HorizontalLineD
         const line = transformer.toPoint(drawing.anchor)
         const mouse = transformer.toPoint(point)
 
-        if (!line || !mouse) {
-            return null
-        }
+        if (!line || !mouse) return
 
         if (Math.abs(mouse.y - line.y) <= tolerance) {
             return {

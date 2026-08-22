@@ -35,9 +35,7 @@ export class ShortPositionHitTester implements DrawingHitTester<ShortPositionDra
         const stoploss = transformer.toPoint(drawing.stoploss)
         const mouse = transformer.toPoint(point)
 
-        if (!start || !end || !target || !stoploss || !mouse) {
-            return null
-        }
+        if (!start || !end || !target || !stoploss || !mouse) return
 
         const handles = [
             {

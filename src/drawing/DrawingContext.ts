@@ -12,7 +12,7 @@ import type { RenderInvalidator } from './renderer/RenderInvalidator'
 import type { CoordinateTransformer } from './renderer/CoordinateTransformer'
 import { DrawingActionFactory } from './actions/DrawinActionFactory'
 
-import { PanTool } from './drawings/PanTool'
+import { PanTool } from './tools/PanTool'
 import { TrendLineTool } from './tools/TrendLineTool'
 import { HorizontalLineTool } from './tools/HorizontalLineTool'
 import { VerticalLineTool } from './tools/VerticalLineTool'

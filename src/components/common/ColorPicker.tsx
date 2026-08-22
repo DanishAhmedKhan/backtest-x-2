@@ -5,7 +5,7 @@ import { ToolbarIcon } from '../ui/ToolbarIcon'
 import { getColorOpacity, hexToHsv, hexToRgba, hsvToHex, rgbaToHex } from '../../helper/color'
 import svg from '../../svg/svg'
 
-import { STORAGE_KEYS } from '../../storage/key'
+import { STORAGE_KEYS } from '../../storage/storageKeys'
 
 type Props = {
     selected: string

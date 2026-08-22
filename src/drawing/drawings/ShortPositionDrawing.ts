@@ -1,4 +1,4 @@
-import { PositionDirection, PositionDrawing } from './PositionDrawing'
+import { PositionDrawing } from './PositionDrawing'
 import { DrawingType } from './DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 
@@ -9,9 +9,8 @@ export class ShortPositionDrawing extends PositionDrawing {
         public end: DrawingAnchor,
         public target: DrawingAnchor,
         public stoploss: DrawingAnchor,
-        public direction = PositionDirection.Short,
     ) {
-        super(id, DrawingType.ShortPosition, start, end, target, stoploss, PositionDirection.Long)
+        super(id, DrawingType.ShortPosition, start, end, target, stoploss)
     }
 
     public clone(): PositionDrawing {
@@ -21,7 +20,6 @@ export class ShortPositionDrawing extends PositionDrawing {
             { ...this.end },
             { ...this.target },
             { ...this.stoploss },
-            this.direction,
         )
 
         clone.profitColor = this.profitColor

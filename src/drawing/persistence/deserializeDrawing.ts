@@ -2,7 +2,6 @@ import type { Drawing } from '../drawings/Drawing'
 import { DrawingType } from '../drawings/DrawingType'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import type { PersistedDrawing } from './PersistedDrawing'
-import type { PositionDirection } from '../drawings/PositionDrawing'
 
 import { TrendLineDrawing } from '../drawings/TrendLineDrawing'
 import { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
@@ -107,7 +106,6 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 end: DrawingAnchor
                 target: DrawingAnchor
                 stoploss: DrawingAnchor
-                direction: PositionDirection
                 profitColor?: string
                 lossColor?: string
                 lineColor?: string
@@ -121,7 +119,6 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 { ...d.end },
                 { ...d.target },
                 { ...d.stoploss },
-                d.direction,
             )
 
             if (d.profitColor !== undefined) drawing.profitColor = d.profitColor
@@ -139,7 +136,6 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 end: DrawingAnchor
                 target: DrawingAnchor
                 stoploss: DrawingAnchor
-                direction: PositionDirection
                 profitColor?: string
                 lossColor?: string
                 lineColor?: string
@@ -153,7 +149,6 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 { ...d.end },
                 { ...d.target },
                 { ...d.stoploss },
-                d.direction,
             )
 
             if (d.profitColor !== undefined) drawing.profitColor = d.profitColor

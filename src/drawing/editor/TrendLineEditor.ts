@@ -26,9 +26,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) {
-            return
-        }
+        if (!target) return
 
         const drawing = target.drawing as TrendLineDrawing
 
@@ -52,9 +50,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     private moveStartHandle(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
         const pointerAnchor = session.getAnchorAtPointer(event)
 
-        if (!pointerAnchor) {
-            return
-        }
+        if (!pointerAnchor) return
 
         drawing.start = this.snapper.snap(drawing.end, pointerAnchor, event.screen, event.shiftKey)
     }
@@ -62,9 +58,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
     private moveEndHandle(drawing: TrendLineDrawing, session: EditingSession, event: ChartPointerEvent) {
         const pointerAnchor = session.getAnchorAtPointer(event)
 
-        if (!pointerAnchor) {
-            return
-        }
+        if (!pointerAnchor) return
 
         drawing.end = this.snapper.snap(drawing.start, pointerAnchor, event.screen, event.shiftKey)
     }
@@ -75,9 +69,7 @@ export class TrendLineEditor implements DrawingEditor<TrendLineDrawing> {
         const start = session.getMovedAnchor(original.start, event)
         const end = session.getMovedAnchor(original.end, event)
 
-        if (!start || !end) {
-            return
-        }
+        if (!start || !end) return
 
         drawing.start = start
         drawing.end = end

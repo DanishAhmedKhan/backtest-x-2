@@ -3,7 +3,6 @@ import type { ChartPointerEvent } from '../models/ChartPointerEvents'
 import type { DrawingAnchor } from '../models/DrawingAnchor'
 import type { PointerAnchor } from '../models/PointerAnchor'
 import type { TimeCoordinateResolver } from '../renderer/TimeCoordinateResolver'
-
 import type { EditTarget } from './EditTarget'
 
 export class EditingSession {

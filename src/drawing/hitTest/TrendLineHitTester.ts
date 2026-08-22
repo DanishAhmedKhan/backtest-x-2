@@ -32,9 +32,7 @@ export class TrendLineHitTester implements DrawingHitTester<TrendLineDrawing, Tr
         const end = transformer.toPoint(drawing.end)
         const mouse = transformer.toPoint(point)
 
-        if (!start || !end || !mouse) {
-            return null
-        }
+        if (!start || !end || !mouse) return
 
         if (LineGeometry.isNearHandle(mouse, start, HitTestConstants.HANDLE_RADIUS)) {
             return {

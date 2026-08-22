@@ -18,25 +18,19 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
     public updateEdit(session: EditingSession, event: ChartPointerEvent) {
         const target = session.getTarget()
 
-        if (!target) {
-            return
-        }
+        if (!target) return
 
         const drawing = target.drawing as LongPositionDrawing
         const original = session.getOriginalDrawing() as LongPositionDrawing
 
-        if (!original) {
-            return
-        }
+        if (!original) return
 
         if (target.target === HitTarget.Body) {
             this.moveBody(drawing, original, session, event)
             return
         }
 
-        if (target.target !== HitTarget.Handle) {
-            return
-        }
+        if (target.target !== HitTarget.Handle) return
 
         switch (target.handle) {
             case LongPositionHandle.Start:
@@ -159,9 +153,7 @@ export class LongPositionEditor implements DrawingEditor<LongPositionDrawing> {
         const target = session.getMovedAnchor(original.target, event)
         const stoploss = session.getMovedAnchor(original.stoploss, event)
 
-        if (!start || !end || !target || !stoploss) {
-            return
-        }
+        if (!start || !end || !target || !stoploss) return
 
         drawing.start = start
         drawing.end = end

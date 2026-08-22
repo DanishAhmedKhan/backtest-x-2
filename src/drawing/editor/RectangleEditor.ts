@@ -105,9 +105,7 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
 
         const pointerAnchor = session.getAnchorAtPointer(event)
 
-        if (!pointerAnchor) {
-            return
-        }
+        if (!pointerAnchor) return
 
         if (axes.horizontal === 'left') {
             left = pointerAnchor.time
@@ -147,9 +145,7 @@ export class RectangleEditor implements DrawingEditor<RectangleDrawing> {
         const start = session.getMovedAnchor(original.start, event)
         const end = session.getMovedAnchor(original.end, event)
 
-        if (!start || !end) {
-            return
-        }
+        if (!start || !end) return
 
         drawing.start = start
         drawing.end = end

@@ -1,8 +1,11 @@
 import { useRef, useState } from 'react'
-import { LocalStorageProvider } from '../../storage/LocalStorageProvider'
-import { STORAGE_KEYS } from '../../storage/key'
-import svg from '../../svg/svg'
+
 import { ToolbarIcon } from './ToolbarIcon'
+
+import { LocalStorageProvider } from '../../storage/LocalStorageProvider'
+import { STORAGE_KEYS } from '../../storage/storageKeys'
+
+import svg from '../../svg/svg'
 
 type Props = {
     children: React.ReactNode
