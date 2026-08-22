@@ -1,6 +1,5 @@
-import { ToolbarButton } from '../ui/ToolbarButton'
+import { ToolbarButton, type ToolbarButtonProps } from '../ui/ToolbarButton'
 import { ToolbarGroup } from '../ui/ToolbarGroup'
-import type { ToolbarButtonProps } from '../ui/types'
 
 type LayoutButton = ToolbarButtonProps & {
     id: string

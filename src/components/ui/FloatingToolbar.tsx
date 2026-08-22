@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { LocalStorageProvider } from '../../storage/LocalStorageProvider'
 import { STORAGE_KEYS } from '../../storage/key'
 import svg from '../../svg/svg'
+import { ToolbarIcon } from './ToolbarIcon'
 
 type Props = {
     children: React.ReactNode
@@ -91,14 +92,9 @@ export function FloatingToolbar({
                 top: position.y,
             }}
         >
-            <div
-                className="floating-toolbar-handle"
-                onMouseDown={handleMouseDown}
-                style={{ width: 28, height: 28 }}
-                dangerouslySetInnerHTML={{
-                    __html: svg.drag,
-                }}
-            />
+            <div className="floating-toolbar-handle" onMouseDown={handleMouseDown}>
+                <ToolbarIcon width={8} height={12} svg={svg.drag}></ToolbarIcon>
+            </div>
 
             <div className="floating-toolbar-content">{children}</div>
         </div>

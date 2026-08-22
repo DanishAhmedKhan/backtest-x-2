@@ -1,4 +1,4 @@
-type Props = {
+export type ToolbarButtonProps = {
     icon?: React.ReactNode
     label?: string
     tooltip?: string
@@ -6,7 +6,7 @@ type Props = {
     onClick?: () => void
 }
 
-export function ToolbarButton({ icon, label, tooltip, active, onClick }: Props) {
+export function ToolbarButton({ icon, label, tooltip, active, onClick }: ToolbarButtonProps) {
     return (
         <button
             type="button"

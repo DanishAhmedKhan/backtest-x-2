@@ -1,5 +1,6 @@
 import { ToolbarProvider } from './ToolbarProvider'
-import type { ToolbarDirection } from './types'
+
+export type ToolbarDirection = 'horizontal' | 'vertical'
 
 type Props = {
     children: React.ReactNode

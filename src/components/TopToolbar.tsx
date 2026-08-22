@@ -14,8 +14,6 @@ import { ToolbarFill } from './ui/ToolbarFill'
 import { ToolbarArrowDropdown } from './ui/ToolbarArrowDropdown'
 import LayoutPicker from './common/LayoutPicker'
 
-import type { ToolbarButtonItem } from './ui/types'
-
 import svg from '../svg/svg'
 import { LAYOUT_TYPES, LAYOUTS, type LayoutType } from '../types/Layout'
 
@@ -57,7 +55,7 @@ export default function TopToolbar({
         icon: <ToolbarIcon width={21} height={19} svg={svg.layout[layoutType]} />,
     }))
 
-    const layoutGroups: ToolbarButtonItem[][] = [[], [], [], []]
+    const layoutGroups = [[], [], [], []]
 
     layoutButtons.forEach((button) => {
         const layoutType = button.id.substring(2)

@@ -4,11 +4,9 @@ import { Toolbar } from './ui/Toolbar'
 import { FloatingToolbar } from './ui/FloatingToolbar'
 import { ToolbarGroup } from './ui/ToolbarGroup'
 import { ToolbarButton } from './ui/ToolbarButton'
-import { ToolbarDropdown } from './ui/ToolbarDropdown'
+import { ToolbarDropdown, type ToolbarDropdownOption } from './ui/ToolbarDropdown'
 import { ToolbarSeparator } from './ui/ToolbarSeparator'
 import { ToolbarIcon } from './ui/ToolbarIcon'
-
-import type { ToolbarDropdownOption } from './ui/types'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'

@@ -1,6 +1,5 @@
 import { createContext } from 'react'
-
-export type ToolbarDirection = 'horizontal' | 'vertical'
+import type { ToolbarDirection } from '../../components/ui/Toolbar'
 
 export interface ToolbarContextValue {
     direction: ToolbarDirection

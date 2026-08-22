@@ -1,7 +1,6 @@
 import svg from '../../svg/svg'
 import { ToolbarIcon } from './ToolbarIcon'
-import { ToolbarDropdown } from './ToolbarDropdown'
-import type { ToolbarDropdownOption } from './types'
+import { ToolbarDropdown, type ToolbarDropdownOption } from './ToolbarDropdown'
 
 export interface ToolbarArrowDropdownProps {
     selectedId: string

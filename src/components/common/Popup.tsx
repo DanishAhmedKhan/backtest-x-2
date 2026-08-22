@@ -13,13 +13,11 @@ type Props = {
     content: React.ReactNode
 }
 
-export function Popup({ open, width, height, title, onClose, content }: Props) {
+export function Popup({ open, width = 300, height, title, onClose, content }: Props) {
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!open) {
-            return
-        }
+        if (!open) return
 
         const handleMouseDown = (e: MouseEvent) => {
             if (!ref.current?.contains(e.target as Node)) {
@@ -34,9 +32,7 @@ export function Popup({ open, width, height, title, onClose, content }: Props) {
         }
     }, [open, onClose])
 
-    if (!open) {
-        return null
-    }
+    if (!open) return
 
     const size: React.CSSProperties = {}
 

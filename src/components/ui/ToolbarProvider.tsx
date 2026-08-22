@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import type { ToolbarDirection } from './types'
 import { ToolbarContext } from '../../ui/toolbar/ToolbarContext'
+import type { ToolbarDirection } from './Toolbar'
 
 type Props = {
     direction: ToolbarDirection

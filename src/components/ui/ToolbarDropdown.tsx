@@ -1,6 +1,29 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { ToolbarDropdownContent, ToolbarDropdownOption, ToolbarDropdownRenderContext } from './types'
 import { createPortal } from 'react-dom'
+
+export interface ToolbarDropdownRenderContext {
+    selected?: ToolbarDropdownOption
+    open: boolean
+    openDropdown(): void
+    closeDropdown(): void
+    toggleDropdown(): void
+}
+
+export interface ToolbarDropdownContext {
+    selectedId: string
+    close(): void
+    select(option: ToolbarDropdownOption): void
+}
+
+export type ToolbarDropdownContent = (context: ToolbarDropdownContext) => React.ReactNode
+
+export interface ToolbarDropdownOption {
+    id: string
+    label: string
+    subLabel?: string
+    icon?: React.ReactNode
+    disabled?: boolean
+}
 
 export interface ToolbarDropdownProps {
     selectedId: string
