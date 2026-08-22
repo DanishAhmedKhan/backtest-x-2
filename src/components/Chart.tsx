@@ -161,7 +161,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         isChangingTimeframeRef,
         isViewportInteractionRef,
         viewportRef,
-        runtimeRef,
     })
 
     useCrosshairSync({
@@ -186,7 +185,6 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         loadedWindowRef,
         totalFilesRef,
         viewportRef,
-        runtimeRef,
         setChartDataStatus,
         refreshPaneLayout,
         setIsChangingTimeframe: (value) => {

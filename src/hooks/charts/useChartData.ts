@@ -15,8 +15,6 @@ import { applyChartData } from '../utilities/applyChartData'
 import { restoreViewport } from '../utilities/viewport'
 import { setRaw1mData } from '../utilities/setRaw1mData'
 
-import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
-
 type Params = {
     ticker: Ticker
     timeframe: Timeframe
@@ -31,7 +29,6 @@ type Params = {
     loadedWindowRef: React.RefObject<LoadedWindow>
     totalFilesRef: React.RefObject<number>
     viewportRef: React.RefObject<ViewportState>
-    runtimeRef: React.RefObject<ChartRuntime | null>
     setChartDataStatus: React.Dispatch<React.SetStateAction<ChartDataStatus>>
     refreshPaneLayout: () => void
     setIsChangingTimeframe: (value: boolean) => void
@@ -51,7 +48,6 @@ export function useChartData({
     loadedWindowRef,
     totalFilesRef,
     viewportRef,
-    runtimeRef,
     setChartDataStatus,
     refreshPaneLayout,
     setIsChangingTimeframe,
@@ -142,8 +138,6 @@ export function useChartData({
                     low: c.low,
                     close: c.close,
                 }))
-
-                runtimeRef.current?.onChartDataChanged()
 
                 eventBus.emit('chartDataChanged')
 

@@ -10,7 +10,6 @@ import type { LoadedWindow } from '../../types/LoadedWindow'
 import type { ViewportState } from '../../types/Viewport'
 import { CandleService } from '../../core/CandleService'
 
-import type { ChartRuntime } from '../../drawing/runtime/ChartRuntime'
 import type { Raw1mData } from '../../components/Chart'
 
 import { loadAdjacentWindow } from '../utilities/loadAdjacentWindow'
@@ -37,7 +36,6 @@ type Params = {
     isChangingTimeframeRef: React.RefObject<boolean>
     isViewportInteractionRef: React.RefObject<boolean>
     viewportRef: React.RefObject<ViewportState>
-    runtimeRef: React.RefObject<ChartRuntime | null>
 }
 
 export function useInfiniteScroll({
@@ -57,7 +55,6 @@ export function useInfiniteScroll({
     isChangingTimeframeRef,
     isViewportInteractionRef,
     viewportRef,
-    runtimeRef,
 }: Params) {
     useEffect(() => {
         const chart = chartRef.current
@@ -108,7 +105,6 @@ export function useInfiniteScroll({
                     if (result.loaded) {
                         displayedCandlesRef.current = candlesRef.current
 
-                        runtimeRef.current?.onChartDataChanged()
                         eventBus.emit('chartDataChanged')
 
                         timeScale.scrollPosition()
@@ -122,7 +118,6 @@ export function useInfiniteScroll({
                     if (result.loaded) {
                         displayedCandlesRef.current = candlesRef.current
 
-                        runtimeRef.current?.onChartDataChanged()
                         eventBus.emit('chartDataChanged')
                     }
                 }
@@ -160,7 +155,6 @@ export function useInfiniteScroll({
         isLoadingDataRef,
         isViewportInteractionRef,
         viewportRef,
-        runtimeRef,
         raw1mRef,
         displayedCandlesRef,
     ])

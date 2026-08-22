@@ -7,7 +7,6 @@ import { ChartSnapshot } from '../renderer/ChartSnapshot'
 import { RenderLoop } from '../renderer/RenderLoop'
 import type { DrawingContext } from '../DrawingContext'
 import type { RawPointerEvent } from '../models/RawPointerEvent'
-import { DrawingLogicalUpdater } from '../renderer/DrawaingLogicalUpdator'
 import type { Timeframe } from '../../core/Timeframe'
 import { PaneGeometry } from '../renderer/PaneGeometry'
 import { CursorApplier } from '../../core/cursor/CursorApplier'
@@ -39,7 +38,6 @@ export class ChartRuntime {
 
     public readonly transformer: CoordinateTransformer
     public readonly timeResolver: TimeCoordinateResolver
-    private readonly drawingLogicalUpdater: DrawingLogicalUpdater
 
     private readonly paneGeometry: PaneGeometry
     private readonly canvas: HTMLCanvasElement
@@ -57,7 +55,6 @@ export class ChartRuntime {
 
         this.timeResolver = new TimeCoordinateResolver(chart, timesRef, params.timeframe)
         this.transformer = new CoordinateTransformer(series, this.timeResolver)
-        this.drawingLogicalUpdater = new DrawingLogicalUpdater(drawingContext.drawingManager, this.timeResolver)
 
         drawingContext.registerTools(this.transformer)
         drawingContext.registerEditor(this.transformer)
@@ -166,11 +163,6 @@ export class ChartRuntime {
 
     public handlePointerLeave() {
         this.pointerController.handlePointerLeave()
-    }
-
-    public onChartDataChanged() {
-        this.drawingLogicalUpdater.update()
-        this.renderLoop.invalidate()
     }
 
     public updatePaneLayout() {
