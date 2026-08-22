@@ -12,14 +12,10 @@ type Params = {
 export function useDrawingTools({ chartRef, containerRef, runtimeRef }: Params) {
     useEffect(() => {
         const chart = chartRef.current
-        if (!chart) {
-            return
-        }
+        if (!chart) return
 
         const container = containerRef.current
-        if (!container) {
-            return
-        }
+        if (!container) return
 
         const createRawPointerEvent = (
             x: number,
@@ -38,9 +34,7 @@ export function useDrawingTools({ chartRef, containerRef, runtimeRef }: Params) 
         })
 
         const handlePointerMove = (param: MouseEventParams<Time>) => {
-            if (!param.point) {
-                return
-            }
+            if (!param.point) return
 
             const sourceEvent = param.sourceEvent
 

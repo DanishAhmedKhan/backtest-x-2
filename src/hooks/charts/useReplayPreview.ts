@@ -42,9 +42,7 @@ export function useReplayPreview({ chartRef }: Props) {
     useEffect(() => {
         const chart = chartRef.current
 
-        if (!chart) {
-            return
-        }
+        if (!chart) return
 
         const timeScale = chart.timeScale()
 

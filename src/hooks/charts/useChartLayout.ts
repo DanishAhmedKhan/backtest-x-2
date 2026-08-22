@@ -16,9 +16,7 @@ export function useChartLayout({ containerRef, chartRef, paneGeometryRef }: Prop
     const refreshPaneLayout = useCallback(() => {
         const pane = paneGeometryRef.current?.calculate()
 
-        if (!pane) {
-            return
-        }
+        if (!pane) return
 
         setPaneLayout((previous) => {
             if (

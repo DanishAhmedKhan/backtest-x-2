@@ -39,7 +39,6 @@ export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorVal
         trueRanges.push(trueRange)
     }
 
-    // First ATR = SMA of the first `period` true ranges.
     let sum = 0
 
     for (let i = 0; i < period; i++) {
@@ -53,10 +52,6 @@ export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorVal
         value: previousATR,
     })
 
-    // Subsequent ATR values use Wilder's smoothing:
-    //
-    // ATR = ((Previous ATR × (period - 1)) + Current TR) / period
-    //
     for (let i = period; i < candles.length; i++) {
         const currentTR = trueRanges[i]
 

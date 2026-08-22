@@ -12,16 +12,10 @@ export function captureViewport({
     viewport: React.RefObject<ViewportState>
 }) {
     const range = chart.timeScale().getVisibleLogicalRange()
-
-    if (!range) {
-        return
-    }
+    if (!range) return
 
     const renderedBars = series.data()
-
-    if (renderedBars.length === 0) {
-        return
-    }
+    if (renderedBars.length === 0) return
 
     const lastIndex = renderedBars.length - 1
 
@@ -52,10 +46,7 @@ export function restoreViewport({
     viewport: React.RefObject<ViewportState>
 }) {
     const renderedBars = series.data()
-
-    if (renderedBars.length === 0) {
-        return
-    }
+    if (renderedBars.length === 0) return
 
     const lastIndex = renderedBars.length - 1
 
@@ -100,10 +91,7 @@ export function scrollViewportToTime({
     align?: 'center' | 'right'
 }) {
     const candles = series.data()
-
-    if (candles.length === 0) {
-        return
-    }
+    if (candles.length === 0) return
 
     let barIndex = candles.findIndex((c) => Number(c.time) >= timestamp)
 
@@ -142,16 +130,10 @@ export function captureViewportAroundTime({
     timestamp: number
 }) {
     const range = chart.timeScale().getVisibleLogicalRange()
-
-    if (!range || candles.length === 0) {
-        return
-    }
+    if (!range || candles.length === 0) return
 
     const barIndex = candles.findIndex((c) => Number(c.time) >= timestamp)
-
-    if (barIndex === -1) {
-        return
-    }
+    if (barIndex === -1) return
 
     viewport.current = {
         visibleBars: range.to - range.from + 1,

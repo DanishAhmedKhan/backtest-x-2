@@ -11,9 +11,7 @@ export class RenderLoop implements RenderInvalidator {
     constructor(private readonly snapshot: ChartSnapshot, private readonly render: () => void) {}
 
     public start() {
-        if (this.animationFrameId !== null) {
-            return
-        }
+        if (this.animationFrameId !== null) return
 
         this.previousSnapshot = this.snapshot.capture()
 
@@ -36,9 +34,7 @@ export class RenderLoop implements RenderInvalidator {
     }
 
     public stop() {
-        if (this.animationFrameId === null) {
-            return
-        }
+        if (this.animationFrameId === null) return
 
         cancelAnimationFrame(this.animationFrameId)
 

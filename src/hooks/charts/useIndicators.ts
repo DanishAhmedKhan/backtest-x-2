@@ -21,9 +21,7 @@ export function useIndicators({ chartRef, displayedCandlesRef, chartReady }: Pro
     useEffect(() => {
         const chart = chartRef.current
 
-        if (!chart || !chartReady) {
-            return
-        }
+        if (!chart || !chartReady) return
 
         const renderer = new IndicatorRenderer(chart)
         const manager = new IndicatorManager(renderer)

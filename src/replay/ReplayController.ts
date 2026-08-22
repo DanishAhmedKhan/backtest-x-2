@@ -12,10 +12,7 @@ export class ReplayController {
 
     public seek(index: number) {
         const candles = replayStore.raw1mCandles
-
-        if (!candles.length) {
-            return
-        }
+        if (!candles.length) return
 
         const clamped = Math.max(replayStore.startIndex ?? 0, Math.min(index, candles.length - 1))
 

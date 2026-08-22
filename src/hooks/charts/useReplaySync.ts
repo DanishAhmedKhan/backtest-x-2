@@ -34,9 +34,7 @@ export function useReplaySync({
         const chart = chartRef.current
         const series = seriesRef.current
 
-        if (!chart || !series) {
-            return
-        }
+        if (!chart || !series) return
 
         const tfSeconds = timeframe.toSeconds()
 

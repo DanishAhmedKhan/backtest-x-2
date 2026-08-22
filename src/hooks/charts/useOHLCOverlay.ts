@@ -22,9 +22,7 @@ export function useOHLCOverlay({ chartRef, seriesRef }: Props) {
         const chart = chartRef.current
         const series = seriesRef.current
 
-        if (!chart || !series) {
-            return
-        }
+        if (!chart || !series) return
 
         const handleCrosshairMove = (param) => {
             const candle = param.seriesData.get(series) as CandlestickData<Time> | undefined

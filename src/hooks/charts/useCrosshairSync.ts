@@ -25,9 +25,7 @@ export function useCrosshairSync({ id, chartRef, seriesRef, candleMapRef, timesR
                 sourceId: id,
             })
 
-            if (!replayStore.isSelecting) {
-                return
-            }
+            if (!replayStore.isSelecting) return
 
             replayStore.previewTime = time
 

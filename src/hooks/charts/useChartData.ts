@@ -57,9 +57,7 @@ export function useChartData({
             const chart = chartRef.current
             const series = seriesRef.current
 
-            if (!chart || !series || !chartReady) {
-                return
-            }
+            if (!chart || !series || !chartReady) return
 
             const setChartEmptyState = (empty: boolean) => {
                 chart.applyOptions({

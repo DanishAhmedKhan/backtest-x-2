@@ -23,9 +23,7 @@ export class RectangleRenderer implements DrawingRenderer<RectangleDrawing> {
         const start = transformer.toPoint(drawing.start)
         const end = transformer.toPoint(drawing.end)
 
-        if (!start || !end) {
-            return
-        }
+        if (!start || !end) return
 
         const left = Math.min(start.x, end.x)
         const right = Math.max(start.x, end.x)
