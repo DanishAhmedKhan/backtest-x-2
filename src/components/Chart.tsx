@@ -111,7 +111,10 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
 
     const paneGeometryRef = useRef<PaneGeometry | null>(null)
 
-    const { chartRef, seriesRef, chartReady } = useChart(containerRef)
+    const { chartRef, seriesRef, chartReady } = useChart({
+        ticker,
+        containerRef,
+    })
 
     const { paneLayout, refreshPaneLayout } = useChartLayout({
         containerRef,
