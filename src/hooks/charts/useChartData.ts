@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { CandlestickData, Time, IChartApi, ISeriesApi } from 'lightweight-charts'
 
 import { Ticker } from '../../core/Ticker'
+import { TickerPriceFormat } from '../../core/TickerPriceFormat'
 import { Timeframe } from '../../core/Timeframe'
 import { CandleService } from '../../core/CandleService'
 import type { ChartDataStatus, Raw1mData } from '../../components/Chart'
@@ -52,7 +53,12 @@ export function useChartData({
     refreshPaneLayout,
     setIsChangingTimeframe,
 }: Params) {
+    const previousTickerRef = useRef(ticker.value)
+
     useEffect(() => {
+        const tickerChanged = previousTickerRef.current !== ticker.value
+        previousTickerRef.current = ticker.value
+
         const load = async () => {
             const chart = chartRef.current
             const series = seriesRef.current
@@ -81,6 +87,10 @@ export function useChartData({
             setIsChangingTimeframe(true)
             setChartDataStatus('loading')
             setChartEmptyState(true)
+
+            series.applyOptions({
+                priceFormat: TickerPriceFormat.getFormat(ticker),
+            })
 
             series.setData([])
 
@@ -128,6 +138,10 @@ export function useChartData({
                     timesRef,
                     skipSeriesUpdate: replayStore.enabled,
                 })
+
+                if (tickerChanged && !replayStore.enabled) {
+                    series.priceScale().setAutoScale(true)
+                }
 
                 displayedCandlesRef.current = result.chartCandles.map((c) => ({
                     time: c.time as Time,
