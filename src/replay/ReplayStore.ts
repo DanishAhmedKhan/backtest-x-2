@@ -27,6 +27,9 @@ export class ReplayStore {
 
     public start(startIndex: number, raw1mCandles: Candle[], chartTimeframeSeconds: number) {
         this.enabled = true
+        this.isSelecting = false
+        this.showToolbar = false
+        this.isPlaying = false
 
         this.raw1mCandles = raw1mCandles
 
@@ -62,16 +65,16 @@ export class ReplayStore {
         this.chartTimeframeSeconds = chartTimeframeSeconds
         this.updateIntervalSeconds = chartTimeframeSeconds
 
-        this.isSelecting = false
-        this.showToolbar = false
         this.previewTime = null
-        this.isPlaying = false
 
         this.pendingStepSeconds = null
     }
 
     public stop() {
         this.enabled = false
+        this.showToolbar = false
+        this.isSelecting = false
+        this.isPlaying = false
 
         this.startIndex = null
         this.replayStartIndex = null
@@ -89,9 +92,6 @@ export class ReplayStore {
         this.updateIntervalSeconds = 60
         this.chartTimeframeSeconds = 60
         this.pendingStepSeconds = null
-
-        this.isSelecting = true
-        this.isPlaying = false
     }
 
     public appendRaw1mCandles(candles: Candle[]) {
@@ -99,9 +99,7 @@ export class ReplayStore {
     }
 
     public seek(index: number) {
-        if (!this.raw1mCandles.length) {
-            return
-        }
+        if (!this.raw1mCandles.length) return
 
         const clamped = Math.max(this.startIndex ?? 0, Math.min(index, this.raw1mCandles.length - 1))
 

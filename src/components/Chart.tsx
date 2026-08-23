@@ -198,6 +198,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
         seriesRef,
         candlesRef,
         displayedCandlesRef,
+        timesRef,
         viewportRef,
         replayViewportRef,
     })

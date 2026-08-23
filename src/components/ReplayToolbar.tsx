@@ -53,7 +53,6 @@ export default function ReplayToolbar() {
     }
 
     const handleExit = () => {
-        setIsPlaying(false)
         replayStore.stop()
 
         eventBus.emit('replayStop')

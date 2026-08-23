@@ -74,7 +74,7 @@ export class CsvCandleLoader {
     }
 
     public static getBeforeYearWeek(year: number, week: number) {
-        let newYear, newWeek
+        let newYear: number, newWeek: number
 
         if (week === 1) {
             newYear = year - 1
