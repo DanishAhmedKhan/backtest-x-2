@@ -13,6 +13,7 @@ const TICKER_PRECISIONS: Record<string, number> = {
     GBPUSD: 5,
     USDJPY: 3,
     US100: 1,
+    XAUUSD: 3,
 }
 
 export class TickerPriceFormat {

@@ -77,6 +77,7 @@ export default function TopToolbar({
         <Toolbar>
             <ToolbarGroup>
                 <ToolbarDropdown
+                    width={140}
                     selectedId={`tkr-${ticker.value}`}
                     options={tickerOptions}
                     onChange={(option) => {
