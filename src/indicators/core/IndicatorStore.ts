@@ -1,4 +1,5 @@
 import { Indicator, type IndicatorConfig } from './Indicator'
+import type { IndicatorSource } from './indicatorSource'
 
 type Listener = () => void
 
@@ -54,9 +55,23 @@ class IndicatorStore {
 
     public updateSetting(id: string, key: string, value: unknown) {
         const indicator = this.get(id)
+
         if (!indicator) return
 
-        indicator.setSetting(key, value)
+        if (key === 'period') {
+            indicator.update({
+                period: Number(value),
+            })
+        } else if (key === 'source') {
+            indicator.update({
+                source: value as IndicatorSource,
+            })
+        } else if (key === 'visible') {
+            indicator.setVisible(Boolean(value))
+        } else {
+            indicator.setSetting(key, value)
+        }
+
         this.indicators = [...this.indicators]
 
         this.notify()

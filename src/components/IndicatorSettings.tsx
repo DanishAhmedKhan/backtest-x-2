@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react'
+
 import { Popup } from './common/Popup'
 
 import type { Indicator } from '../indicators/core/Indicator'
@@ -11,11 +13,26 @@ type Props = {
 }
 
 export default function IndicatorSettings({ open, onClose, indicator }: Props) {
-    if (!indicator) {
+    const indicators = useSyncExternalStore(
+        indicatorStore.subscribe.bind(indicatorStore),
+        () => indicatorStore.getAll(),
+        () => indicatorStore.getAll(),
+    )
+
+    const currentIndicator = indicator ? indicators.find((item) => item.id === indicator.id) ?? null : null
+
+    if (!currentIndicator) {
         return null
     }
 
-    return <IndicatorSettingsContent key={indicator.id} indicator={indicator} open={open} onClose={onClose} />
+    return (
+        <IndicatorSettingsContent
+            key={currentIndicator.id}
+            indicator={currentIndicator}
+            open={open}
+            onClose={onClose}
+        />
+    )
 }
 
 type ContentProps = {
