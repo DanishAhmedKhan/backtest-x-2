@@ -1,11 +1,15 @@
 import { useRef, useState, useLayoutEffect, useMemo } from 'react'
+
 import ChartFrame from './ChartFrame'
+
+import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
+import type { Indicator } from '../indicators/core/Indicator'
+
+import { useLayoutResize } from '../hooks/useLayoutResize'
 import type { ChartState } from '../types/ChartState'
 import type { LayoutType } from '../types/Layout'
 import { createLayout } from '../layout/layoutTemplates'
 import { computeLayoutRects, HANDLE_SIZE } from '../layout/layoutEngine'
-import { useLayoutResize } from '../hooks/useLayoutResize'
-import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
 
 type Props = {
     charts: ChartState[]
@@ -13,6 +17,7 @@ type Props = {
     onSelectChart: (id: string) => void
     layout: LayoutType
     onDrawingToolbarManagerReady?: (manager: DrawingToolbarManager) => void
+    onIndicatorSettings: (indicator: Indicator) => void
 }
 
 export default function ChartWindow({
@@ -21,6 +26,7 @@ export default function ChartWindow({
     onSelectChart,
     layout,
     onDrawingToolbarManagerReady,
+    onIndicatorSettings,
 }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -81,6 +87,7 @@ export default function ChartWindow({
                             isActive={chart.id === activeChartId}
                             onSelect={() => onSelectChart(chart.id)}
                             onDrawingToolbarManagerReady={onDrawingToolbarManagerReady}
+                            onIndicatorSettings={onIndicatorSettings}
                         />
                     </div>
                 )

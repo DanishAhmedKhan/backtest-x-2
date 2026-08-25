@@ -6,12 +6,13 @@ import JumpTo from './JumpTo'
 import IndicatorSelector from './IndicatorSelector'
 import DrawingToolbar from './DrawingToolbar'
 import ReplayToolbar from './ReplayToolbar'
-import { DrawingPropertiesToolbar } from './DrawingPropertiesToolbar'
+import DrawingPropertiesToolbar from './DrawingPropertiesToolbar'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
+import type { Indicator } from '../indicators/core/Indicator'
 
 import type { ChartState } from '../types/ChartState'
 import { LAYOUTS, type LayoutType } from '../types/Layout'
@@ -27,6 +28,7 @@ import { indicatorStore } from '../indicators/core/IndicatorStore'
 
 import '../../styles/index.css'
 import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
+import IndicatorSettings from './IndicatorSettings'
 
 const storage = new LocalStorageProvider()
 
@@ -72,8 +74,12 @@ export default function Main() {
     const [charts, setCharts] = useState<ChartState[]>(initialCharts)
     const [activeChartId, setActiveChartId] = useState(initialCharts[0]?.id ?? '')
     const [showReplayToolbar, setShowReplayToolbar] = useState(false)
+
     const [jumpOpen, setJumpOpen] = useState(false)
     const [indicatorListOpen, setIndicatorListOpen] = useState(false)
+    const [indicatorSettingsOpen, setIndicatorSettingsOpen] = useState(false)
+
+    const [selectedIndicatorId, setSelectedIndicatorId] = useState<string | null>(null)
 
     const [drawingToolbarManager, setDrawingToolbarManager] = useState<DrawingToolbarManager | null>(null)
 
@@ -101,6 +107,11 @@ export default function Main() {
         if (!newCharts.some((c) => c.id === activeChartId)) {
             setActiveChartId(newCharts[0].id)
         }
+    }
+
+    const handleIndicatorSettings = (indicator: Indicator) => {
+        setSelectedIndicatorId(indicator.id)
+        setIndicatorSettingsOpen(true)
     }
 
     useEffect(() => {
@@ -133,6 +144,8 @@ export default function Main() {
 
     useReplayController()
 
+    const selectedIndicator = selectedIndicatorId !== null ? indicatorStore.get(selectedIndicatorId) ?? null : null
+
     return (
         <div className="main">
             <div className="main-toptoolbar">
@@ -161,6 +174,7 @@ export default function Main() {
                 onSelectChart={setActiveChartId}
                 layout={layout}
                 onDrawingToolbarManagerReady={setDrawingToolbarManager}
+                onIndicatorSettings={handleIndicatorSettings}
             />
 
             <JumpTo
@@ -189,6 +203,15 @@ export default function Main() {
                         })
                     }
                 }}
+            />
+
+            <IndicatorSettings
+                open={indicatorSettingsOpen}
+                onClose={() => {
+                    setIndicatorSettingsOpen(false)
+                    setSelectedIndicatorId(null)
+                }}
+                indicator={selectedIndicator}
             />
 
             {showReplayToolbar && <ReplayToolbar />}

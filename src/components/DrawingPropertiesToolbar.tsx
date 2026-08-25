@@ -33,7 +33,7 @@ function getButtonIcon(id: string) {
     return <div style={{ width: 28, height: 28 }} dangerouslySetInnerHTML={{ __html: icon }} />
 }
 
-export function DrawingPropertiesToolbar({ manager }: Props) {
+export default function DrawingPropertiesToolbar({ manager }: Props) {
     const [isVisible, setIsVisible] = useState(() => manager?.isVisible() ?? false)
     const [items, setItems] = useState<ToolbarItem[]>(() => manager?.getToolbarItems() ?? [])
 

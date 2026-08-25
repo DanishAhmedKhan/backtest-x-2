@@ -5,6 +5,7 @@ import ChartOHLC from './ChartOHLC'
 import ReplayOverlay from './ReplayOverlay'
 import DrawingCanvas from './DrawingCanvas'
 import ChartNoData from './ChartNoData'
+import IndicatorList from './IndicatorList'
 
 import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
@@ -34,6 +35,8 @@ import { DrawingPersistence } from '../drawing/persistence/DrawingPersistence'
 import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 import { toolStore } from '../drawing/tools/ToolStore'
 
+import type { Indicator } from '../indicators/core/Indicator'
+
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
 import type { ViewportState } from '../types/Viewport'
@@ -43,7 +46,6 @@ import { binarySearch } from '../helper/binarySearch'
 import { DEFAULT_BLANK_CANDLE, DEFAULT_VISIBLE_CANDLE } from '../config/default/CandleConfig'
 import { CursorType } from '../core/cursor/CursorType'
 import { CursorSource } from '../core/cursor/CursorSource'
-import IndicatorList from './IndicatorList'
 
 export type Raw1mData = {
     candles: Candle[]
@@ -57,9 +59,10 @@ type Props = {
     ticker: Ticker
     timeframe: Timeframe
     onDrawingToolbarManagerReady?: (manager: DrawingToolbarManager) => void
+    onIndicatorSettings: (indicator: Indicator) => void
 }
 
-function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
+function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady, onIndicatorSettings }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -384,7 +387,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     return (
         <div className="chart">
             {chartDataStatus !== 'no-data' && <ChartOHLC ohlc={ohlc} />}
-            {chartDataStatus !== 'no-data' && <IndicatorList />}
+            {chartDataStatus !== 'no-data' && <IndicatorList onIndicatorSettings={onIndicatorSettings} />}
 
             <div
                 className="chart-container"

@@ -1,9 +1,17 @@
 import { useSyncExternalStore } from 'react'
-import { indicatorStore } from '../indicators/core/IndicatorStore'
-import svg from '../svg/svg'
+
 import { ToolbarIcon } from './ui/ToolbarIcon'
 
-export default function IndicatorList() {
+import type { Indicator } from '../indicators/core/Indicator'
+import { indicatorStore } from '../indicators/core/IndicatorStore'
+
+import svg from '../svg/svg'
+
+type Props = {
+    onIndicatorSettings: (indicator: Indicator) => void
+}
+
+export default function IndicatorList({ onIndicatorSettings }: Props) {
     const indicators = useSyncExternalStore(
         indicatorStore.subscribe.bind(indicatorStore),
         () => indicatorStore.getAll(),
@@ -16,6 +24,7 @@ export default function IndicatorList() {
                 return (
                     <div className="chart-indicator-item" key={indicator.id}>
                         <div className="name">{indicator.getName()}</div>
+
                         <div className="action">
                             <div
                                 className="action-button"
@@ -23,9 +32,11 @@ export default function IndicatorList() {
                             >
                                 <ToolbarIcon width={18} height={18} svg={svg.eyeOpen} />
                             </div>
-                            <div className="action-button">
+
+                            <div className="action-button" onClick={() => onIndicatorSettings(indicator)}>
                                 <ToolbarIcon width={18} height={18} svg={svg.settings} />
                             </div>
+
                             <div className="action-button" onClick={() => indicatorStore.remove(indicator.id)}>
                                 <ToolbarIcon width={18} height={18} svg={svg.delete18} />
                             </div>

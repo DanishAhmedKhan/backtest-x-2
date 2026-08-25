@@ -1,6 +1,8 @@
 import Chart from './Chart'
+
 import type { ChartState } from '../types/ChartState'
 import type { DrawingToolbarManager } from '../drawing/toolbar/DrawingToolbarManager'
+import type { Indicator } from '../indicators/core/Indicator'
 
 type Props = {
     id: string
@@ -8,9 +10,16 @@ type Props = {
     isActive: boolean
     onSelect: () => void
     onDrawingToolbarManagerReady?: (manager: DrawingToolbarManager) => void
+    onIndicatorSettings: (indicator: Indicator) => void
 }
 
-export default function ChartFrame({ chart, isActive, onSelect, onDrawingToolbarManagerReady }: Props) {
+export default function ChartFrame({
+    chart,
+    isActive,
+    onSelect,
+    onDrawingToolbarManagerReady,
+    onIndicatorSettings,
+}: Props) {
     return (
         <div
             className="chart-frame"
@@ -24,6 +33,7 @@ export default function ChartFrame({ chart, isActive, onSelect, onDrawingToolbar
                 ticker={chart.ticker}
                 timeframe={chart.timeframe}
                 onDrawingToolbarManagerReady={isActive ? onDrawingToolbarManagerReady : undefined}
+                onIndicatorSettings={onIndicatorSettings}
             />
         </div>
     )

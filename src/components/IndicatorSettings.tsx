@@ -1,0 +1,187 @@
+import { Popup } from './common/Popup'
+
+import type { Indicator } from '../indicators/core/Indicator'
+import type { IndicatorSettingDefinition, IndicatorSettingOption } from '../indicators/core/IndicatorSettings'
+import { indicatorStore } from '../indicators/core/IndicatorStore'
+
+type Props = {
+    open: boolean
+    onClose: () => void
+    indicator: Indicator | null
+}
+
+export default function IndicatorSettings({ open, onClose, indicator }: Props) {
+    if (!indicator) {
+        return null
+    }
+
+    return <IndicatorSettingsContent key={indicator.id} indicator={indicator} open={open} onClose={onClose} />
+}
+
+type ContentProps = {
+    open: boolean
+    onClose: () => void
+    indicator: Indicator
+}
+
+function IndicatorSettingsContent({ open, onClose, indicator }: ContentProps) {
+    const settings = indicator.getSettingsDefinition()
+
+    return (
+        <Popup
+            open={open}
+            width={400}
+            title={indicator.getName()}
+            onClose={onClose}
+            content={
+                <div>
+                    {renderGroup('inputs', 'Inputs', settings, indicator)}
+                    {renderGroup('style', 'Style', settings, indicator)}
+                    {renderGroup('visibility', 'Visibility', settings, indicator)}
+                </div>
+            }
+        />
+    )
+}
+
+function renderGroup(
+    group: 'inputs' | 'style' | 'visibility',
+    title: string,
+    settings: IndicatorSettingDefinition[],
+    indicator: Indicator,
+) {
+    const groupSettings = settings.filter((setting) => setting.group === group)
+
+    if (groupSettings.length === 0) {
+        return null
+    }
+
+    return (
+        <div>
+            <h4>{title}</h4>
+
+            {groupSettings.map((setting) => (
+                <SettingControl key={setting.key} indicator={indicator} setting={setting} />
+            ))}
+        </div>
+    )
+}
+
+function SettingControl({ indicator, setting }: { indicator: Indicator; setting: IndicatorSettingDefinition }) {
+    const currentValue = getCurrentValue(indicator, setting)
+
+    switch (setting.type) {
+        case 'number':
+            return (
+                <label>
+                    {setting.label}{' '}
+                    <input
+                        type="number"
+                        value={Number(currentValue)}
+                        min={setting.min}
+                        max={setting.max}
+                        step={setting.step}
+                        onChange={(event) => {
+                            const value = Number(event.target.value)
+
+                            indicatorStore.updateSetting(indicator.id, setting.key, value)
+                        }}
+                    />
+                </label>
+            )
+
+        case 'select':
+            return (
+                <label>
+                    {setting.label}{' '}
+                    <select
+                        value={String(currentValue ?? '')}
+                        onChange={(event) => {
+                            indicatorStore.updateSetting(indicator.id, setting.key, event.target.value)
+                        }}
+                    >
+                        {setting.options?.map((option: IndicatorSettingOption) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+            )
+
+        case 'color':
+            return (
+                <label>
+                    {setting.label}{' '}
+                    <input
+                        type="color"
+                        value={String(currentValue ?? '#000000')}
+                        onChange={(event) => {
+                            indicatorStore.updateSetting(indicator.id, setting.key, event.target.value)
+                        }}
+                    />
+                </label>
+            )
+
+        case 'boolean':
+            return (
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={Boolean(currentValue)}
+                        onChange={(event) => {
+                            indicatorStore.updateSetting(indicator.id, setting.key, event.target.checked)
+                        }}
+                    />{' '}
+                    {setting.label}
+                </label>
+            )
+
+        case 'text':
+            return (
+                <label>
+                    {setting.label}{' '}
+                    <input
+                        type="text"
+                        value={String(currentValue ?? '')}
+                        onChange={(event) => {
+                            indicatorStore.updateSetting(indicator.id, setting.key, event.target.value)
+                        }}
+                    />
+                </label>
+            )
+
+        case 'time':
+            return (
+                <label>
+                    {setting.label}{' '}
+                    <input
+                        type="time"
+                        value={String(currentValue ?? '')}
+                        onChange={(event) => {
+                            indicatorStore.updateSetting(indicator.id, setting.key, event.target.value)
+                        }}
+                    />
+                </label>
+            )
+
+        default:
+            return null
+    }
+}
+
+function getCurrentValue(indicator: Indicator, setting: IndicatorSettingDefinition) {
+    if (setting.key === 'period') {
+        return indicator.getPeriod()
+    }
+
+    if (setting.key === 'source') {
+        return indicator.getSource()
+    }
+
+    if (setting.key === 'visible') {
+        return indicator.isVisible()
+    }
+
+    return indicator.getSetting(setting.key) ?? setting.defaultValue ?? ''
+}
