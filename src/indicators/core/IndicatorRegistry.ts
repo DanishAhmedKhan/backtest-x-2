@@ -1,20 +1,7 @@
-import type { IndicatorConfig, IndicatorType } from './Indicator'
-import type { IndicatorSource } from './indicatorSource'
+import type { IndicatorType } from './Indicator'
+import type { IndicatorDefinition } from './IndicatorDefinition'
 
 export type IndicatorDisplay = 'overlay' | 'pane'
-
-export type IndicatorDefinition = {
-    type: IndicatorType
-    name: string
-    description: string
-    display: 'overlay' | 'pane'
-
-    defaultConfig: {
-        period: number
-        source?: IndicatorSource
-    }
-    createName: (config: IndicatorConfig) => string
-}
 
 class IndicatorRegistry {
     private readonly definitions = new Map<IndicatorType, IndicatorDefinition>()

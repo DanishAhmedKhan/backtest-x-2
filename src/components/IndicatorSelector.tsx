@@ -1,6 +1,7 @@
 import { Popup } from './common/Popup'
 
-import { indicatorRegistry, type IndicatorDefinition } from '../indicators/core/IndicatorRegistry'
+import type { IndicatorDefinition } from '../indicators/core/IndicatorDefinition'
+import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
 
 type Props = {
     open: boolean
