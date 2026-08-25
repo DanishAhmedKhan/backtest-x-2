@@ -1,7 +1,6 @@
 import type { IndicatorType } from './Indicator'
 import type { IndicatorDefinition } from './IndicatorDefinition'
-
-export type IndicatorDisplay = 'overlay' | 'pane'
+import type { IndicatorSettingDefinition } from './IndicatorSettings'
 
 class IndicatorRegistry {
     private readonly definitions = new Map<IndicatorType, IndicatorDefinition>()
@@ -16,6 +15,10 @@ class IndicatorRegistry {
 
     public getAll(): IndicatorDefinition[] {
         return [...this.definitions.values()]
+    }
+
+    public getSettings(type: IndicatorType): IndicatorSettingDefinition[] {
+        return this.definitions.get(type)?.settings ?? []
     }
 
     public has(type: IndicatorType): boolean {
@@ -40,6 +43,39 @@ class IndicatorRegistry {
                 period: 20,
                 source: 'close',
             },
+            settings: [
+                {
+                    key: 'period',
+                    label: 'Length',
+                    group: 'inputs',
+                    type: 'number',
+                    min: 1,
+                    step: 1,
+                },
+                {
+                    key: 'source',
+                    label: 'Source',
+                    group: 'inputs',
+                    type: 'select',
+                    options: [
+                        { value: 'open', label: 'Open' },
+                        { value: 'high', label: 'High' },
+                        { value: 'low', label: 'Low' },
+                        { value: 'close', label: 'Close' },
+                        { value: 'hl2', label: 'HL2' },
+                        { value: 'hlc3', label: 'HLC3' },
+                        { value: 'ohlc4', label: 'OHLC4' },
+                    ],
+                },
+                {
+                    key: 'visible',
+                    label: 'Visible',
+                    group: 'visibility',
+                    type: 'boolean',
+                    defaultValue: true,
+                },
+            ],
+
             createName: (config) => {
                 return `SMA ${config.period} ${config.source}`
             },
@@ -54,6 +90,39 @@ class IndicatorRegistry {
                 period: 20,
                 source: 'close',
             },
+            settings: [
+                {
+                    key: 'period',
+                    label: 'Length',
+                    group: 'inputs',
+                    type: 'number',
+                    min: 1,
+                    step: 1,
+                },
+                {
+                    key: 'source',
+                    label: 'Source',
+                    group: 'inputs',
+                    type: 'select',
+                    options: [
+                        { value: 'open', label: 'Open' },
+                        { value: 'high', label: 'High' },
+                        { value: 'low', label: 'Low' },
+                        { value: 'close', label: 'Close' },
+                        { value: 'hl2', label: 'HL2' },
+                        { value: 'hlc3', label: 'HLC3' },
+                        { value: 'ohlc4', label: 'OHLC4' },
+                    ],
+                },
+                {
+                    key: 'visible',
+                    label: 'Visible',
+                    group: 'visibility',
+                    type: 'boolean',
+                    defaultValue: true,
+                },
+            ],
+
             createName: (config) => {
                 return `EMA ${config.period} ${config.source}`
             },
@@ -67,6 +136,23 @@ class IndicatorRegistry {
             defaultConfig: {
                 period: 14,
             },
+            settings: [
+                {
+                    key: 'period',
+                    label: 'Length',
+                    group: 'inputs',
+                    type: 'number',
+                    min: 1,
+                    step: 1,
+                },
+                {
+                    key: 'visible',
+                    label: 'Visible',
+                    group: 'visibility',
+                    type: 'boolean',
+                    defaultValue: true,
+                },
+            ],
             createName: (config) => {
                 return `ATR ${config.period}`
             },

@@ -28,7 +28,6 @@ class IndicatorStore {
         }
 
         const indicator = new Indicator(config)
-
         this.indicators = [...this.indicators, indicator]
 
         this.notify()
@@ -36,10 +35,7 @@ class IndicatorStore {
 
     public remove(id: string) {
         const exists = this.indicators.some((indicator) => indicator.id === id)
-
-        if (!exists) {
-            return
-        }
+        if (!exists) return
 
         this.indicators = this.indicators.filter((indicator) => indicator.id !== id)
 
@@ -48,13 +44,19 @@ class IndicatorStore {
 
     public update(id: string, changes: Partial<Omit<IndicatorConfig, 'id' | 'type'>>) {
         const indicator = this.get(id)
-
-        if (!indicator) {
-            return
-        }
+        if (!indicator) return
 
         indicator.update(changes)
+        this.indicators = [...this.indicators]
 
+        this.notify()
+    }
+
+    public updateSetting(id: string, key: string, value: unknown) {
+        const indicator = this.get(id)
+        if (!indicator) return
+
+        indicator.setSetting(key, value)
         this.indicators = [...this.indicators]
 
         this.notify()
@@ -62,13 +64,9 @@ class IndicatorStore {
 
     public setVisible(id: string, visible: boolean) {
         const indicator = this.get(id)
-
-        if (!indicator) {
-            return
-        }
+        if (!indicator) return
 
         indicator.setVisible(visible)
-
         this.indicators = [...this.indicators]
 
         this.notify()
@@ -76,22 +74,16 @@ class IndicatorStore {
 
     public toggleVisibility(id: string) {
         const indicator = this.get(id)
-
-        if (!indicator) {
-            return
-        }
+        if (!indicator) return
 
         indicator.setVisible(!indicator.isVisible())
-
         this.indicators = [...this.indicators]
 
         this.notify()
     }
 
     public clear() {
-        if (!this.indicators.length) {
-            return
-        }
+        if (!this.indicators.length) return
 
         this.indicators = []
 
