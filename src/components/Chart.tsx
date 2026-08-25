@@ -126,6 +126,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     })
 
     useIndicators({
+        timeframe,
         chartRef,
         displayedCandlesRef,
         chartReady,
@@ -371,9 +372,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady }: Props) {
     useEffect(() => {
         const cursorController = runtimeRef.current?.getCursorController()
 
-        if (!cursorController) {
-            return
-        }
+        if (!cursorController) return
 
         if (showReplayOverlay) {
             cursorController.request(CursorSource.Replay, CursorType.None)

@@ -2,11 +2,17 @@ import type { Candle } from '../../core/Candle'
 import type { Indicator } from './Indicator'
 import { calculateIndicator } from './indicatorCalculator'
 import type { IndicatorRenderer } from '../rendering/IndicatorRenderer'
+import type { IndicatorContext } from './IndicatorContext'
+import type { Timeframe } from '../../core/Timeframe'
+
+type IndicatorInstance = {
+    indicator: Indicator
+}
 
 export class IndicatorManager {
-    private readonly indicators = new Map<string, Indicator>()
+    private readonly indicators = new Map<string, IndicatorInstance>()
 
-    constructor(private readonly renderer: IndicatorRenderer) {}
+    constructor(private readonly renderer: IndicatorRenderer, private readonly timeframe: Timeframe) {}
 
     public sync(indicators: Indicator[]) {
         const incomingIds = new Set<string>()
@@ -21,7 +27,7 @@ export class IndicatorManager {
                 continue
             }
 
-            this.renderer.setVisible(indicator.id, indicator.isVisible())
+            existing.indicator = indicator
         }
 
         for (const id of this.indicators.keys()) {
@@ -32,21 +38,20 @@ export class IndicatorManager {
     }
 
     public update(candles: Candle[]) {
-        for (const indicator of this.indicators.values()) {
-            const config = indicator.getConfig()
+        const context: IndicatorContext = {
+            candles,
+            timeframe: this.timeframe,
+        }
 
-            const values = calculateIndicator(candles, config)
-
-            this.renderer.setData(indicator.id, values)
-
-            this.renderer.setVisible(indicator.id, indicator.isVisible())
+        for (const instance of this.indicators.values()) {
+            this.updateIndicator(instance, context)
         }
     }
 
     public remove(id: string) {
-        const indicator = this.indicators.get(id)
+        const instance = this.indicators.get(id)
 
-        if (!indicator) {
+        if (!instance) {
             return
         }
 
@@ -56,21 +61,25 @@ export class IndicatorManager {
     }
 
     public clear() {
-        this.indicators.clear()
-        this.renderer.clear()
+        for (const id of [...this.indicators.keys()]) {
+            this.remove(id)
+        }
     }
 
     public dispose() {
         this.clear()
+        this.renderer.dispose()
     }
 
     private create(indicator: Indicator) {
-        this.renderer.createLine(indicator.id, indicator.getDisplay(), {
-            lineWidth: 1,
+        this.indicators.set(indicator.id, {
+            indicator,
         })
+    }
 
-        this.indicators.set(indicator.id, indicator)
+    private updateIndicator(instance: IndicatorInstance, context: IndicatorContext) {
+        const result = calculateIndicator(context, instance.indicator)
 
-        this.renderer.setVisible(indicator.id, indicator.isVisible())
+        this.renderer.render(instance.indicator.id, result, instance.indicator.isVisible())
     }
 }

@@ -1,23 +1,25 @@
 import type { Candle } from '../../core/Candle'
+import { emptyIndicatorResult, type IndicatorResult } from '../core/IndicatorResult'
 import type { IndicatorValue } from '../core/indicatorSource'
 
 export type ATRConfig = {
     period: number
 }
 
-export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorValue[] {
+export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorResult {
     const { period } = config
 
     if (period <= 0 || !Number.isInteger(period)) {
         throw new Error(`ATR period must be a positive integer: ${period}`)
     }
 
+    const result = emptyIndicatorResult()
+
     if (candles.length <= period) {
-        return []
+        return result
     }
 
-    const result: IndicatorValue[] = []
-
+    const values: IndicatorValue[] = []
     const trueRanges: number[] = []
 
     for (let i = 0; i < candles.length; i++) {
@@ -47,7 +49,7 @@ export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorVal
 
     let previousATR = sum / period
 
-    result.push({
+    values.push({
         time: candles[period - 1].time,
         value: previousATR,
     })
@@ -59,11 +61,16 @@ export function calculateATR(candles: Candle[], config: ATRConfig): IndicatorVal
 
         previousATR = atr
 
-        result.push({
+        values.push({
             time: candles[i].time,
             value: atr,
         })
     }
+
+    result.lines.push({
+        id: 'atr',
+        values,
+    })
 
     return result
 }

@@ -1,4 +1,5 @@
 import type { Candle } from '../../core/Candle'
+import { emptyIndicatorResult, type IndicatorResult } from '../core/IndicatorResult'
 import { getIndicatorSourceValue, type IndicatorSource, type IndicatorValue } from '../core/indicatorSource'
 
 export type EMAConfig = {
@@ -6,18 +7,20 @@ export type EMAConfig = {
     source: IndicatorSource
 }
 
-export function calculateEMA(candles: Candle[], config: EMAConfig): IndicatorValue[] {
+export function calculateEMA(candles: Candle[], config: EMAConfig): IndicatorResult {
     const { period, source } = config
 
     if (period <= 0 || !Number.isInteger(period)) {
         throw new Error(`EMA period must be a positive integer: ${period}`)
     }
 
+    const result = emptyIndicatorResult()
+
     if (candles.length < period) {
-        return []
+        return result
     }
 
-    const result: IndicatorValue[] = []
+    const values: IndicatorValue[] = []
 
     const multiplier = 2 / (period + 1)
 
@@ -29,7 +32,7 @@ export function calculateEMA(candles: Candle[], config: EMAConfig): IndicatorVal
 
     let previousEMA = sum / period
 
-    result.push({
+    values.push({
         time: candles[period - 1].time,
         value: previousEMA,
     })
@@ -41,11 +44,16 @@ export function calculateEMA(candles: Candle[], config: EMAConfig): IndicatorVal
 
         previousEMA = ema
 
-        result.push({
+        values.push({
             time: candles[i].time,
             value: ema,
         })
     }
+
+    result.lines.push({
+        id: 'ema',
+        values,
+    })
 
     return result
 }

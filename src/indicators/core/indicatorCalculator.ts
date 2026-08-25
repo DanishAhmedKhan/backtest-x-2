@@ -1,35 +1,33 @@
-import type { Candle } from '../../core/Candle'
-import type { IndicatorConfig } from './Indicator'
+import type { Indicator } from './Indicator'
 
 import { calculateEMA } from '../calculations/ema'
 import { calculateSMA } from '../calculations/sma'
 import { calculateATR } from '../calculations/atr'
+import type { IndicatorContext } from './IndicatorContext'
+import type { IndicatorResult } from './IndicatorResult'
 
-export type CalculatedIndicatorValue = {
-    time: number
-    value: number
-}
+export function calculateIndicator(context: IndicatorContext, indicator: Indicator): IndicatorResult {
+    const config = indicator.getConfig()
 
-export function calculateIndicator(candles: Candle[], config: IndicatorConfig): CalculatedIndicatorValue[] {
     switch (config.type) {
         case 'sma':
-            return calculateSMA(candles, {
+            return calculateSMA(context.candles, {
                 period: config.period,
-                source: config.source ?? 'close',
+                source: config.source!,
             })
 
         case 'ema':
-            return calculateEMA(candles, {
+            return calculateEMA(context.candles, {
                 period: config.period,
-                source: config.source ?? 'close',
+                source: config.source!,
             })
 
         case 'atr':
-            return calculateATR(candles, {
+            return calculateATR(context.candles, {
                 period: config.period,
             })
 
         default:
-            return []
+            throw new Error(`Unsupported indicator type: ${config.type}`)
     }
 }
