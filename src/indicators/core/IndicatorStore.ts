@@ -7,6 +7,9 @@ class IndicatorStore {
     private indicators: Indicator[] = []
     private listeners = new Set<Listener>()
 
+    private snapshots = new Map<string, Indicator[]>()
+    private allSnapshot: Indicator[] = []
+
     public subscribe(listener: Listener) {
         this.listeners.add(listener)
 
@@ -15,8 +18,24 @@ class IndicatorStore {
         }
     }
 
-    public getAll(): Indicator[] {
-        return this.indicators
+    public getSnapshot(chartId: string): Indicator[] {
+        return this.getAll(chartId)
+    }
+
+    public getAll(chartId?: string): Indicator[] {
+        if (!chartId) {
+            return this.allSnapshot
+        }
+
+        let snapshot = this.snapshots.get(chartId)
+
+        if (!snapshot) {
+            snapshot = this.indicators.filter((indicator) => indicator.chartId === chartId)
+
+            this.snapshots.set(chartId, snapshot)
+        }
+
+        return snapshot
     }
 
     public get(id: string): Indicator | undefined {
@@ -31,6 +50,7 @@ class IndicatorStore {
         const indicator = new Indicator(config)
         this.indicators = [...this.indicators, indicator]
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
@@ -39,6 +59,7 @@ class IndicatorStore {
         if (!exists) return
 
         this.indicators = this.indicators.filter((indicator) => indicator.id !== id)
+        this.rebuildSnapshots()
 
         this.notify()
     }
@@ -50,6 +71,7 @@ class IndicatorStore {
         indicator.update(changes)
         this.indicators = [...this.indicators]
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
@@ -74,6 +96,7 @@ class IndicatorStore {
 
         this.indicators = [...this.indicators]
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
@@ -84,6 +107,7 @@ class IndicatorStore {
         indicator.setVisible(visible)
         this.indicators = [...this.indicators]
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
@@ -94,15 +118,31 @@ class IndicatorStore {
         indicator.setVisible(!indicator.isVisible())
         this.indicators = [...this.indicators]
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
     public clear() {
         if (!this.indicators.length) return
-
         this.indicators = []
 
+        this.rebuildSnapshots()
         this.notify()
+    }
+
+    private rebuildSnapshots() {
+        this.allSnapshot = this.indicators
+
+        const chartIds = new Set(this.indicators.map((indicator) => indicator.chartId))
+
+        this.snapshots.clear()
+
+        for (const chartId of chartIds) {
+            this.snapshots.set(
+                chartId,
+                this.indicators.filter((indicator) => indicator.chartId === chartId),
+            )
+        }
     }
 
     private notify() {

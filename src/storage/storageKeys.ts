@@ -3,4 +3,5 @@ export const STORAGE_KEYS = {
     FLOATING_TOOLBAR_POSITIONS: 'floating_toolbar_positions',
     COLOR_PICKER_SAVED_COLOR: 'color_picker_saved_color',
     DRAWING_ITEMS: 'drawing-items',
+    INDICATOR_ITEMS: 'indicator-items',
 }

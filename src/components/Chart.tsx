@@ -36,6 +36,7 @@ import { PaneGeometry } from '../drawing/renderer/PaneGeometry'
 import { toolStore } from '../drawing/tools/ToolStore'
 
 import type { Indicator } from '../indicators/core/Indicator'
+import { IndicatorPersistence } from '../indicators/persistence/IndicatorPersistence'
 
 import { eventBus } from '../event/EventBus'
 import { replayStore } from '../replay/ReplayStore'
@@ -112,6 +113,8 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady, onIndicato
     const drawingPersistenceRef = useRef<DrawingPersistence | null>(null)
     const drawingPersistenceTickerRef = useRef<string | null>(null)
 
+    const indicatorPersistenceRef = useRef<IndicatorPersistence | null>(null)
+
     const paneGeometryRef = useRef<PaneGeometry | null>(null)
 
     const { chartRef, seriesRef, chartReady } = useChart({
@@ -129,6 +132,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady, onIndicato
     })
 
     useIndicators({
+        chartId: id,
         timeframe,
         chartRef,
         displayedCandlesRef,
@@ -254,6 +258,23 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady, onIndicato
     useToolSync({
         runtimeRef,
     })
+
+    useEffect(() => {
+        if (!chartReady) return
+
+        indicatorPersistenceRef.current?.stop()
+
+        const persistence = new IndicatorPersistence(id)
+
+        indicatorPersistenceRef.current = persistence
+
+        persistence.start()
+
+        return () => {
+            persistence.stop()
+            indicatorPersistenceRef.current = null
+        }
+    }, [chartReady, id])
 
     useEffect(() => {
         const handleMouseUp = () => {
@@ -387,7 +408,7 @@ function Chart({ id, ticker, timeframe, onDrawingToolbarManagerReady, onIndicato
     return (
         <div className="chart">
             {chartDataStatus !== 'no-data' && <ChartOHLC ohlc={ohlc} />}
-            {chartDataStatus !== 'no-data' && <IndicatorList onIndicatorSettings={onIndicatorSettings} />}
+            {chartDataStatus !== 'no-data' && <IndicatorList chartId={id} onIndicatorSettings={onIndicatorSettings} />}
 
             <div
                 className="chart-container"

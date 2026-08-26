@@ -198,6 +198,7 @@ export default function Main() {
                     if (definition) {
                         indicatorStore.add({
                             id: definition.type + '-' + crypto.randomUUID(),
+                            chartId: activeChartId + '',
                             type: definition.type,
                             ...definition.defaultConfig,
                         })

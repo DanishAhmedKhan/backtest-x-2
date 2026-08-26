@@ -8,14 +8,15 @@ import { indicatorStore } from '../indicators/core/IndicatorStore'
 import svg from '../svg/svg'
 
 type Props = {
+    chartId: string
     onIndicatorSettings: (indicator: Indicator) => void
 }
 
-export default function IndicatorList({ onIndicatorSettings }: Props) {
+export default function IndicatorList({ chartId, onIndicatorSettings }: Props) {
     const indicators = useSyncExternalStore(
         indicatorStore.subscribe.bind(indicatorStore),
-        () => indicatorStore.getAll(),
-        () => indicatorStore.getAll(),
+        () => indicatorStore.getAll(chartId),
+        () => indicatorStore.getAll(chartId),
     )
 
     return (

@@ -6,14 +6,17 @@ export type IndicatorType = 'sma' | 'ema' | 'atr'
 
 export type IndicatorConfig = {
     id: string
+    chartId: string
     type: IndicatorType
     period: number
     source?: IndicatorSource
     settings?: Record<string, unknown>
+    visible?: boolean
 }
 
 export class Indicator {
     public readonly id: string
+    public readonly chartId: string
     public readonly type: IndicatorType
 
     private period?: number
@@ -21,10 +24,11 @@ export class Indicator {
 
     private settings: Record<string, unknown>
 
-    private visible = true
+    private visible: boolean
 
     constructor(config: IndicatorConfig) {
         this.id = config.id
+        this.chartId = config.chartId
         this.type = config.type
 
         this.period = config.period
@@ -45,17 +49,21 @@ export class Indicator {
             ...defaultSettings,
             ...(config.settings ?? {}),
         }
+
+        this.visible = config.visible ?? true
     }
 
     public getConfig(): IndicatorConfig {
         return {
             id: this.id,
+            chartId: this.chartId,
             type: this.type,
             period: this.period,
             source: this.source,
             settings: {
                 ...this.settings,
             },
+            visible: this.visible,
         }
     }
 
