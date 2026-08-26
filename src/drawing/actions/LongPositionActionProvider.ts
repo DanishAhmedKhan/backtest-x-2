@@ -32,6 +32,7 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
                 execute: (color) => {
                     drawing.profitColor = color
 
+                    this.drawingManager.notifyChanged()
                     this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },
@@ -43,6 +44,7 @@ export class LongPositionActionProvider implements DrawingActionProvider<LongPos
                 execute: (color) => {
                     drawing.lossColor = color
 
+                    this.drawingManager.notifyChanged()
                     this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },

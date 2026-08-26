@@ -35,6 +35,7 @@ export class RectangleActionProvider implements DrawingActionProvider<RectangleD
                 execute: (backgroundColor) => {
                     drawing.background = backgroundColor
 
+                    this.drawingManager.notifyChanged()
                     this.drawingStateManager.refresh()
                     this.renderInvalidator.invalidate()
                 },

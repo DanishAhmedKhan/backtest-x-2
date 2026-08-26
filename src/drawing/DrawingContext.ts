@@ -127,7 +127,11 @@ export class DrawingContext {
     }
 
     public registerActionProviders(renderInvalidator: RenderInvalidator) {
-        const drawingActionFactory = new DrawingActionFactory(this.drawingStateManager, renderInvalidator)
+        const drawingActionFactory = new DrawingActionFactory(
+            this.drawingManager,
+            this.drawingStateManager,
+            renderInvalidator,
+        )
 
         this.drawingActionManager.register(new LineActionProvider(this.drawingManager, drawingActionFactory))
 

@@ -6,6 +6,7 @@ import type { DrawingAction, DrawingActionMap, ValueActionId } from './DrawingAc
 
 export class DrawingActionFactory {
     constructor(
+        private readonly drawingManager: DrawingManager,
         private readonly drawingStateManager: DrawingStateManager,
         private readonly renderInvalidator: RenderInvalidator,
     ) {}
@@ -23,6 +24,7 @@ export class DrawingActionFactory {
             execute: (value) => {
                 execute(value)
 
+                this.drawingManager.notifyChanged()
                 this.drawingStateManager.refresh()
                 this.renderInvalidator.invalidate()
             },
@@ -45,6 +47,8 @@ export class DrawingActionFactory {
             value,
             execute: (value) => {
                 action(value)
+
+                this.drawingManager.notifyChanged()
                 this.drawingStateManager.refresh()
                 this.renderInvalidator.invalidate()
             },
