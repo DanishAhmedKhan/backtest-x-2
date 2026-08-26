@@ -5,6 +5,7 @@ import CalendarPicker from './CalendarPicker'
 
 import svg from '../svg/svg'
 import { Popup } from './common/Popup'
+import { PopupTabs } from './common/PopupTabs'
 
 type Props = {
     open: boolean
@@ -35,7 +36,6 @@ function fromDateTime(date: string, time: string) {
 export default function JumpTo({ open, initialDate = new Date(), onClose, onGo }: Props) {
     const [date, setDate] = useState(() => toDateInputValue(initialDate))
     const [time, setTime] = useState(() => toTimeInputValue(initialDate))
-    const [activeTab, setActiveTab] = useState<'date' | 'range'>('date')
 
     if (!open) return null
 
@@ -66,63 +66,55 @@ export default function JumpTo({ open, initialDate = new Date(), onClose, onGo }
             title="Jump To"
             width={304}
             content={
-                <div className="go-to-dialog">
-                    <div className="go-to-tabs">
-                        <button
-                            type="button"
-                            className={`go-to-tab ${activeTab === 'date' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('date')}
-                        >
-                            Date
-                        </button>
+                <>
+                    <PopupTabs
+                        tabs={[
+                            {
+                                id: 'date',
+                                label: 'Date',
+                                content: (
+                                    <div>
+                                        <div className="go-to-inputs">
+                                            <div className="go-to-input-group">
+                                                <input
+                                                    type="text"
+                                                    name="date"
+                                                    value={date}
+                                                    onChange={(e) => setDate(e.target.value)}
+                                                    placeholder="YYYY-MM-DD"
+                                                />
 
-                        <button
-                            type="button"
-                            className={`go-to-tab ${activeTab === 'range' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('range')}
-                        >
-                            Custom range
-                        </button>
-                    </div>
+                                                <button type="button" className="go-to-input-icon">
+                                                    <ToolbarIcon svg={svg.calendar} />
+                                                </button>
+                                            </div>
 
-                    {activeTab === 'date' && (
-                        <>
-                            <div className="go-to-inputs">
-                                <div className="go-to-input-group">
-                                    <input
-                                        type="text"
-                                        name="date"
-                                        value={date}
-                                        onChange={(e) => setDate(e.target.value)}
-                                        placeholder="YYYY-MM-DD"
-                                    />
+                                            <div className="go-to-input-group">
+                                                <input
+                                                    type="text"
+                                                    name="time"
+                                                    value={time}
+                                                    onChange={(e) => setTime(e.target.value)}
+                                                    placeholder="HH:MM"
+                                                />
 
-                                    <button type="button" className="go-to-input-icon">
-                                        <ToolbarIcon svg={svg.calendar} />
-                                    </button>
-                                </div>
+                                                <button type="button" className="go-to-input-icon">
+                                                    <ToolbarIcon svg={svg.clock} />
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                <div className="go-to-input-group">
-                                    <input
-                                        type="text"
-                                        name="time"
-                                        value={time}
-                                        onChange={(e) => setTime(e.target.value)}
-                                        placeholder="HH:MM"
-                                    />
-
-                                    <button type="button" className="go-to-input-icon">
-                                        <ToolbarIcon svg={svg.clock} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <CalendarPicker value={selectedDate} onChange={handleCalendarChange} />
-                        </>
-                    )}
-
-                    {activeTab === 'range' && <div className="go-to-range-placeholder">Custom range</div>}
-
+                                        <CalendarPicker value={selectedDate} onChange={handleCalendarChange} />
+                                    </div>
+                                ),
+                            },
+                            {
+                                id: 'custom-range',
+                                label: 'Custom range',
+                                content: <div className="">Custom range</div>,
+                            },
+                        ]}
+                    />
                     <div className="go-to-footer">
                         <button type="button" className="go-to-cancel" onClick={onClose}>
                             Cancel
@@ -132,7 +124,7 @@ export default function JumpTo({ open, initialDate = new Date(), onClose, onGo }
                             Go to
                         </button>
                     </div>
-                </div>
+                </>
             }
         ></Popup>
     )

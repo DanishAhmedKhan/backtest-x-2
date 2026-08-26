@@ -75,7 +75,6 @@ class IndicatorRegistry {
                     defaultValue: true,
                 },
             ],
-
             createName: (config) => {
                 return `SMA ${config.period} ${config.source}`
             },
@@ -122,7 +121,6 @@ class IndicatorRegistry {
                     defaultValue: true,
                 },
             ],
-
             createName: (config) => {
                 return `EMA ${config.period} ${config.source}`
             },

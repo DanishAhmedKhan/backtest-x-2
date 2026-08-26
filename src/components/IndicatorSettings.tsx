@@ -5,6 +5,7 @@ import { Popup } from './common/Popup'
 import type { Indicator } from '../indicators/core/Indicator'
 import type { IndicatorSettingDefinition, IndicatorSettingOption } from '../indicators/core/IndicatorSettings'
 import { indicatorStore } from '../indicators/core/IndicatorStore'
+import { PopupTabs } from './common/PopupTabs'
 
 type Props = {
     open: boolean
@@ -51,11 +52,25 @@ function IndicatorSettingsContent({ open, onClose, indicator }: ContentProps) {
             title={indicator.getName()}
             onClose={onClose}
             content={
-                <div>
-                    {renderGroup('inputs', 'Inputs', settings, indicator)}
-                    {renderGroup('style', 'Style', settings, indicator)}
-                    {renderGroup('visibility', 'Visibility', settings, indicator)}
-                </div>
+                <PopupTabs
+                    tabs={[
+                        {
+                            id: 'inputs',
+                            label: 'Inputs',
+                            content: renderGroup('inputs', settings, indicator),
+                        },
+                        {
+                            id: 'style',
+                            label: 'Style',
+                            content: renderGroup('style', settings, indicator),
+                        },
+                        {
+                            id: 'visibility',
+                            label: 'Visibility',
+                            content: renderGroup('visibility', settings, indicator),
+                        },
+                    ]}
+                />
             }
         />
     )
@@ -63,7 +78,6 @@ function IndicatorSettingsContent({ open, onClose, indicator }: ContentProps) {
 
 function renderGroup(
     group: 'inputs' | 'style' | 'visibility',
-    title: string,
     settings: IndicatorSettingDefinition[],
     indicator: Indicator,
 ) {
@@ -74,9 +88,7 @@ function renderGroup(
     }
 
     return (
-        <div>
-            <h4>{title}</h4>
-
+        <div className="indicator-group-content">
             {groupSettings.map((setting) => (
                 <SettingControl key={setting.key} indicator={indicator} setting={setting} />
             ))}
