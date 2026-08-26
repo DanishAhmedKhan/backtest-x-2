@@ -33,16 +33,30 @@ class IndicatorRegistry {
         this.definitions.set(definition.type, definition)
     }
 
+    public createDefaultSettings(type: IndicatorType): Record<string, unknown> {
+        const definition = this.get(type)
+
+        if (!definition) {
+            throw new Error(`Indicator definition "${type}" does not exist`)
+        }
+
+        const settings: Record<string, unknown> = {}
+
+        for (const setting of definition.settings) {
+            if (setting.defaultValue !== undefined) {
+                settings[setting.key] = setting.defaultValue
+            }
+        }
+
+        return settings
+    }
+
     private registerDefaults() {
         this.register({
             type: 'sma',
             name: 'Simple Moving Average',
             description: 'Calculates the simple moving average of price.',
             display: 'overlay',
-            defaultConfig: {
-                period: 20,
-                source: 'close',
-            },
             settings: [
                 {
                     key: 'period',
@@ -51,6 +65,7 @@ class IndicatorRegistry {
                     type: 'number',
                     min: 1,
                     step: 1,
+                    defaultValue: 20,
                 },
                 {
                     key: 'source',
@@ -66,6 +81,7 @@ class IndicatorRegistry {
                         { value: 'hlc3', label: 'HLC3' },
                         { value: 'ohlc4', label: 'OHLC4' },
                     ],
+                    defaultValue: 'close',
                 },
                 {
                     key: 'color',
@@ -92,8 +108,8 @@ class IndicatorRegistry {
                     defaultValue: true,
                 },
             ],
-            createName: (config) => {
-                return `SMA ${config.period} ${config.source}`
+            createName: (settings) => {
+                return `SMA ${settings.period} ${settings.source}`
             },
         })
 
@@ -102,10 +118,6 @@ class IndicatorRegistry {
             name: 'Exponential Moving Average',
             description: 'Calculates the exponential moving average of price.',
             display: 'overlay',
-            defaultConfig: {
-                period: 20,
-                source: 'close',
-            },
             settings: [
                 {
                     key: 'period',
@@ -114,6 +126,7 @@ class IndicatorRegistry {
                     type: 'number',
                     min: 1,
                     step: 1,
+                    defaultValue: 20,
                 },
                 {
                     key: 'source',
@@ -129,6 +142,24 @@ class IndicatorRegistry {
                         { value: 'hlc3', label: 'HLC3' },
                         { value: 'ohlc4', label: 'OHLC4' },
                     ],
+                    defaultValue: 'close',
+                },
+                {
+                    key: 'color',
+                    label: 'Color',
+                    group: 'style',
+                    type: 'color',
+                    defaultValue: '#2962FF',
+                },
+                {
+                    key: 'lineWidth',
+                    label: 'Line Width',
+                    group: 'style',
+                    type: 'number',
+                    min: 1,
+                    max: 5,
+                    step: 1,
+                    defaultValue: 1,
                 },
                 {
                     key: 'visible',
@@ -138,8 +169,8 @@ class IndicatorRegistry {
                     defaultValue: true,
                 },
             ],
-            createName: (config) => {
-                return `EMA ${config.period} ${config.source}`
+            createName: (settings) => {
+                return `SMA ${settings.period} ${settings.source}`
             },
         })
 
@@ -148,9 +179,6 @@ class IndicatorRegistry {
             name: 'Average True Range',
             description: 'Measures market volatility using true range.',
             display: 'pane',
-            defaultConfig: {
-                period: 14,
-            },
             settings: [
                 {
                     key: 'period',
@@ -159,6 +187,7 @@ class IndicatorRegistry {
                     type: 'number',
                     min: 1,
                     step: 1,
+                    defaultValue: 14,
                 },
                 {
                     key: 'visible',
@@ -168,8 +197,8 @@ class IndicatorRegistry {
                     defaultValue: true,
                 },
             ],
-            createName: (config) => {
-                return `ATR ${config.period}`
+            createName: (settings) => {
+                return `ATR ${settings.period}`
             },
         })
     }

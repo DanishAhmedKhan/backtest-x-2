@@ -200,14 +200,6 @@ function SettingControl({ indicator, setting }: { indicator: Indicator; setting:
 }
 
 function getCurrentValue(indicator: Indicator, setting: IndicatorSettingDefinition) {
-    if (setting.key === 'period') {
-        return indicator.getPeriod()
-    }
-
-    if (setting.key === 'source') {
-        return indicator.getSource()
-    }
-
     if (setting.key === 'visible') {
         return indicator.isVisible()
     }

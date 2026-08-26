@@ -1,5 +1,4 @@
 import { Indicator, type IndicatorConfig } from './Indicator'
-import type { IndicatorSource } from './indicatorSource'
 
 type Listener = () => void
 
@@ -48,6 +47,7 @@ class IndicatorStore {
         }
 
         const indicator = new Indicator(config)
+
         this.indicators = [...this.indicators, indicator]
 
         this.rebuildSnapshots()
@@ -56,19 +56,22 @@ class IndicatorStore {
 
     public remove(id: string) {
         const exists = this.indicators.some((indicator) => indicator.id === id)
+
         if (!exists) return
 
         this.indicators = this.indicators.filter((indicator) => indicator.id !== id)
-        this.rebuildSnapshots()
 
+        this.rebuildSnapshots()
         this.notify()
     }
 
     public update(id: string, changes: Partial<Omit<IndicatorConfig, 'id' | 'type'>>) {
         const indicator = this.get(id)
+
         if (!indicator) return
 
         indicator.update(changes)
+
         this.indicators = [...this.indicators]
 
         this.rebuildSnapshots()
@@ -80,15 +83,7 @@ class IndicatorStore {
 
         if (!indicator) return
 
-        if (key === 'period') {
-            indicator.update({
-                period: Number(value),
-            })
-        } else if (key === 'source') {
-            indicator.update({
-                source: value as IndicatorSource,
-            })
-        } else if (key === 'visible') {
+        if (key === 'visible') {
             indicator.setVisible(Boolean(value))
         } else {
             indicator.setSetting(key, value)
@@ -102,9 +97,11 @@ class IndicatorStore {
 
     public setVisible(id: string, visible: boolean) {
         const indicator = this.get(id)
+
         if (!indicator) return
 
         indicator.setVisible(visible)
+
         this.indicators = [...this.indicators]
 
         this.rebuildSnapshots()
@@ -113,9 +110,11 @@ class IndicatorStore {
 
     public toggleVisibility(id: string) {
         const indicator = this.get(id)
+
         if (!indicator) return
 
         indicator.setVisible(!indicator.isVisible())
+
         this.indicators = [...this.indicators]
 
         this.rebuildSnapshots()
@@ -124,6 +123,7 @@ class IndicatorStore {
 
     public clear() {
         if (!this.indicators.length) return
+
         this.indicators = []
 
         this.rebuildSnapshots()

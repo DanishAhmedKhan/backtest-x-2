@@ -1,5 +1,4 @@
-import type { IndicatorConfig, IndicatorType } from './Indicator'
-import type { IndicatorSource } from './indicatorSource'
+import type { IndicatorType } from './Indicator'
 import type { IndicatorSettingDefinition } from './IndicatorSettings'
 
 export type IndicatorDisplay = 'overlay' | 'pane'
@@ -8,14 +7,7 @@ export type IndicatorDefinition = {
     type: IndicatorType
     name: string
     description: string
-    display: IndicatorDisplay
-
-    defaultConfig: {
-        period: number
-        source?: IndicatorSource
-    }
-
+    display: 'overlay' | 'pane'
     settings: IndicatorSettingDefinition[]
-
-    createName: (config: IndicatorConfig) => string
+    createName: (settings: Record<string, unknown>) => string
 }

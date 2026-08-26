@@ -1,6 +1,6 @@
-import type { IndicatorSource } from './indicatorSource'
-import { indicatorRegistry } from './IndicatorRegistry'
+import type { IndicatorDefinition, IndicatorDisplay } from './IndicatorDefinition'
 import type { IndicatorSettingDefinition } from './IndicatorSettings'
+import { indicatorRegistry } from './IndicatorRegistry'
 
 export type IndicatorType = 'sma' | 'ema' | 'atr'
 
@@ -8,8 +8,6 @@ export type IndicatorConfig = {
     id: string
     chartId: string
     type: IndicatorType
-    period: number
-    source?: IndicatorSource
     settings?: Record<string, unknown>
     visible?: boolean
 }
@@ -19,34 +17,17 @@ export class Indicator {
     public readonly chartId: string
     public readonly type: IndicatorType
 
-    private period?: number
-    private source?: IndicatorSource
-
     private settings: Record<string, unknown>
 
-    private visible: boolean
+    private visible = true
 
     constructor(config: IndicatorConfig) {
         this.id = config.id
         this.chartId = config.chartId
         this.type = config.type
 
-        this.period = config.period
-        this.source = config.source
-
-        const definition = indicatorRegistry.get(this.type)
-        const defaultSettings: Record<string, unknown> = {}
-
-        if (definition) {
-            for (const setting of definition.settings) {
-                if (setting.defaultValue !== undefined) {
-                    defaultSettings[setting.key] = setting.defaultValue
-                }
-            }
-        }
-
         this.settings = {
-            ...defaultSettings,
+            ...indicatorRegistry.createDefaultSettings(this.type),
             ...(config.settings ?? {}),
         }
 
@@ -58,8 +39,6 @@ export class Indicator {
             id: this.id,
             chartId: this.chartId,
             type: this.type,
-            period: this.period,
-            source: this.source,
             settings: {
                 ...this.settings,
             },
@@ -67,29 +46,23 @@ export class Indicator {
         }
     }
 
-    public update(changes: Partial<Omit<IndicatorConfig, 'id' | 'type'>>) {
-        if (changes.period !== undefined) {
-            this.period = changes.period
+    private getDefinition(): IndicatorDefinition {
+        const definition = indicatorRegistry.get(this.type)
+
+        if (!definition) {
+            throw new Error(`Indicator definition "${this.type}" does not exist`)
         }
 
-        if (changes.source !== undefined) {
-            this.source = changes.source
-        }
+        return definition
+    }
 
+    public update(changes: Partial<Omit<IndicatorConfig, 'id' | 'chartId' | 'type'>>) {
         if (changes.settings !== undefined) {
             this.settings = {
                 ...this.settings,
                 ...changes.settings,
             }
         }
-    }
-
-    public getPeriod(): number | undefined {
-        return this.period
-    }
-
-    public getSource(): IndicatorSource | undefined {
-        return this.source
     }
 
     public isVisible(): boolean {
@@ -115,21 +88,11 @@ export class Indicator {
     }
 
     public getSettingsDefinition(): IndicatorSettingDefinition[] {
-        const definition = indicatorRegistry.get(this.type)
-
-        if (!definition) {
-            return []
-        }
-
-        return definition.settings
+        return this.getDefinition().settings
     }
 
     public getStyleSettings(): Record<string, unknown> {
-        const definition = indicatorRegistry.get(this.type)
-
-        if (!definition) {
-            return {}
-        }
+        const definition = this.getDefinition()
 
         const style: Record<string, unknown> = {}
 
@@ -145,22 +108,10 @@ export class Indicator {
     }
 
     public getName(): string {
-        const definition = indicatorRegistry.get(this.type)
-
-        if (!definition) {
-            return this.type
-        }
-
-        return definition.createName(this.getConfig())
+        return this.getDefinition().createName(this.settings)
     }
 
-    public getDisplay(): 'overlay' | 'pane' {
-        const definition = indicatorRegistry.get(this.type)
-
-        if (!definition) {
-            throw new Error(`Indicator definition "${this.type}" does not exist`)
-        }
-
-        return definition.display
+    public getDisplay(): IndicatorDisplay {
+        return this.getDefinition().display
     }
 }

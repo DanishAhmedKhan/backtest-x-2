@@ -12,7 +12,10 @@ import { Ticker } from '../core/Ticker'
 import { Timeframe } from '../core/Timeframe'
 import { TickerRegistry } from '../core/TickerRegstry'
 import { TimeframeRegistry } from '../core/TimeframeRegistry'
+
 import type { Indicator } from '../indicators/core/Indicator'
+import IndicatorSettings from './IndicatorSettings'
+import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
 
 import type { ChartState } from '../types/ChartState'
 import { LAYOUTS, type LayoutType } from '../types/Layout'
@@ -27,8 +30,6 @@ import { replayStore } from '../replay/ReplayStore'
 import { indicatorStore } from '../indicators/core/IndicatorStore'
 
 import '../../styles/index.css'
-import { indicatorRegistry } from '../indicators/core/IndicatorRegistry'
-import IndicatorSettings from './IndicatorSettings'
 
 const storage = new LocalStorageProvider()
 
@@ -200,7 +201,7 @@ export default function Main() {
                             id: definition.type + '-' + crypto.randomUUID(),
                             chartId: activeChartId + '',
                             type: definition.type,
-                            ...definition.defaultConfig,
+                            settings: indicatorRegistry.createDefaultSettings(definition.type),
                         })
                     }
                 }}
