@@ -80,6 +80,11 @@ export class IndicatorManager {
     private updateIndicator(instance: IndicatorInstance, context: IndicatorContext) {
         const result = calculateIndicator(context, instance.indicator)
 
-        this.renderer.render(instance.indicator.id, result, instance.indicator.isVisible())
+        this.renderer.render(
+            instance.indicator.id,
+            result,
+            instance.indicator.isVisible(),
+            instance.indicator.getStyleSettings(),
+        )
     }
 }

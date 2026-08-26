@@ -68,6 +68,23 @@ class IndicatorRegistry {
                     ],
                 },
                 {
+                    key: 'color',
+                    label: 'Color',
+                    group: 'style',
+                    type: 'color',
+                    defaultValue: '#2962FF',
+                },
+                {
+                    key: 'lineWidth',
+                    label: 'Line Width',
+                    group: 'style',
+                    type: 'number',
+                    min: 1,
+                    max: 5,
+                    step: 1,
+                    defaultValue: 2,
+                },
+                {
                     key: 'visible',
                     label: 'Visible',
                     group: 'visibility',

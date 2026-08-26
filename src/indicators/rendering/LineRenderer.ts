@@ -42,6 +42,16 @@ export class LineRenderer {
         )
     }
 
+    public setOptions(id: string, options: Partial<LineSeriesOptions>) {
+        const series = this.series.get(id)
+
+        if (!series) {
+            return
+        }
+
+        series.applyOptions(options)
+    }
+
     public setVisible(id: string, visible: boolean) {
         const series = this.series.get(id)
 

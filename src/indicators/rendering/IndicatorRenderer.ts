@@ -13,13 +13,22 @@ export class IndicatorRenderer {
         return this.lineRenderer.create(id, options)
     }
 
-    public render(id: string, result: IndicatorResult, visible: boolean) {
+    public render(id: string, result: IndicatorResult, visible: boolean, style?: Record<string, unknown>) {
         if (result.lines.length > 0) {
             const line = result.lines[0]
 
             this.lineRenderer.create(id)
 
             this.lineRenderer.setData(id, line)
+
+            function isLineWidth(value: unknown): value is 1 | 2 | 3 | 4 {
+                return value === 1 || value === 2 || value === 3 || value === 4
+            }
+
+            this.lineRenderer.setOptions(id, {
+                color: typeof style?.color === 'string' ? style.color : undefined,
+                lineWidth: isLineWidth(style?.lineWidth) ? style.lineWidth : undefined,
+            })
 
             this.lineRenderer.setVisible(id, visible)
         }

@@ -30,7 +30,19 @@ export class Indicator {
         this.period = config.period
         this.source = config.source
 
+        const definition = indicatorRegistry.get(this.type)
+        const defaultSettings: Record<string, unknown> = {}
+
+        if (definition) {
+            for (const setting of definition.settings) {
+                if (setting.defaultValue !== undefined) {
+                    defaultSettings[setting.key] = setting.defaultValue
+                }
+            }
+        }
+
         this.settings = {
+            ...defaultSettings,
             ...(config.settings ?? {}),
         }
     }
@@ -72,6 +84,14 @@ export class Indicator {
         return this.source
     }
 
+    public isVisible(): boolean {
+        return this.visible
+    }
+
+    public setVisible(value: boolean) {
+        this.visible = value
+    }
+
     public getSetting<T = unknown>(key: string): T | undefined {
         return this.settings[key] as T | undefined
     }
@@ -96,12 +116,24 @@ export class Indicator {
         return definition.settings
     }
 
-    public isVisible(): boolean {
-        return this.visible
-    }
+    public getStyleSettings(): Record<string, unknown> {
+        const definition = indicatorRegistry.get(this.type)
 
-    public setVisible(value: boolean) {
-        this.visible = value
+        if (!definition) {
+            return {}
+        }
+
+        const style: Record<string, unknown> = {}
+
+        for (const setting of definition.settings) {
+            if (setting.group !== 'style') {
+                continue
+            }
+
+            style[setting.key] = this.settings[setting.key] ?? setting.defaultValue
+        }
+
+        return style
     }
 
     public getName(): string {
