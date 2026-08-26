@@ -46,7 +46,7 @@ export class Indicator {
         }
     }
 
-    private getDefinition(): IndicatorDefinition {
+    public getDefinition(): IndicatorDefinition {
         const definition = indicatorRegistry.get(this.type)
 
         if (!definition) {

@@ -13,6 +13,12 @@ type Props = {
     indicator: Indicator | null
 }
 
+type ContentProps = {
+    open: boolean
+    onClose: () => void
+    indicator: Indicator
+}
+
 export default function IndicatorSettings({ open, onClose, indicator }: Props) {
     const indicators = useSyncExternalStore(
         indicatorStore.subscribe.bind(indicatorStore),
@@ -36,12 +42,6 @@ export default function IndicatorSettings({ open, onClose, indicator }: Props) {
     )
 }
 
-type ContentProps = {
-    open: boolean
-    onClose: () => void
-    indicator: Indicator
-}
-
 function IndicatorSettingsContent({ open, onClose, indicator }: ContentProps) {
     const settings = indicator.getSettingsDefinition()
 
@@ -49,7 +49,7 @@ function IndicatorSettingsContent({ open, onClose, indicator }: ContentProps) {
         <Popup
             open={open}
             width={400}
-            title={indicator.getName()}
+            title={indicator.getDefinition().altName}
             onClose={onClose}
             content={
                 <PopupTabs

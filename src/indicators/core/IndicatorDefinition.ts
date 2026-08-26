@@ -6,6 +6,7 @@ export type IndicatorDisplay = 'overlay' | 'pane'
 export type IndicatorDefinition = {
     type: IndicatorType
     name: string
+    altName?: string
     description: string
     display: 'overlay' | 'pane'
     settings: IndicatorSettingDefinition[]

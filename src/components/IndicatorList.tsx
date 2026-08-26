@@ -31,15 +31,19 @@ export default function IndicatorList({ chartId, onIndicatorSettings }: Props) {
                                 className="action-button"
                                 onClick={() => indicatorStore.toggleVisibility(indicator.id)}
                             >
-                                <ToolbarIcon width={18} height={18} svg={svg.eyeOpen} />
+                                <ToolbarIcon
+                                    width={18}
+                                    height={18}
+                                    svg={indicator.isVisible() ? svg.small.eyeOpen : svg.small.eyeClose}
+                                />
                             </div>
 
                             <div className="action-button" onClick={() => onIndicatorSettings(indicator)}>
-                                <ToolbarIcon width={18} height={18} svg={svg.settings} />
+                                <ToolbarIcon width={18} height={18} svg={svg.small.settings} />
                             </div>
 
                             <div className="action-button" onClick={() => indicatorStore.remove(indicator.id)}>
-                                <ToolbarIcon width={18} height={18} svg={svg.delete18} />
+                                <ToolbarIcon width={18} height={18} svg={svg.small.delete} />
                             </div>
                         </div>
                     </div>

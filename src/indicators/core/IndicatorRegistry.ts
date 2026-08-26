@@ -52,9 +52,20 @@ class IndicatorRegistry {
     }
 
     private registerDefaults() {
+        const sourceOptions = [
+            { value: 'open', label: 'Open' },
+            { value: 'high', label: 'High' },
+            { value: 'low', label: 'Low' },
+            { value: 'close', label: 'Close' },
+            { value: 'hl2', label: 'HL2' },
+            { value: 'hlc3', label: 'HLC3' },
+            { value: 'ohlc4', label: 'OHLC4' },
+        ]
+
         this.register({
             type: 'sma',
             name: 'Simple Moving Average',
+            altName: 'SMA',
             description: 'Calculates the simple moving average of price.',
             display: 'overlay',
             settings: [
@@ -72,15 +83,7 @@ class IndicatorRegistry {
                     label: 'Source',
                     group: 'inputs',
                     type: 'select',
-                    options: [
-                        { value: 'open', label: 'Open' },
-                        { value: 'high', label: 'High' },
-                        { value: 'low', label: 'Low' },
-                        { value: 'close', label: 'Close' },
-                        { value: 'hl2', label: 'HL2' },
-                        { value: 'hlc3', label: 'HLC3' },
-                        { value: 'ohlc4', label: 'OHLC4' },
-                    ],
+                    options: sourceOptions,
                     defaultValue: 'close',
                 },
                 {
@@ -116,6 +119,7 @@ class IndicatorRegistry {
         this.register({
             type: 'ema',
             name: 'Exponential Moving Average',
+            altName: 'EMA',
             description: 'Calculates the exponential moving average of price.',
             display: 'overlay',
             settings: [
@@ -133,15 +137,7 @@ class IndicatorRegistry {
                     label: 'Source',
                     group: 'inputs',
                     type: 'select',
-                    options: [
-                        { value: 'open', label: 'Open' },
-                        { value: 'high', label: 'High' },
-                        { value: 'low', label: 'Low' },
-                        { value: 'close', label: 'Close' },
-                        { value: 'hl2', label: 'HL2' },
-                        { value: 'hlc3', label: 'HLC3' },
-                        { value: 'ohlc4', label: 'OHLC4' },
-                    ],
+                    options: sourceOptions,
                     defaultValue: 'close',
                 },
                 {
@@ -177,6 +173,7 @@ class IndicatorRegistry {
         this.register({
             type: 'atr',
             name: 'Average True Range',
+            altName: 'ATR',
             description: 'Measures market volatility using true range.',
             display: 'pane',
             settings: [
