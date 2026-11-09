@@ -48,7 +48,7 @@ export default function JumpTo({ open, initialDate = new Date(), onClose, onGo }
     const handleGo = () => {
         if (isNaN(selectedDate.getTime())) return
 
-        const setDebiggingDate = true
+        const setDebiggingDate = false
         if (setDebiggingDate) {
             const date = fromDateTime('2025-04-01', time)
             onGo(date.getTime() / 1000)

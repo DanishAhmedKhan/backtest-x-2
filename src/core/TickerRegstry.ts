@@ -8,6 +8,8 @@ export class TickerRegistry {
         new Ticker('GBPUSD', AssetType.FOREX),
         new Ticker('US100', AssetType.INDEX),
         new Ticker('XAUUSD', AssetType.COMMODITY),
+        new Ticker('NQ', AssetType.FUTURES),
+        new Ticker('ES', AssetType.FUTURES),
     ]
 
     public static getAll(): Ticker[] {

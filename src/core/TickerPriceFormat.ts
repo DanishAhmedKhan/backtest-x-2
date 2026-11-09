@@ -14,6 +14,13 @@ const TICKER_PRECISIONS: Record<string, number> = {
     USDJPY: 3,
     US100: 1,
     XAUUSD: 3,
+    NQ: 2,
+    ES: 2,
+}
+
+const TICKER_MIN_MOVE: Record<string, number> = {
+    NQ: 0.25,
+    ES: 0.25,
 }
 
 export class TickerPriceFormat {
@@ -23,11 +30,11 @@ export class TickerPriceFormat {
         return {
             type: 'price',
             precision: precision,
-            minMove: this.getMinMove(precision),
+            minMove: this.getMinMove(precision, ticker),
         }
     }
 
-    private static getMinMove(precision: number): number {
-        return 10 ** -precision
+    private static getMinMove(precision: number, ticker: Ticker): number {
+        return TICKER_MIN_MOVE[ticker.value] ?? 10 ** -precision
     }
 }
