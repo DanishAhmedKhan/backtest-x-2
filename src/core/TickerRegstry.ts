@@ -10,6 +10,7 @@ export class TickerRegistry {
         new Ticker('XAUUSD', AssetType.COMMODITY),
         new Ticker('NQ', AssetType.FUTURES),
         new Ticker('ES', AssetType.FUTURES),
+        new Ticker('GC', AssetType.FUTURES),
     ]
 
     public static getAll(): Ticker[] {

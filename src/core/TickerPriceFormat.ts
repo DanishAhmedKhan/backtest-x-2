@@ -16,11 +16,13 @@ const TICKER_PRECISIONS: Record<string, number> = {
     XAUUSD: 3,
     NQ: 2,
     ES: 2,
+    GC: 1,
 }
 
 const TICKER_MIN_MOVE: Record<string, number> = {
     NQ: 0.25,
     ES: 0.25,
+    GC: 0.1,
 }
 
 export class TickerPriceFormat {

@@ -88,7 +88,6 @@ export function useChartData({
             setChartDataStatus('loading')
             setChartEmptyState(true)
 
-            console.log(TickerPriceFormat.getFormat(ticker))
             series.applyOptions({
                 priceFormat: TickerPriceFormat.getFormat(ticker),
             })

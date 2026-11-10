@@ -43,4 +43,9 @@ export const drawingTools: DrawingToolConfig[] = [
         icon: svg.tool.shortPosition,
         label: 'Short Position',
     },
+    {
+        type: ToolType.FibRetracement,
+        icon: svg.tool.fibRetracement,
+        label: 'Fib Retracement',
+    },
 ]

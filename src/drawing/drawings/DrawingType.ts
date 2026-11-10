@@ -10,4 +10,5 @@ export enum DrawingType {
     Crossline = 'crossline',
     LongPosition = 'long-position',
     ShortPosition = 'short-position',
+    FibRetracement = 'fib-retracement',
 }

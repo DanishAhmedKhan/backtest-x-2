@@ -3,9 +3,12 @@ import { DrawingType } from '../drawings/DrawingType'
 import type { PersistedDrawing } from './PersistedDrawing'
 
 import type { TrendLineDrawing } from '../drawings/TrendLineDrawing'
+import type { HorizontalLineDrawing } from '../drawings/HorizontalLineDrawing'
 import type { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 import type { RectangleDrawing } from '../drawings/RectangleDrawing'
 import type { LongPositionDrawing } from '../drawings/LongPositionDrawing'
+import type { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
+import type { FibRetracementDrawing } from '../drawings/FibRetracementDrawing'
 
 export function serializeDrawing(drawing: Drawing): PersistedDrawing {
     switch (drawing.type) {
@@ -28,7 +31,7 @@ export function serializeDrawing(drawing: Drawing): PersistedDrawing {
         }
 
         case DrawingType.HorizontalLine: {
-            const d = drawing as VerticalLineDrawing
+            const d = drawing as HorizontalLineDrawing
 
             return {
                 id: d.id,
@@ -101,7 +104,7 @@ export function serializeDrawing(drawing: Drawing): PersistedDrawing {
         }
 
         case DrawingType.ShortPosition: {
-            const d = drawing as LongPositionDrawing
+            const d = drawing as ShortPositionDrawing
 
             return {
                 id: d.id,
@@ -114,6 +117,24 @@ export function serializeDrawing(drawing: Drawing): PersistedDrawing {
                     profitColor: d.profitColor,
                     lossColor: d.lossColor,
                     lineColor: d.lineColor,
+                    locked: d.locked,
+                    visible: d.visible,
+                },
+            }
+        }
+
+        case DrawingType.FibRetracement: {
+            const d = drawing as FibRetracementDrawing
+
+            return {
+                id: d.id,
+                type: d.type,
+                data: {
+                    start: d.start,
+                    end: d.end,
+                    color: d.color,
+                    style: d.style,
+                    width: d.width,
                     locked: d.locked,
                     visible: d.visible,
                 },

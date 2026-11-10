@@ -9,6 +9,7 @@ import { VerticalLineDrawing } from '../drawings/VerticalLineDrawing'
 import { RectangleDrawing } from '../drawings/RectangleDrawing'
 import { LongPositionDrawing } from '../drawings/LongPositionDrawing'
 import { ShortPositionDrawing } from '../drawings/ShortPositionDrawing'
+import { FibRetracementDrawing } from '../drawings/FibRetracementDrawing'
 
 export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
     switch (data.type) {
@@ -156,6 +157,28 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
             if (d.lineColor !== undefined) drawing.lineColor = d.lineColor
             if (d.locked !== undefined) drawing.locked = d.locked
             if (d.visible !== undefined) drawing.visible = d.visible
+
+            return drawing
+        }
+
+        case DrawingType.FibRetracement: {
+            const d = data.data as {
+                start: DrawingAnchor
+                end: DrawingAnchor
+                color?: string
+                style?: string
+                width?: number
+                locked?: boolean
+                visible?: boolean
+            }
+
+            const drawing = new FibRetracementDrawing(data.id, { ...d.start }, { ...d.end })
+
+            drawing.color = d.color ?? drawing.color
+            drawing.style = d.style ?? drawing.style
+            drawing.width = d.width ?? drawing.width
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }

@@ -11,4 +11,5 @@ export enum ToolType {
     Crossline = 'crossline',
     LongPosition = 'LongPosition',
     ShortPosition = 'ShortPosition',
+    FibRetracement = 'FibRetracement',
 }
