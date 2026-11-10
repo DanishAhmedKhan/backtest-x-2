@@ -123,4 +123,25 @@ export class DrawingPrimitives {
         ctx.lineWidth = 2
         ctx.strokeRect(x, y, size, size)
     }
+
+    public static drawText(
+        ctx: CanvasRenderingContext2D,
+        text: string,
+        x: number,
+        y: number,
+        color: string,
+        font = '12px Arial',
+        align: CanvasTextAlign = 'right',
+    ) {
+        ctx.save()
+
+        ctx.font = font
+        ctx.fillStyle = color
+        ctx.textAlign = align
+        ctx.textBaseline = 'middle'
+
+        ctx.fillText(text, x, y)
+
+        ctx.restore()
+    }
 }

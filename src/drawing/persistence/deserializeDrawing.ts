@@ -26,11 +26,11 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
 
             const drawing = new TrendLineDrawing(data.id, { ...d.start }, { ...d.end })
 
-            if (d.color !== undefined) drawing.color = d.color
-            if (d.style !== undefined) drawing.style = d.style
-            if (d.width !== undefined) drawing.width = d.width
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.color = d.color ?? drawing.color
+            drawing.style = d.style ?? drawing.style
+            drawing.width = d.width ?? drawing.width
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }
@@ -47,11 +47,11 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
 
             const drawing = new HorizontalLineDrawing(data.id, { ...d.anchor })
 
-            if (d.color !== undefined) drawing.color = d.color
-            if (d.style !== undefined) drawing.style = d.style
-            if (d.width !== undefined) drawing.width = d.width
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.color = d.color ?? drawing.color
+            drawing.style = d.style ?? drawing.style
+            drawing.width = d.width ?? drawing.width
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }
@@ -68,11 +68,11 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
 
             const drawing = new VerticalLineDrawing(data.id, { ...d.anchor })
 
-            if (d.color !== undefined) drawing.color = d.color
-            if (d.style !== undefined) drawing.style = d.style
-            if (d.width !== undefined) drawing.width = d.width
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.color = d.color ?? drawing.color
+            drawing.style = d.style ?? drawing.style
+            drawing.width = d.width ?? drawing.width
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }
@@ -91,12 +91,12 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
 
             const drawing = new RectangleDrawing(data.id, { ...d.start }, { ...d.end })
 
-            if (d.color !== undefined) drawing.color = d.color
-            if (d.style !== undefined) drawing.style = d.style
-            if (d.width !== undefined) drawing.width = d.width
-            if (d.background !== undefined) drawing.background = d.background
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.color = d.color ?? drawing.color
+            drawing.style = d.style ?? drawing.style
+            drawing.width = d.width ?? drawing.width
+            drawing.background = d.background ?? drawing.background
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }
@@ -122,11 +122,11 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 { ...d.stoploss },
             )
 
-            if (d.profitColor !== undefined) drawing.profitColor = d.profitColor
-            if (d.lossColor !== undefined) drawing.lossColor = d.lossColor
-            if (d.lineColor !== undefined) drawing.lineColor = d.lineColor
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.profitColor = d.profitColor ?? drawing.profitColor
+            drawing.lossColor = d.lossColor ?? drawing.lossColor
+            drawing.lineColor = d.lineColor ?? drawing.lineColor
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }
@@ -152,11 +152,11 @@ export function deserializeDrawing(data: PersistedDrawing): Drawing | null {
                 { ...d.stoploss },
             )
 
-            if (d.profitColor !== undefined) drawing.profitColor = d.profitColor
-            if (d.lossColor !== undefined) drawing.lossColor = d.lossColor
-            if (d.lineColor !== undefined) drawing.lineColor = d.lineColor
-            if (d.locked !== undefined) drawing.locked = d.locked
-            if (d.visible !== undefined) drawing.visible = d.visible
+            drawing.profitColor = d.profitColor ?? drawing.profitColor
+            drawing.lossColor = d.lossColor ?? drawing.lossColor
+            drawing.lineColor = d.lineColor ?? drawing.lineColor
+            drawing.locked = d.locked ?? drawing.locked
+            drawing.visible = d.visible ?? drawing.visible
 
             return drawing
         }

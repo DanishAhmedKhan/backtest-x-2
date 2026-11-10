@@ -41,6 +41,13 @@ export class FibRetracementRenderer implements DrawingRenderer<FibRetracementDra
             if (!levelStart || !levelEnd) continue
 
             DrawingPrimitives.drawLine(ctx, levelStart, levelEnd, drawing.color, drawing.width, drawing.style)
+            DrawingPrimitives.drawText(
+                ctx,
+                String(level),
+                Math.min(levelStart.x, levelEnd.x) - 8,
+                levelStart.y,
+                drawing.color,
+            )
         }
 
         if (state.active) {
